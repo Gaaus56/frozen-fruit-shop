@@ -1,56 +1,104 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fdfefe;
-  --foreground: #10202b;
+  --background: #f3f2f2;
+  --surface: #eae9e9;
+  --foreground: #201e1d;
+  --price: #ae1800;
+  --divider: color-mix(in srgb, #201e1d 16%, transparent);
+}
+
+:root[data-theme="dark"] {
+  --background: #1b1a19;
+  --surface: #2b2927;
+  --foreground: #f3f2f2;
+  --price: #ff9783;
+  --divider: color-mix(in srgb, #f3f2f2 20%, transparent);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-manrope);
-  --font-display: var(--font-fraunces);
+  --color-price: var(--price);
+  --color-divider: var(--divider);
+  --font-sans: var(--font-archivo);
 }
 
 @theme {
-  /* Mango — hành động chính, giá tiền */
-  --color-mango-50: #fff6ec;
-  --color-mango-100: #ffead1;
-  --color-mango-200: #ffd2a3;
-  --color-mango-300: #ffb56c;
-  --color-mango-400: #fa9640;
-  --color-mango-500: #f2790e;
-  --color-mango-600: #de6604;
-  --color-mango-700: #b85104;
-  --color-mango-800: #924009;
-  --color-mango-900: #77350c;
-
-  /* Teal — tin cậy, bảo quản lạnh, nhãn phụ */
-  --color-teal-50: #ecfbfd;
-  --color-teal-100: #d2f4f9;
-  --color-teal-200: #a6e7f1;
-  --color-teal-300: #6ed4e4;
-  --color-teal-400: #33b8cf;
-  --color-teal-500: #0891ac;
-  --color-teal-600: #06748c;
-  --color-teal-700: #075d71;
-  --color-teal-800: #0a4b5c;
-  --color-teal-900: #0c3f4d;
-
-  /* Berry — khuyến mãi, nhãn nổi bật, dùng tiết chế */
-  --color-berry-50: #fdecf2;
-  --color-berry-100: #fbd0df;
-  --color-berry-200: #f7a1c0;
-  --color-berry-300: #f16d9e;
-  --color-berry-400: #ea3d7c;
-  --color-berry-500: #e31c63;
-  --color-berry-600: #c11151;
-  --color-berry-700: #980e41;
-  --color-berry-800: #750f35;
-  --color-berry-900: #5c0f2c;
+  /* Accent — một màu duy nhất dùng cho hành động, giá, nhãn phụ, tiêu đề phụ */
+  --color-accent-50: #fff6f4;
+  --color-accent-100: #fff2ef;
+  --color-accent-200: #ffe0d9;
+  --color-accent-300: #ffc4b8;
+  --color-accent-400: #ff9783;
+  --color-accent-500: #ff563c;
+  --color-accent-600: #ec3013;
+  --color-accent-700: #ae1800;
+  --color-accent-800: #7c1405;
+  --color-accent-900: #4d170e;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  transition: background 0.15s linear, color 0.15s linear;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.grayscale-photo {
+  filter: grayscale(1) contrast(1.08);
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes logo-shine {
+  0%,
+  65% {
+    transform: translateX(-160%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(260%) skewX(-20deg);
+  }
+}
+
+.marquee-track {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee-scroll 32s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.logo-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  animation: logo-shine 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .logo-shine::after {
+    animation: none;
+  }
 }

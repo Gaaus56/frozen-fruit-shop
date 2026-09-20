@@ -14,7 +14,7 @@ export function ContactForm() {
 
   if (isSubmitted) {
     return (
-      <div className="rounded-2xl border border-mango-200 bg-mango-50 p-6 text-mango-800">
+      <div className="rounded-none border border-accent-200 bg-accent-50 p-6 text-accent-800">
         Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.
       </div>
     );
@@ -23,7 +23,7 @@ export function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
-        <label htmlFor="name" className="text-sm font-medium text-slate-700">
+        <label htmlFor="name" className="text-sm font-medium text-foreground/85">
           Họ và tên
         </label>
         <input
@@ -31,12 +31,12 @@ export function ContactForm() {
           name="name"
           type="text"
           required
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-mango-500 focus:outline-none"
+          className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
         />
       </div>
 
       <div>
-        <label htmlFor="contact" className="text-sm font-medium text-slate-700">
+        <label htmlFor="contact" className="text-sm font-medium text-foreground/85">
           Email hoặc số điện thoại
         </label>
         <input
@@ -44,12 +44,12 @@ export function ContactForm() {
           name="contact"
           type="text"
           required
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-mango-500 focus:outline-none"
+          className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
         />
       </div>
 
       <div>
-        <label htmlFor="message" className="text-sm font-medium text-slate-700">
+        <label htmlFor="message" className="text-sm font-medium text-foreground/85">
           Nội dung
         </label>
         <textarea
@@ -57,7 +57,7 @@ export function ContactForm() {
           name="message"
           rows={4}
           required
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-mango-500 focus:outline-none"
+          className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
         />
       </div>
 

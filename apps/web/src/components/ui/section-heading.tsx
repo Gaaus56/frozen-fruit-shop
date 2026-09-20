@@ -10,15 +10,10 @@ export function SectionHeading({
   return (
     <div className="max-w-2xl">
       {eyebrow ? (
-        <p className="flex items-center gap-2.5 text-sm font-bold uppercase tracking-wide text-teal-600">
-          <span className="h-px w-5 bg-teal-600/50" aria-hidden />
-          {eyebrow}
-        </p>
+        <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-accent-600">{eyebrow}</p>
       ) : null}
-      <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-900 text-balance sm:text-3xl">
-        {title}
-      </h2>
-      {description ? <p className="mt-2 text-slate-600">{description}</p> : null}
+      <h2 className="mt-3 text-2xl uppercase tracking-tight text-foreground text-balance sm:text-3xl">{title}</h2>
+      {description ? <p className="mt-2 text-foreground/70">{description}</p> : null}
     </div>
   );
 }

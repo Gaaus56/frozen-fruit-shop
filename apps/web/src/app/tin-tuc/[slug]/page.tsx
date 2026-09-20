@@ -35,22 +35,22 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
   return (
     <Container className="py-12">
-      <nav className="mb-6 text-sm text-slate-500">
-        <Link href="/tin-tuc" className="hover:text-teal-600">Tin tức</Link>
+      <nav className="mb-6 text-sm text-foreground/55">
+        <Link href="/tin-tuc" className="hover:text-accent-600">Tin tức</Link>
         {" / "}
-        <span className="text-slate-700">{post.title}</span>
+        <span className="text-foreground/85">{post.title}</span>
       </nav>
 
-      <p className="text-xs font-bold uppercase tracking-wide text-teal-600">
+      <p className="text-xs font-bold uppercase tracking-wide text-accent-600">
         {post.category} · {formatDate(post.publishedAt)}
       </p>
-      <h1 className="mt-2 max-w-3xl font-display text-2xl font-semibold text-slate-900 sm:text-3xl">{post.title}</h1>
+      <h1 className="mt-2 max-w-3xl text-2xl uppercase text-foreground sm:text-3xl">{post.title}</h1>
 
-      <div className="relative mt-6 aspect-[16/8] w-full max-w-3xl rounded-2xl bg-teal-50/60">
-        <Image src={post.coverImage} alt={post.title} fill className="object-contain p-10" />
+      <div className="relative mt-6 aspect-[16/8] w-full max-w-3xl rounded-none bg-surface">
+        <Image src={post.coverImage} alt={post.title} fill className="grayscale-photo object-contain p-10" />
       </div>
 
-      <div className="mt-8 max-w-3xl space-y-4 text-slate-700">
+      <div className="mt-8 max-w-3xl space-y-4 text-foreground/85">
         <p>{post.content}</p>
       </div>
     </Container>

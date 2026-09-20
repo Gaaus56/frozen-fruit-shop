@@ -27,23 +27,23 @@ export default function WholesalePage() {
           { title: "Sơ chế sẵn", description: "Rửa sạch, gọt vỏ, cắt miếng — sẵn sàng chế biến ngay." },
           { title: "Giao hàng đúng lịch", description: "Cam kết thời gian giao hàng ổn định, đóng gói giữ lạnh chuyên dụng." },
         ].map((item) => (
-          <div key={item.title} className="rounded-2xl border border-slate-200 p-6">
-            <p className="font-semibold text-slate-900">{item.title}</p>
-            <p className="mt-2 text-sm text-slate-600">{item.description}</p>
+          <div key={item.title} className="rounded-none border border-divider p-6">
+            <p className="font-semibold text-foreground">{item.title}</p>
+            <p className="mt-2 text-sm text-foreground/70">{item.description}</p>
           </div>
         ))}
       </div>
 
       <div className="mt-12">
-        <h2 className="text-xl font-bold text-slate-900">Sản phẩm phù hợp mua sỉ</h2>
+        <h2 className="text-xl font-bold text-foreground">Sản phẩm phù hợp mua sỉ</h2>
         <div className="mt-6">
           <ProductGrid products={wholesaleProducts} />
         </div>
       </div>
 
-      <div className="mt-14 max-w-2xl border-t border-slate-200 pt-10">
-        <h2 className="text-xl font-bold text-slate-900">Yêu cầu báo giá</h2>
-        <p className="mt-2 text-slate-600">
+      <div className="mt-14 max-w-2xl border-t border-divider pt-10">
+        <h2 className="text-xl font-bold text-foreground">Yêu cầu báo giá</h2>
+        <p className="mt-2 text-foreground/70">
           Điền thông tin bên dưới, đội ngũ kinh doanh sẽ liên hệ tư vấn báo giá trong vòng 24 giờ.
         </p>
         <div className="mt-6">

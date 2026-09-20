@@ -14,8 +14,8 @@ export default function CartPage() {
     return (
       <Container className="flex flex-col items-center gap-4 py-20 text-center">
         <p className="text-5xl" aria-hidden>🛒</p>
-        <h1 className="font-display text-2xl font-semibold text-slate-900">Giỏ hàng của bạn đang trống</h1>
-        <p className="text-slate-600">Hãy khám phá các sản phẩm trái cây đông lạnh của chúng tôi.</p>
+        <h1 className="text-2xl uppercase text-foreground">Giỏ hàng của bạn đang trống</h1>
+        <p className="text-foreground/70">Hãy khám phá các sản phẩm trái cây đông lạnh của chúng tôi.</p>
         <LinkButton href="/san-pham">Xem sản phẩm</LinkButton>
       </Container>
     );
@@ -23,31 +23,31 @@ export default function CartPage() {
 
   return (
     <Container className="py-10">
-      <h1 className="font-display text-2xl font-semibold text-slate-900">Giỏ hàng ({items.length} sản phẩm)</h1>
+      <h1 className="text-2xl uppercase text-foreground">Giỏ hàng ({items.length} sản phẩm)</h1>
 
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-3">
         <div className="flex flex-col gap-4 lg:col-span-2">
           {items.map((item) => (
             <div
               key={item.variantId}
-              className="flex items-center gap-4 rounded-2xl border border-slate-200 p-4"
+              className="flex items-center gap-4 rounded-none border border-divider p-4"
             >
-              <div className="relative h-20 w-20 shrink-0 rounded-xl bg-teal-50/60">
+              <div className="relative h-20 w-20 shrink-0 rounded-none bg-surface">
                 <Image src={item.image} alt={item.productName} fill className="object-contain p-2" />
               </div>
 
               <div className="flex-1">
-                <Link href={`/san-pham/${item.productSlug}`} className="font-semibold text-slate-900 hover:text-teal-600">
+                <Link href={`/san-pham/${item.productSlug}`} className="font-semibold text-foreground hover:text-accent-600">
                   {item.productName}
                 </Link>
-                <p className="text-sm text-slate-500">Quy cách: {item.packageSize}</p>
-                <p className="mt-1 font-display font-semibold text-mango-600">{formatCurrency(item.unitPrice)}</p>
+                <p className="text-sm text-foreground/55">Quy cách: {item.packageSize}</p>
+                <p className="mt-1 font-bold text-price">{formatCurrency(item.unitPrice)}</p>
               </div>
 
-              <div className="flex items-center rounded-full border border-slate-300">
+              <div className="flex items-center rounded-none border border-divider">
                 <button
                   type="button"
-                  className="px-3 py-1.5 text-lg text-slate-600"
+                  className="px-3 py-1.5 text-lg text-foreground/70"
                   onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
                   aria-label="Giảm số lượng"
                 >
@@ -56,7 +56,7 @@ export default function CartPage() {
                 <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
                 <button
                   type="button"
-                  className="px-3 py-1.5 text-lg text-slate-600"
+                  className="px-3 py-1.5 text-lg text-foreground/70"
                   onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
                   aria-label="Tăng số lượng"
                 >
@@ -67,7 +67,7 @@ export default function CartPage() {
               <button
                 type="button"
                 onClick={() => removeItem(item.variantId)}
-                className="text-sm font-medium text-slate-400 hover:text-red-600"
+                className="text-sm font-medium text-foreground/40 hover:text-red-600"
                 aria-label={`Xóa ${item.productName} khỏi giỏ hàng`}
               >
                 Xóa
@@ -76,19 +76,19 @@ export default function CartPage() {
           ))}
         </div>
 
-        <div className="h-fit rounded-2xl border border-slate-200 p-6">
-          <h2 className="font-semibold text-slate-900">Tóm tắt đơn hàng</h2>
-          <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+        <div className="h-fit rounded-none border border-divider p-6">
+          <h2 className="font-semibold text-foreground">Tóm tắt đơn hàng</h2>
+          <div className="mt-4 flex items-center justify-between text-sm text-foreground/70">
             <span>Tạm tính</span>
             <span>{formatCurrency(subtotal)}</span>
           </div>
-          <div className="mt-2 flex items-center justify-between text-sm text-slate-600">
+          <div className="mt-2 flex items-center justify-between text-sm text-foreground/70">
             <span>Phí vận chuyển</span>
             <span>Tính ở bước thanh toán</span>
           </div>
-          <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-4 font-semibold text-slate-900">
+          <div className="mt-4 flex items-center justify-between border-t border-divider pt-4 font-semibold text-foreground">
             <span>Tổng cộng</span>
-            <span className="font-display text-lg font-semibold text-mango-600">{formatCurrency(subtotal)}</span>
+            <span className="text-lg font-extrabold text-price">{formatCurrency(subtotal)}</span>
           </div>
           <LinkButton href="/thanh-toan" className="mt-6 w-full">
             Tiến hành thanh toán

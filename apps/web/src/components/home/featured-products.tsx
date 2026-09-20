@@ -8,7 +8,7 @@ export function FeaturedProducts() {
   const featured = getFeaturedProducts();
 
   return (
-    <section className="bg-slate-50 py-12">
+    <section className="py-16">
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <SectionHeading eyebrow="Sản phẩm nổi bật" title="Được khách hàng yêu thích nhất" />

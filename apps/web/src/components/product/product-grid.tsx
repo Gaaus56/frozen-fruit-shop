@@ -3,7 +3,7 @@ import { ProductCard } from "@/components/product/product-card";
 
 export function ProductGrid({ products }: { products: Product[] }) {
   if (products.length === 0) {
-    return <p className="text-slate-600">Chưa có sản phẩm nào trong danh mục này.</p>;
+    return <p className="text-foreground/70">Chưa có sản phẩm nào trong danh mục này.</p>;
   }
 
   return (

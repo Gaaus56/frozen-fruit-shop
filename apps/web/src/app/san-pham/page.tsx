@@ -33,10 +33,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       <div className="mt-6 flex flex-wrap gap-2">
         <Link
           href="/san-pham"
-          className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+          className={`rounded-none border px-4 py-2 text-sm font-medium transition-colors ${
             !activeCategorySlug
-              ? "border-mango-600 bg-mango-600 text-white"
-              : "border-slate-300 text-slate-700 hover:border-mango-500"
+              ? "border-accent-600 bg-accent-600 text-white"
+              : "border-divider text-foreground/85 hover:border-accent-500"
           }`}
         >
           Tất cả
@@ -45,10 +45,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           <Link
             key={category.id}
             href={`/san-pham?danh-muc=${category.slug}`}
-            className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+            className={`rounded-none border px-4 py-2 text-sm font-medium transition-colors ${
               activeCategorySlug === category.slug
-                ? "border-mango-600 bg-mango-600 text-white"
-                : "border-slate-300 text-slate-700 hover:border-mango-500"
+                ? "border-accent-600 bg-accent-600 text-white"
+                : "border-divider text-foreground/85 hover:border-accent-500"
             }`}
           >
             {category.name}

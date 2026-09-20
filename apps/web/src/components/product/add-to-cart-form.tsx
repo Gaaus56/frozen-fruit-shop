@@ -41,7 +41,7 @@ export function AddToCartForm({ product }: { product: Product }) {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <p className="mb-2 text-sm font-semibold text-slate-900">Quy cách đóng gói</p>
+        <p className="mb-2 text-sm font-semibold text-foreground">Quy cách đóng gói</p>
         <div className="flex flex-wrap gap-2">
           {product.variants.map((variant) => (
             <button
@@ -49,10 +49,10 @@ export function AddToCartForm({ product }: { product: Product }) {
               type="button"
               onClick={() => setSelectedVariantId(variant.id)}
               disabled={variant.stockStatus === "out_of_stock"}
-              className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+              className={`rounded-none border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                 variant.id === selectedVariantId
-                  ? "border-mango-600 bg-mango-600 text-white"
-                  : "border-slate-300 text-slate-700 hover:border-mango-500"
+                  ? "border-accent-600 bg-accent-600 text-white"
+                  : "border-divider text-foreground/85 hover:border-accent-500"
               }`}
             >
               {variant.packageSize}
@@ -62,10 +62,10 @@ export function AddToCartForm({ product }: { product: Product }) {
       </div>
 
       <div className="flex items-baseline gap-3">
-        <span className="font-display text-2xl font-semibold text-mango-600">
+        <span className="text-2xl font-extrabold text-price">
           {formatCurrency(selectedVariant.price)}
         </span>
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-foreground/55">
           ({formatCurrency(selectedVariant.pricePerKg)}/kg)
         </span>
       </div>
@@ -76,11 +76,11 @@ export function AddToCartForm({ product }: { product: Product }) {
       {isOutOfStock ? <p className="text-sm font-medium text-red-600">Hiện đã hết hàng</p> : null}
 
       <div className="flex items-center gap-3">
-        <p className="text-sm font-semibold text-slate-900">Số lượng</p>
-        <div className="flex items-center rounded-full border border-slate-300">
+        <p className="text-sm font-semibold text-foreground">Số lượng</p>
+        <div className="flex items-center rounded-none border border-divider">
           <button
             type="button"
-            className="px-3 py-1.5 text-lg text-slate-600 disabled:opacity-40"
+            className="px-3 py-1.5 text-lg text-foreground/70 disabled:opacity-40"
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
             disabled={quantity <= 1}
             aria-label="Giảm số lượng"
@@ -90,7 +90,7 @@ export function AddToCartForm({ product }: { product: Product }) {
           <span className="w-8 text-center text-sm font-medium">{quantity}</span>
           <button
             type="button"
-            className="px-3 py-1.5 text-lg text-slate-600"
+            className="px-3 py-1.5 text-lg text-foreground/70"
             onClick={() => setQuantity((q) => q + 1)}
             aria-label="Tăng số lượng"
           >

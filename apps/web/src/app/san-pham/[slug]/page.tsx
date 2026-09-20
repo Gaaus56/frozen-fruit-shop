@@ -38,66 +38,82 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   const category = getCategoryBySlug(product.categorySlug);
   const relatedProducts = getRelatedProducts(product);
+  const defaultVariant = product.variants[0];
+
+  const specs = [
+    { label: "Danh mục", value: category?.name ?? "—" },
+    { label: "Quy cách", value: `Túi hút chân không ${defaultVariant.packageSize}` },
+    { label: "Bảo quản", value: product.storageInfo.temperature },
+    { label: "Hạn sử dụng", value: `${product.storageInfo.shelfLifeDays} ngày kể từ ngày sản xuất` },
+    { label: "Rã đông", value: product.storageInfo.thawInstructions },
+  ];
 
   return (
-    <Container className="py-10">
-      <nav className="mb-6 text-sm text-slate-500">
-        <Link href="/san-pham" className="hover:text-teal-600">Sản phẩm</Link>
+    <Container className="py-12">
+      <nav className="mb-6 text-sm text-foreground/55">
+        <Link href="/san-pham" className="hover:text-accent-600">Sản phẩm</Link>
         {category ? (
           <>
             {" / "}
-            <Link href={`/san-pham?danh-muc=${category.slug}`} className="hover:text-teal-600">
+            <Link href={`/san-pham?danh-muc=${category.slug}`} className="hover:text-accent-600">
               {category.name}
             </Link>
           </>
         ) : null}
         {" / "}
-        <span className="text-slate-700">{product.name}</span>
+        <span className="text-foreground/85">{product.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <div className="relative aspect-square w-full rounded-2xl bg-teal-50/60">
-          <Image src={product.images[0]} alt={product.name} fill className="object-contain p-10" priority />
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div className="relative aspect-square w-full bg-surface">
+          <Image
+            src={product.images[0]}
+            alt={product.name}
+            fill
+            className="grayscale-photo object-contain p-10"
+            priority
+          />
         </div>
 
         <div>
-          <h1 className="font-display text-2xl font-semibold text-slate-900 sm:text-3xl">{product.name}</h1>
-          <div className="mt-2">
+          {category ? <p className="text-[13px] font-bold uppercase tracking-wide text-accent-600">{category.name}</p> : null}
+          <h1 className="mt-2 text-2xl uppercase text-foreground sm:text-3xl">{product.name}</h1>
+          <div className="mt-3">
             <StarRating rating={product.rating} reviewCount={product.reviewCount} />
           </div>
-          <p className="mt-4 text-slate-600">{product.shortDescription}</p>
+          <p className="mt-4 text-foreground/70">{product.shortDescription}</p>
 
-          <div className="mt-6 border-t border-slate-200 pt-6">
+          <div className="mt-6 border-t border-divider pt-6">
             <AddToCartForm product={product} />
           </div>
 
-          <div className="mt-8 rounded-2xl border border-teal-100 bg-teal-50/70 p-5">
-            <p className="font-semibold text-teal-800">🧊 Bảo quản & sử dụng</p>
-            <ul className="mt-2 space-y-1 text-sm text-teal-900">
-              <li>Nhiệt độ bảo quản: {product.storageInfo.temperature}</li>
-              <li>Hạn sử dụng: {product.storageInfo.shelfLifeDays} ngày kể từ ngày sản xuất</li>
-              <li>Hướng dẫn rã đông: {product.storageInfo.thawInstructions}</li>
-            </ul>
-          </div>
-
           {product.isWholesaleAvailable ? (
-            <p className="mt-4 text-sm text-slate-600">
+            <p className="mt-4 text-sm text-foreground/70">
               Cần mua số lượng lớn?{" "}
-              <Link href="/dat-hang-si" className="font-semibold text-mango-700 hover:underline">
+              <Link href="/dat-hang-si" className="font-bold text-accent-700 hover:underline">
                 Xem chính sách đặt hàng sỉ
               </Link>
             </p>
           ) : null}
+
+          <dl className="mt-8 flex flex-col gap-0 border-t border-divider text-sm">
+            {specs.map((spec) => (
+              <div key={spec.label} className="flex items-center justify-between gap-4 border-b border-divider py-2.5">
+                <dt className="text-foreground/60">{spec.label}</dt>
+                <dd className="font-semibold text-foreground">{spec.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </div>
 
-      <div className="mt-14 border-t border-slate-200 pt-10">
-        <h2 className="font-display text-xl font-semibold text-slate-900">Mô tả chi tiết</h2>
-        <p className="mt-3 max-w-3xl text-slate-600">{product.description}</p>
+      <div className="mt-16 border-t border-divider pt-10">
+        <h2 className="text-xl uppercase text-foreground">Mô tả chi tiết</h2>
+        <p className="mt-3 max-w-3xl text-foreground/70">{product.description}</p>
       </div>
 
       {relatedProducts.length > 0 ? (
-        <div className="mt-14 border-t border-slate-200 pt-10">
+        <div className="mt-16 border-t border-divider pt-10">
           <SectionHeading title="Sản phẩm liên quan" />
           <div className="mt-6">
             <ProductGrid products={relatedProducts} />

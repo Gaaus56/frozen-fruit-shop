@@ -24,7 +24,7 @@ export default function OrderLookupPage() {
 
       <form onSubmit={handleSubmit} className="mt-8 flex max-w-md flex-col gap-4">
         <div>
-          <label htmlFor="orderCode" className="text-sm font-medium text-slate-700">
+          <label htmlFor="orderCode" className="text-sm font-medium text-foreground/85">
             Mã đơn hàng
           </label>
           <input
@@ -32,11 +32,11 @@ export default function OrderLookupPage() {
             name="orderCode"
             type="text"
             required
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-mango-500 focus:outline-none"
+            className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
           />
         </div>
         <div>
-          <label htmlFor="phone" className="text-sm font-medium text-slate-700">
+          <label htmlFor="phone" className="text-sm font-medium text-foreground/85">
             Số điện thoại
           </label>
           <input
@@ -44,7 +44,7 @@ export default function OrderLookupPage() {
             name="phone"
             type="tel"
             required
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-mango-500 focus:outline-none"
+            className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
           />
         </div>
         <Button type="submit" className="w-fit">
@@ -53,7 +53,7 @@ export default function OrderLookupPage() {
       </form>
 
       {isSubmitted ? (
-        <p className="mt-6 max-w-md text-sm text-slate-600">
+        <p className="mt-6 max-w-md text-sm text-foreground/70">
           Tính năng tra cứu đơn hàng đang được hoàn thiện cùng với hệ thống xử lý đơn hàng. Vui lòng
           liên hệ hotline để được hỗ trợ trong lúc chờ.
         </p>

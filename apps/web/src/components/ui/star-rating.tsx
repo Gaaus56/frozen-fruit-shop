@@ -7,7 +7,7 @@ export function StarRating({ rating, reviewCount }: { rating: number; reviewCoun
           <span key={index}>{index < fullStars ? "★" : "☆"}</span>
         ))}
       </span>
-      <span className="text-slate-500">
+      <span className="text-foreground/55">
         {rating.toFixed(1)}
         {typeof reviewCount === "number" ? ` (${reviewCount})` : ""}
       </span>

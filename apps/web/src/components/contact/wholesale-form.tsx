@@ -14,7 +14,7 @@ export function WholesaleForm() {
 
   if (isSubmitted) {
     return (
-      <div className="rounded-2xl border border-mango-200 bg-mango-50 p-6 text-mango-800">
+      <div className="rounded-none border border-accent-200 bg-accent-50 p-6 text-accent-800">
         Cảm ơn bạn đã gửi yêu cầu! Đội ngũ kinh doanh sẽ liên hệ trong vòng 24 giờ.
       </div>
     );
@@ -24,7 +24,7 @@ export function WholesaleForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="company" className="text-sm font-medium text-slate-700">
+          <label htmlFor="company" className="text-sm font-medium text-foreground/85">
             Tên công ty / cửa hàng
           </label>
           <input
@@ -32,11 +32,11 @@ export function WholesaleForm() {
             name="company"
             type="text"
             required
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-mango-500 focus:outline-none"
+            className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
           />
         </div>
         <div>
-          <label htmlFor="phone" className="text-sm font-medium text-slate-700">
+          <label htmlFor="phone" className="text-sm font-medium text-foreground/85">
             Số điện thoại
           </label>
           <input
@@ -44,13 +44,13 @@ export function WholesaleForm() {
             name="phone"
             type="tel"
             required
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-mango-500 focus:outline-none"
+            className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="quantity" className="text-sm font-medium text-slate-700">
+        <label htmlFor="quantity" className="text-sm font-medium text-foreground/85">
           Số lượng dự kiến / tháng
         </label>
         <input
@@ -58,19 +58,19 @@ export function WholesaleForm() {
           name="quantity"
           type="text"
           placeholder="Ví dụ: 50kg/tháng"
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-mango-500 focus:outline-none"
+          className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
         />
       </div>
 
       <div>
-        <label htmlFor="note" className="text-sm font-medium text-slate-700">
+        <label htmlFor="note" className="text-sm font-medium text-foreground/85">
           Ghi chú
         </label>
         <textarea
           id="note"
           name="note"
           rows={4}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-mango-500 focus:outline-none"
+          className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
         />
       </div>
 
