@@ -5,7 +5,7 @@ import type { Category, Product } from '@frozen-fruit-shop/types';
 import { Field, inputClassName } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { VariantEditor } from './variant-editor';
-import type { ProductFormState } from '@/app/(dashboard)/san-pham/actions';
+import type { ProductFormState } from '@/app/(dashboard)/products/actions';
 
 type ProductAction = (
   prevState: ProductFormState | undefined,

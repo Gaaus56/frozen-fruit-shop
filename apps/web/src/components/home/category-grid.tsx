@@ -14,7 +14,7 @@ export function CategoryGrid() {
           {categories.map((category) => (
             <Link
               key={category.id}
-              href={`/san-pham?danh-muc=${category.slug}`}
+              href={`/products?category=${category.slug}`}
               className="group flex flex-col items-center gap-3 bg-surface p-5 text-center transition-colors hover:bg-accent-100"
             >
               <div className="relative h-14 w-14">

@@ -12,7 +12,7 @@ export function FeaturedProducts() {
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <SectionHeading eyebrow="Sản phẩm nổi bật" title="Được khách hàng yêu thích nhất" />
-          <LinkButton href="/san-pham" variant="secondary">
+          <LinkButton href="/products" variant="secondary">
             Xem tất cả sản phẩm
           </LinkButton>
         </div>

@@ -2,11 +2,11 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 
 const POLICY_LINKS = [
-  { href: "/chinh-sach/huong-dan-mua-hang", label: "Hướng dẫn mua hàng" },
-  { href: "/chinh-sach/bao-mat", label: "Chính sách bảo mật" },
-  { href: "/chinh-sach/thanh-toan", label: "Chính sách thanh toán" },
-  { href: "/chinh-sach/van-chuyen", label: "Chính sách vận chuyển" },
-  { href: "/chinh-sach/doi-tra", label: "Chính sách đổi trả" },
+  { href: "/policies/how-to-order", label: "Hướng dẫn mua hàng" },
+  { href: "/policies/privacy", label: "Chính sách bảo mật" },
+  { href: "/policies/payment", label: "Chính sách thanh toán" },
+  { href: "/policies/shipping", label: "Chính sách vận chuyển" },
+  { href: "/policies/returns", label: "Chính sách đổi trả" },
 ];
 
 export function Footer() {
@@ -25,10 +25,10 @@ export function Footer() {
             Danh mục
           </p>
           <ul className="mt-4 space-y-2.5 text-sm" style={{ color: "rgba(243,242,242,.8)" }}>
-            <li><Link href="/san-pham" className="hover:text-accent-400">Tất cả sản phẩm</Link></li>
-            <li><Link href="/gioi-thieu" className="hover:text-accent-400">Giới thiệu</Link></li>
-            <li><Link href="/dat-hang-si" className="hover:text-accent-400">Đặt hàng sỉ / F&B</Link></li>
-            <li><Link href="/tin-tuc" className="hover:text-accent-400">Tin tức</Link></li>
+            <li><Link href="/products" className="hover:text-accent-400">Tất cả sản phẩm</Link></li>
+            <li><Link href="/about" className="hover:text-accent-400">Giới thiệu</Link></li>
+            <li><Link href="/wholesale" className="hover:text-accent-400">Đặt hàng sỉ / F&B</Link></li>
+            <li><Link href="/news" className="hover:text-accent-400">Tin tức</Link></li>
           </ul>
         </div>
 
@@ -55,7 +55,7 @@ export function Footer() {
             <li>Hotline: 0934 568 196</li>
             <li>Email: hello@frozenfruitshop.vn</li>
             <li>Zalo: 0934 568 196</li>
-            <li><Link href="/tra-cuu-don-hang" className="hover:text-accent-400">Tra cứu đơn hàng</Link></li>
+            <li><Link href="/order-lookup" className="hover:text-accent-400">Tra cứu đơn hàng</Link></li>
           </ul>
         </div>
       </Container>

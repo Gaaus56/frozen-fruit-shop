@@ -35,7 +35,7 @@ export function AddToCartForm({ product }: { product: Product }) {
 
   function handleBuyNow() {
     handleAddToCart();
-    router.push("/gio-hang");
+    router.push("/cart");
   }
 
   return (

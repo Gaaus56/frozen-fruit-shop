@@ -18,8 +18,8 @@ export function Hero() {
             hương vị — giao hàng lạnh tận nơi trên toàn quốc.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <LinkButton href="/san-pham">Khám phá sản phẩm</LinkButton>
-            <LinkButton href="/gioi-thieu" variant="secondary">
+            <LinkButton href="/products">Khám phá sản phẩm</LinkButton>
+            <LinkButton href="/about" variant="secondary">
               Tìm hiểu về chúng tôi
             </LinkButton>
           </div>

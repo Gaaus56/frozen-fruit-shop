@@ -3,9 +3,9 @@ import { logoutAction } from '@/lib/auth-actions';
 
 const NAV_LINKS = [
   { href: '/', label: 'Tổng quan' },
-  { href: '/san-pham', label: 'Sản phẩm' },
-  { href: '/danh-muc', label: 'Danh mục' },
-  { href: '/bai-viet', label: 'Bài viết' },
+  { href: '/products', label: 'Sản phẩm' },
+  { href: '/categories', label: 'Danh mục' },
+  { href: '/posts', label: 'Bài viết' },
 ];
 
 export function Sidebar() {

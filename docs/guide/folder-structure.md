@@ -64,9 +64,9 @@ apps/admin/
 │   ├── app/
 │   │   ├── login/                 # Trang đăng nhập (không có sidebar)
 │   │   └── (dashboard)/           # Route group — mọi trang trong này có sidebar + yêu cầu đăng nhập
-│   │       ├── san-pham/           # Danh sách, thêm (moi/), sửa ([slug]/) sản phẩm
-│   │       ├── danh-muc/            # Tương tự, cho danh mục
-│   │       └── bai-viet/             # Tương tự, cho bài viết
+│   │       ├── products/          # Danh sách, thêm (new/), sửa ([slug]/) sản phẩm
+│   │       ├── categories/           # Tương tự, cho danh mục
+│   │       └── posts/             # Tương tự, cho bài viết
 │   ├── components/
 │   │   ├── layout/                # Sidebar
 │   │   ├── ui/                     # Button, Field, PageHeader, DeleteButton dùng chung
@@ -143,7 +143,7 @@ Ngược lại, `apps/api/.env.example` và `apps/admin/.env.example` **có** đ
 ## 8. Checklist khi thêm thứ mới vào repo
 
 - Thêm một trang mới cho khách hàng? → `apps/web/src/app/<route>/page.tsx`.
-- Thêm một trang quản trị mới (vd. quản lý đơn hàng sau này)? → thư mục mới trong `apps/admin/src/app/(dashboard)/<ten-trang>/`, theo mẫu `san-pham/` (có `page.tsx`, `actions.ts`, `moi/page.tsx`, `[slug]/page.tsx`).
+- Thêm một trang quản trị mới (vd. quản lý đơn hàng sau này)? → thư mục mới trong `apps/admin/src/app/(dashboard)/<ten-trang>/`, theo mẫu `products/` (có `page.tsx`, `actions.ts`, `new/page.tsx`, `[slug]/page.tsx`).
 - Thêm một API endpoint mới? → module mới trong `apps/api/src/<ten-module>/`, theo mẫu `products/`. Nếu là endpoint ghi dữ liệu, nhớ gắn `@UseGuards(JwtAuthGuard)`.
 - Cấu trúc dữ liệu mới cần cả web/admin và api dùng? → thêm type vào `packages/types/src/`, chạy lại `npm run build:packages`.
 - Dữ liệu mẫu/nội dung demo mới cần cả web và api? → thêm vào `packages/fixtures/src/`.

@@ -2,17 +2,17 @@ import Link from 'next/link';
 
 const SECTIONS = [
   {
-    href: '/san-pham',
+    href: '/products',
     title: 'Sản phẩm',
     description: 'Thêm, sửa, xoá sản phẩm và quản lý giá theo từng quy cách đóng gói.',
   },
   {
-    href: '/danh-muc',
+    href: '/categories',
     title: 'Danh mục',
     description: 'Quản lý các nhóm trái cây hiển thị trên website.',
   },
   {
-    href: '/bai-viet',
+    href: '/posts',
     title: 'Bài viết',
     description: 'Quản lý bài viết ở mục Tin tức trên website.',
   },

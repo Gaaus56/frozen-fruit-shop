@@ -4,7 +4,7 @@ import { useActionState } from 'react';
 import type { BlogPost } from '@frozen-fruit-shop/types';
 import { Field, inputClassName } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
-import type { BlogPostFormState } from '@/app/(dashboard)/bai-viet/actions';
+import type { BlogPostFormState } from '@/app/(dashboard)/posts/actions';
 
 type BlogPostAction = (
   prevState: BlogPostFormState | undefined,

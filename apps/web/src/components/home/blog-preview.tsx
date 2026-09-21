@@ -15,7 +15,7 @@ export function BlogPreview() {
 
         <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Link key={post.id} href={`/tin-tuc/${post.slug}`} className="group">
+            <Link key={post.id} href={`/news/${post.slug}`} className="group">
               <div className="relative aspect-[4/3] w-full bg-surface">
                 <Image
                   src={post.coverImage}

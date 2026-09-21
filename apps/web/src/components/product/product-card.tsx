@@ -29,7 +29,7 @@ export function ProductCard({ product }: { product: Product }) {
   }
 
   return (
-    <Link href={`/san-pham/${product.slug}`} className="group flex flex-col overflow-hidden bg-surface">
+    <Link href={`/products/${product.slug}`} className="group flex flex-col overflow-hidden bg-surface">
       <div className="relative aspect-square w-full">
         <Image
           src={product.images[0]}

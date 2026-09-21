@@ -4,7 +4,7 @@ import { useActionState } from 'react';
 import type { Category } from '@frozen-fruit-shop/types';
 import { Field, inputClassName } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
-import type { CategoryFormState } from '@/app/(dashboard)/danh-muc/actions';
+import type { CategoryFormState } from '@/app/(dashboard)/categories/actions';
 
 type CategoryAction = (
   prevState: CategoryFormState | undefined,

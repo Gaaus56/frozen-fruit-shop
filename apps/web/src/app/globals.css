@@ -5,6 +5,7 @@
   --surface: #eae9e9;
   --foreground: #201e1d;
   --price: #ae1800;
+  --leaf: #1f6b3f;
   --divider: color-mix(in srgb, #201e1d 16%, transparent);
 }
 
@@ -13,6 +14,7 @@
   --surface: #2b2927;
   --foreground: #f3f2f2;
   --price: #ff9783;
+  --leaf: #4fb37a;
   --divider: color-mix(in srgb, #f3f2f2 20%, transparent);
 }
 
@@ -21,6 +23,7 @@
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
   --color-price: var(--price);
+  --color-leaf: var(--leaf);
   --color-divider: var(--divider);
   --font-sans: var(--font-archivo);
 }
