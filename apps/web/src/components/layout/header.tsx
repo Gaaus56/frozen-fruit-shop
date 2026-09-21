@@ -47,6 +47,7 @@ export function Header() {
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
+  const [isDropdownSuppressed, setIsDropdownSuppressed] = useState(false);
   const pathname = usePathname();
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
@@ -171,9 +172,14 @@ export function Header() {
               const active = isActive(link.href);
               const hasDropdown = link.href === "/products";
               return (
-                <div key={link.href} className="group/nav relative">
+                <div
+                  key={link.href}
+                  className="group/nav relative"
+                  onMouseLeave={() => setIsDropdownSuppressed(false)}
+                >
                   <Link
                     href={link.href}
+                    onClick={() => setIsDropdownSuppressed(true)}
                     aria-current={active ? "page" : undefined}
                     aria-haspopup={hasDropdown ? "menu" : undefined}
                     className={`group relative flex items-center gap-0.5 py-0.5 text-[15px] font-bold uppercase transition-colors hover:text-accent-700 ${
@@ -193,13 +199,18 @@ export function Header() {
                   </Link>
 
                   {hasDropdown ? (
-                    <div className="invisible absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-focus-within/nav:visible group-focus-within/nav:opacity-100 group-hover/nav:visible group-hover/nav:opacity-100">
+                    <div className={`invisible absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 ${
+                        isDropdownSuppressed
+                          ? ""
+                          : "group-has-[:focus-visible]/nav:visible group-has-[:focus-visible]/nav:opacity-100 group-hover/nav:visible group-hover/nav:opacity-100"
+                      }`}>
                       <ul className="border-t-2 border-accent-700 bg-background py-2 shadow-2xl ring-1 ring-divider" role="menu">
                         {categories.map((category) => (
                           <li key={category.id} role="none">
                             <Link
                               role="menuitem"
                               href={`/products?category=${category.slug}`}
+                              onClick={() => setIsDropdownSuppressed(true)}
                               className="block border-b border-divider px-5 py-3 text-sm font-semibold normal-case text-foreground/75 last:border-b-0 hover:bg-surface hover:text-accent-700"
                             >
                               {category.name}
