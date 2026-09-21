@@ -100,6 +100,19 @@ h4 {
   }
 }
 
+@keyframes banner-progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.banner-progress {
+  animation: banner-progress 5s linear forwards;
+}
+
 .contact-pulse {
   animation: contact-beat 2.4s ease-in-out infinite;
 }
@@ -152,6 +165,7 @@ h4 {
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track,
+  .banner-progress,
   .contact-pulse,
   .contact-pulse::before,
   .contact-pulse::after,
