@@ -3,7 +3,7 @@ import { Archivo } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { CallButton } from "@/components/layout/call-button";
+import { FloatingContact } from "@/components/layout/floating-contact";
 import { CartProvider } from "@/lib/cart-context";
 import { ThemeProvider } from "@/lib/theme-context";
 
@@ -31,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
-            <CallButton />
+            <FloatingContact />
           </CartProvider>
         </ThemeProvider>
       </body>
