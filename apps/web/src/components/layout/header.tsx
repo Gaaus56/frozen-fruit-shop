@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { categories } from "@frozen-fruit-shop/fixtures";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
 import { useTheme } from "@/lib/theme-context";
@@ -45,8 +46,23 @@ export function Header() {
   const { totalQuantity } = useCart();
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isProductsOpen, setIsProductsOpen] = useState(false);
   const pathname = usePathname();
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 150);
@@ -153,23 +169,47 @@ export function Header() {
           <nav className="hidden items-center gap-8 lg:flex">
             {NAV_LINKS.map((link) => {
               const active = isActive(link.href);
+              const hasDropdown = link.href === "/products";
               return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`group relative py-0.5 text-[15px] font-bold uppercase transition-colors hover:text-accent-700 ${
-                    active ? "text-accent-700" : "text-foreground/85"
-                  }`}
-                >
-                  {link.label}
-                  <span
-                    aria-hidden
-                    className={`absolute bottom-0 left-0 h-[3px] w-full bg-accent-700 transition-opacity ${
-                      active ? "opacity-100" : "opacity-0"
+                <div key={link.href} className="group/nav relative">
+                  <Link
+                    href={link.href}
+                    aria-current={active ? "page" : undefined}
+                    aria-haspopup={hasDropdown ? "menu" : undefined}
+                    className={`group relative flex items-center gap-0.5 py-0.5 text-[15px] font-bold uppercase transition-colors hover:text-accent-700 ${
+                      active ? "text-accent-700" : "text-foreground/85"
                     }`}
-                  />
-                </Link>
+                  >
+                    <span className="relative">
+                      {link.label}
+                      <span
+                        aria-hidden
+                        className={`absolute -bottom-0.5 left-0 h-[3px] w-full bg-accent-700 transition-opacity ${
+                          active ? "opacity-100" : "opacity-0"
+                        }`}
+                      />
+                    </span>
+                    {hasDropdown ? <ChevronIcon /> : null}
+                  </Link>
+
+                  {hasDropdown ? (
+                    <div className="invisible absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-focus-within/nav:visible group-focus-within/nav:opacity-100 group-hover/nav:visible group-hover/nav:opacity-100">
+                      <ul className="border-t-2 border-accent-700 bg-background py-2 shadow-2xl ring-1 ring-divider" role="menu">
+                        {categories.map((category) => (
+                          <li key={category.id} role="none">
+                            <Link
+                              role="menuitem"
+                              href={`/products?category=${category.slug}`}
+                              className="block border-b border-divider px-5 py-3 text-sm font-semibold normal-case text-foreground/75 last:border-b-0 hover:bg-surface hover:text-accent-700"
+                            >
+                              {category.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </div>
               );
             })}
           </nav>
@@ -203,40 +243,136 @@ export function Header() {
               className="inline-flex h-9 w-9 items-center justify-center border border-divider text-foreground/85 lg:hidden"
               aria-label="Mở menu"
               aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
               onClick={() => setIsMenuOpen((open) => !open)}
             >
               <MenuIcon />
             </button>
           </div>
         </Container>
+      </header>
 
-        {isMenuOpen ? (
-          <div className="border-t border-divider bg-background lg:hidden">
-            <Container className="flex flex-col gap-1 py-3">
-              {NAV_LINKS.map((link) => (
+      <div
+        className={`fixed inset-0 z-[60] bg-black/50 transition-opacity duration-300 lg:hidden ${
+          isMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={() => setIsMenuOpen(false)}
+        aria-hidden
+      />
+      <aside
+        id="mobile-menu"
+        aria-label="Menu"
+        aria-hidden={!isMenuOpen}
+        className="fixed inset-y-0 left-0 z-[70] flex w-80 max-w-[85vw] flex-col bg-background shadow-2xl lg:hidden"
+        style={{
+          transform: isMenuOpen ? "translateX(0)" : "translateX(-105%)",
+          visibility: isMenuOpen ? "visible" : "hidden",
+          transition: `transform 300ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear ${isMenuOpen ? "0s" : "300ms"}`,
+        }}
+      >
+        <div className="flex h-16 shrink-0 items-center justify-between gap-3 bg-[#1f6b3f] px-4 text-white">
+          <span className="flex min-w-0 items-center gap-3">
+            <span className="logo-shine relative block h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-white">
+              <LogoBadge className="h-full w-full" />
+            </span>
+            <span className="truncate text-sm font-extrabold uppercase">Trái Cây Đông Lạnh 28</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen(false)}
+            aria-label="Đóng menu"
+            className="flex h-9 w-9 shrink-0 items-center justify-center hover:bg-white/15"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto py-2">
+          {NAV_LINKS.map((link) => (
+            <div key={link.href} className="border-b border-divider">
+              <div className="flex items-stretch">
                 <Link
-                  key={link.href}
                   href={link.href}
-                  className={`border-l-4 px-3 py-2 text-sm font-bold uppercase hover:bg-accent-50 hover:text-accent-600 ${
+                  className={`flex-1 border-l-4 px-4 py-3.5 text-sm font-bold uppercase hover:bg-surface hover:text-accent-700 ${
                     isActive(link.href) ? "border-accent-700 text-accent-700" : "border-transparent text-foreground/85"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
-              ))}
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="border-l-4 border-transparent px-3 py-2 text-left text-sm font-bold uppercase text-foreground/85 hover:bg-accent-50 hover:text-accent-600 sm:hidden"
-              >
-                {theme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
-              </button>
-            </Container>
-          </div>
-        ) : null}
-      </header>
+                {link.href === "/products" ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsProductsOpen((open) => !open)}
+                    aria-expanded={isProductsOpen}
+                    aria-label="Xem các loại sản phẩm"
+                    className="px-5 text-foreground/70 hover:text-accent-700"
+                  >
+                    <ChevronIcon open={isProductsOpen} />
+                  </button>
+                ) : null}
+              </div>
+              {link.href === "/products" && isProductsOpen ? (
+                <ul className="bg-surface/60 pb-2">
+                  {categories.map((category) => (
+                    <li key={category.id}>
+                      <Link
+                        href={`/products?category=${category.slug}`}
+                        className="block px-9 py-2.5 text-sm text-foreground/75 hover:text-accent-700"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {category.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ))}
+        </nav>
+
+        <div className="flex flex-col gap-3 border-t border-divider p-4">
+          <a
+            href="tel:0934568196"
+            className="flex items-center justify-center gap-2 bg-[#1f6b3f] px-4 py-3 text-sm font-extrabold text-white hover:bg-[#154d2d]"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.3.2 2.5.6 3.6a1 1 0 0 1-.25 1z" />
+            </svg>
+            Gọi 0934 568 196
+          </a>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex items-center justify-center gap-2 border border-divider px-4 py-2.5 text-sm font-bold text-foreground/85 hover:border-accent-600 hover:text-accent-600"
+          >
+            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            {theme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
+          </button>
+        </div>
+      </aside>
     </>
+  );
+}
+
+function ChevronIcon({ open = false }: { open?: boolean }) {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={`transition-transform duration-200 group-hover/nav:rotate-180 ${open ? "rotate-180" : ""}`}
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
   );
 }
 
