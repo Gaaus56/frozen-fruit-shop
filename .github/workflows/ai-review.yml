@@ -1,9 +1,12 @@
 name: AI review
 
+# Tạm ngừng: không tự chạy trên PR. Bật lại bằng cách khôi phục trigger pull_request bên dưới.
+# on:
+#   pull_request:
+#     types: [opened, synchronize, reopened]
+#     branches: [main]
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ai-review-${{ github.ref }}
@@ -18,17 +21,16 @@ jobs:
       pull-requests: write
     env:
       GH_TOKEN: ${{ github.token }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      GEMINI_MODEL: gemini-3.6-flash
-      GEMINI_FALLBACK_MODEL: gemini-flash-latest
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CLAUDE_MODEL: claude-sonnet-5
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Review PR diff with Gemini (free tier)
+      - name: Review PR diff with Claude
         run: |
-          if [ -z "$GEMINI_API_KEY" ]; then
-            echo "::warning::Chưa có secret GEMINI_API_KEY, bỏ qua AI review."
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::warning::Chưa có secret ANTHROPIC_API_KEY, bỏ qua AI review."
             exit 0
           fi
 
@@ -46,36 +48,35 @@ jobs:
             cat full.diff
           } > prompt.txt
 
-          jq -n --rawfile text prompt.txt \
-            '{contents:[{parts:[{text:$text}]}], generationConfig:{maxOutputTokens:2048}}' > request.json
+          jq -n --rawfile text prompt.txt --arg model "$CLAUDE_MODEL" \
+            '{model:$model, max_tokens:4096, output_config:{effort:"low"}, messages:[{role:"user", content:$text}]}' > request.json
 
-          # Thử model chính rồi model dự phòng; mỗi model tối đa 3 lần, chờ tăng dần (503/429 thường chỉ tạm thời).
+          # Thử tối đa 3 lần (429/5xx thường chỉ tạm thời).
           HTTP_CODE=000
           REVIEW=""
-          for MODEL in "$GEMINI_MODEL" "$GEMINI_FALLBACK_MODEL"; do
-            for ATTEMPT in 1 2 3; do
-              HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
-                -H "Content-Type: application/json" \
-                -H "x-goog-api-key: $GEMINI_API_KEY" \
-                -d @request.json \
-                "https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent")
-              REVIEW=$(jq -r '.candidates[0].content.parts[0].text // empty' response.json)
-              if [ "$HTTP_CODE" = "200" ] && [ -n "$REVIEW" ]; then
-                break 2
-              fi
-              echo "Model $MODEL lần $ATTEMPT: HTTP $HTTP_CODE"
-              sleep $((ATTEMPT * 15))
-            done
+          for ATTEMPT in 1 2 3; do
+            HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
+              -H "content-type: application/json" \
+              -H "x-api-key: $ANTHROPIC_API_KEY" \
+              -H "anthropic-version: 2023-06-01" \
+              -d @request.json \
+              https://api.anthropic.com/v1/messages)
+            REVIEW=$(jq -r '[.content[]? | select(.type=="text") | .text] | join("\n")' response.json)
+            if [ "$HTTP_CODE" = "200" ] && [ -n "$REVIEW" ]; then
+              break
+            fi
+            echo "Lần $ATTEMPT: HTTP $HTTP_CODE"
+            sleep $((ATTEMPT * 15))
           done
 
           if [ "$HTTP_CODE" != "200" ] || [ -z "$REVIEW" ]; then
-            echo "::warning::Gemini không trả kết quả (HTTP $HTTP_CODE), bỏ qua AI review lần này."
+            echo "::warning::Claude không trả kết quả (HTTP $HTTP_CODE), bỏ qua AI review lần này."
             cat response.json
             exit 0
           fi
 
           {
-            echo "### 🤖 AI review (Gemini, miễn phí)"
+            echo "### 🤖 AI review (Claude)"
             echo
             echo "$REVIEW"
           } > comment.md
