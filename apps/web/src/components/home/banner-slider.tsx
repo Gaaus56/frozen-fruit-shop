@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Container } from "@/components/ui/container";
 import { LinkButton } from "@/components/ui/button";
 
@@ -40,12 +40,6 @@ export function BannerSlider() {
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  useEffect(() => {
-    if (isPaused) return;
-    const timer = window.setInterval(() => setIndex((current) => (current + 1) % SLIDES.length), 5000);
-    return () => window.clearInterval(timer);
-  }, [isPaused]);
-
   const go = (next: number) => setIndex((next + SLIDES.length) % SLIDES.length);
 
   return (
@@ -67,11 +61,15 @@ export function BannerSlider() {
                 fill
                 priority={i === 0}
                 sizes="100vw"
-                className="object-cover"
+                className={`object-cover transition-transform duration-[7000ms] ease-out ${i === index ? "scale-100" : "scale-110"}`}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
               <Container className="absolute inset-0 flex items-center">
-                <div className="flex max-w-xl flex-col gap-3 pl-8 text-white sm:pl-0">
+                <div
+                  className={`flex max-w-xl flex-col gap-3 pl-8 text-white transition-all duration-700 delay-300 sm:pl-0 ${
+                    i === index ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
+                  }`}
+                >
                   <h2 className="text-xl uppercase leading-tight sm:text-4xl">{slide.title}</h2>
                   <p className="hidden text-sm text-white/85 sm:block sm:text-base">{slide.description}</p>
                   <div>
@@ -99,7 +97,7 @@ export function BannerSlider() {
             ›
           </button>
 
-          <div className="absolute bottom-3 right-4 flex gap-2">
+          <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
             {SLIDES.map((slide, i) => (
               <button
                 key={slide.src}
@@ -107,8 +105,19 @@ export function BannerSlider() {
                 onClick={() => setIndex(i)}
                 aria-label={`Chuyển tới banner ${i + 1}`}
                 aria-current={i === index}
-                className={`h-2 transition-all ${i === index ? "w-6 bg-accent-600" : "w-2 bg-white/70 hover:bg-white"}`}
-              />
+                className={`relative h-1.5 overflow-hidden bg-white/60 transition-all duration-500 hover:bg-white ${
+                  i === index ? "w-10" : "w-4"
+                }`}
+              >
+                {i === index ? (
+                  <span
+                    key={index}
+                    className="banner-progress absolute inset-y-0 left-0 bg-accent-600"
+                    onAnimationEnd={() => go(index + 1)}
+                    style={{ animationPlayState: isPaused ? "paused" : "running" }}
+                  />
+                ) : null}
+              </button>
             ))}
           </div>
       </div>

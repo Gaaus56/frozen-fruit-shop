@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
@@ -44,6 +45,8 @@ export function Header() {
   const { totalQuantity } = useCart();
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 150);
@@ -63,15 +66,8 @@ export function Header() {
         </div>
       </div>
 
-      <div className="relative bg-background">
-        <Container className="flex h-[4.5rem] items-center gap-6 pl-44 sm:pl-48 lg:pl-56">
-          <Link href="/" className="text-accent-700 lg:hidden">
-            <span className="block text-base font-extrabold uppercase leading-tight tracking-tight">
-              Trái Cây Đông Lạnh 28
-            </span>
-            <span className="block text-sm font-extrabold">0934 568 196</span>
-          </Link>
-
+      <div className="relative h-0 bg-background lg:h-auto">
+        <Container className="hidden h-16 items-center gap-6 lg:flex lg:pl-52">
           <ul className="hidden flex-1 items-center lg:flex">
             {FEATURES.map((feature, index) => (
               <li
@@ -103,9 +99,9 @@ export function Header() {
         <Link
           href="/"
           aria-label="Trái Cây Đông Lạnh 28 — Trang chủ"
-          className="absolute left-4 top-0 z-50 flex h-[10.5rem] w-40 justify-center rounded-b-full bg-[#1f6b3f] pt-4 shadow-xl sm:left-6 lg:left-8"
+          className="absolute left-3 top-0 z-50 flex h-[5.75rem] w-20 justify-center rounded-b-full bg-[#1f6b3f] pt-2 shadow-xl lg:left-8 lg:h-[9.5rem] lg:w-36 lg:pt-3"
         >
-          <span className="logo-shine relative block h-32 w-32 overflow-hidden rounded-full ring-4 ring-white">
+          <span className="logo-shine relative block h-16 w-16 overflow-hidden rounded-full ring-2 ring-white lg:h-28 lg:w-28 lg:ring-4">
             <LogoBadge className="h-full w-full" />
           </span>
         </Link>
@@ -117,16 +113,34 @@ export function Header() {
         }`}
       >
         <Container
-          className={`flex h-14 items-center justify-end gap-4 transition-[padding] duration-300 lg:justify-between ${
-            isScrolled ? "pl-4" : "pl-44 sm:pl-48 lg:pl-56"
+          className={`flex h-16 items-center justify-between gap-3 transition-[padding] duration-300 lg:h-12 ${
+            isScrolled ? "pl-4 sm:pl-6 lg:pl-8" : "pl-28 sm:pl-28 lg:pl-52"
           }`}
         >
+          <div className={`min-w-0 leading-tight lg:hidden ${isScrolled ? "hidden" : "block"}`}>
+            <Link
+              href="/"
+              className="block truncate text-[13px] font-extrabold uppercase tracking-tight text-accent-700 min-[420px]:text-[15px]"
+            >
+              Trái Cây Đông Lạnh 28
+            </Link>
+            <a
+              href="tel:0934568196"
+              className="mt-0.5 flex items-center gap-1 text-xs font-extrabold text-[#1f6b3f] min-[420px]:text-sm"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.3.2 2.5.6 3.6a1 1 0 0 1-.25 1z" />
+              </svg>
+              0934 568 196
+            </a>
+          </div>
+
           <Link
             href="/"
             aria-label="Trang chủ"
             tabIndex={isScrolled ? 0 : -1}
             aria-hidden={!isScrolled}
-            className={`mr-auto flex items-center gap-2.5 overflow-hidden whitespace-nowrap transition-all duration-300 lg:mr-2 ${
+            className={`flex items-center gap-2.5 overflow-hidden whitespace-nowrap transition-all duration-300 ${
               isScrolled ? "max-w-[15rem] opacity-100" : "pointer-events-none max-w-0 opacity-0"
             }`}
           >
@@ -136,23 +150,35 @@ export function Header() {
             <span className="text-sm font-extrabold uppercase text-accent-700">Trái Cây Đông Lạnh 28</span>
           </Link>
 
-          <nav className="hidden items-center gap-7 lg:flex">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm font-bold uppercase text-foreground/85 transition-colors hover:text-accent-600"
-              >
-                {link.label}
-              </Link>
-            ))}
+          <nav className="hidden items-center gap-8 lg:flex">
+            {NAV_LINKS.map((link) => {
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`group relative py-0.5 text-[15px] font-bold uppercase transition-colors hover:text-accent-700 ${
+                    active ? "text-accent-700" : "text-foreground/85"
+                  }`}
+                >
+                  {link.label}
+                  <span
+                    aria-hidden
+                    className={`absolute bottom-0 left-0 h-[3px] w-full bg-accent-700 transition-opacity ${
+                      active ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={toggleTheme}
-              className="inline-flex h-9 w-9 items-center justify-center border border-divider text-foreground/85 hover:border-accent-600 hover:text-accent-600"
+              className="hidden h-9 w-9 items-center justify-center border border-divider text-foreground/85 hover:border-accent-600 hover:text-accent-600 sm:inline-flex"
               aria-label={theme === "dark" ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}
               title="Chuyển giao diện sáng/tối"
             >
@@ -191,12 +217,21 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-3 py-2 text-sm font-medium text-foreground/85 hover:bg-accent-50 hover:text-accent-600"
+                  className={`border-l-4 px-3 py-2 text-sm font-bold uppercase hover:bg-accent-50 hover:text-accent-600 ${
+                    isActive(link.href) ? "border-accent-700 text-accent-700" : "border-transparent text-foreground/85"
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="border-l-4 border-transparent px-3 py-2 text-left text-sm font-bold uppercase text-foreground/85 hover:bg-accent-50 hover:text-accent-600 sm:hidden"
+              >
+                {theme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
+              </button>
             </Container>
           </div>
         ) : null}
