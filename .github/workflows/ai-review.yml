@@ -20,6 +20,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       GEMINI_MODEL: gemini-3.6-flash
+      GEMINI_FALLBACK_MODEL: gemini-flash-latest
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - uses: actions/checkout@v4
@@ -48,13 +49,24 @@ jobs:
           jq -n --rawfile text prompt.txt \
             '{contents:[{parts:[{text:$text}]}], generationConfig:{maxOutputTokens:2048}}' > request.json
 
-          HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
-            -H "Content-Type: application/json" \
-            -H "x-goog-api-key: $GEMINI_API_KEY" \
-            -d @request.json \
-            "https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent")
-
-          REVIEW=$(jq -r '.candidates[0].content.parts[0].text // empty' response.json)
+          # Thử model chính rồi model dự phòng; mỗi model tối đa 3 lần, chờ tăng dần (503/429 thường chỉ tạm thời).
+          HTTP_CODE=000
+          REVIEW=""
+          for MODEL in "$GEMINI_MODEL" "$GEMINI_FALLBACK_MODEL"; do
+            for ATTEMPT in 1 2 3; do
+              HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
+                -H "Content-Type: application/json" \
+                -H "x-goog-api-key: $GEMINI_API_KEY" \
+                -d @request.json \
+                "https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent")
+              REVIEW=$(jq -r '.candidates[0].content.parts[0].text // empty' response.json)
+              if [ "$HTTP_CODE" = "200" ] && [ -n "$REVIEW" ]; then
+                break 2
+              fi
+              echo "Model $MODEL lần $ATTEMPT: HTTP $HTTP_CODE"
+              sleep $((ATTEMPT * 15))
+            done
+          done
 
           if [ "$HTTP_CODE" != "200" ] || [ -z "$REVIEW" ]; then
             echo "::warning::Gemini không trả kết quả (HTTP $HTTP_CODE), bỏ qua AI review lần này."
