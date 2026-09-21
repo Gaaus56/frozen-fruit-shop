@@ -1,0 +1,10 @@
+# Caddy tự xin và gia hạn chứng chỉ HTTPS (Let's Encrypt). DOMAIN lấy từ deploy/.env.
+api.{$DOMAIN} {
+	encode gzip
+	reverse_proxy api:4000
+}
+
+admin.{$DOMAIN} {
+	encode gzip
+	reverse_proxy admin:3002
+}
