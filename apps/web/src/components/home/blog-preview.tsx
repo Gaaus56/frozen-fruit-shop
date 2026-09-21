@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getLatestBlogPosts } from "@frozen-fruit-shop/fixtures";
@@ -15,7 +14,7 @@ export function BlogPreview() {
 
         <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Link key={post.id} href={`/news/${post.slug}`} className="group">
+            <article key={post.id} className="group">
               <div className="relative aspect-[4/3] w-full bg-surface">
                 <Image
                   src={post.coverImage}
@@ -29,7 +28,7 @@ export function BlogPreview() {
               </p>
               <h3 className="mt-1.5 line-clamp-2 text-[15px] font-bold text-foreground">{post.title}</h3>
               <p className="mt-1.5 line-clamp-2 text-sm text-foreground/70">{post.excerpt}</p>
-            </Link>
+            </article>
           ))}
         </div>
       </Container>

@@ -24,15 +24,15 @@ const SLIDES = [
     src: "/images/banners/banner_v3.jpg",
     title: "Sinh tố & nước ép từ trái cây đông lạnh",
     description: "Công thức nhanh gọn cho gia đình, ngon như trái cây tươi.",
-    href: "/news",
-    cta: "Xem công thức",
+    href: "/products",
+    cta: "Xem sản phẩm",
   },
   {
     src: "/images/banners/banner_v4.jpg",
     title: "Nguyên liệu ổn định cho quán nước & F&B",
     description: "Giá sỉ ưu đãi, giao lạnh đúng lịch trên toàn quốc.",
-    href: "/wholesale",
-    cta: "Báo giá sỉ",
+    href: "/contact",
+    cta: "Liên hệ báo giá",
   },
 ];
 

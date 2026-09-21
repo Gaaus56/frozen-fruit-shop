@@ -90,8 +90,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           {product.isWholesaleAvailable ? (
             <p className="mt-4 text-sm text-foreground/70">
               Cần mua số lượng lớn?{" "}
-              <Link href="/wholesale" className="font-bold text-accent-700 hover:underline">
-                Xem chính sách đặt hàng sỉ
+              <Link href="/contact" className="font-bold text-accent-700 hover:underline">
+                Liên hệ để được báo giá sỉ
               </Link>
             </p>
           ) : null}

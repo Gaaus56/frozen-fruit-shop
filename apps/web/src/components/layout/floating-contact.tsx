@@ -101,7 +101,7 @@ export function FloatingContact() {
   }, [isOpen]);
 
   return (
-    <div ref={rootRef} className="fixed bottom-6 right-6 z-50 isolate flex flex-col items-end gap-3">
+    <div ref={rootRef} className="fixed bottom-[0.85rem] left-1/2 z-50 isolate flex -translate-x-1/2 flex-col items-center gap-3 lg:bottom-6 lg:left-auto lg:right-6 lg:translate-x-0 lg:items-end">
       {isOpen ? (
         <ul className="w-56 bg-background p-2 shadow-2xl ring-1 ring-divider" role="menu">
           {CONTACTS.map((contact) => (
@@ -130,7 +130,7 @@ export function FloatingContact() {
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
         aria-label={isOpen ? "Đóng danh sách liên hệ" : "Liên hệ"}
-        className={`relative flex h-16 w-16 items-center justify-center rounded-full bg-[#1f6b3f] text-white shadow-lg shadow-black/30 transition-colors hover:bg-[#154d2d] ${
+        className={`relative flex h-14 w-14 items-center justify-center rounded-full bg-[#1f6b3f] max-lg:ring-4 max-lg:ring-background lg:h-16 lg:w-16 text-white shadow-lg shadow-black/30 transition-colors hover:bg-[#154d2d] ${
           isOpen ? "" : "contact-pulse"
         }`}
       >

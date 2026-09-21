@@ -27,8 +27,6 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm" style={{ color: "rgba(243,242,242,.8)" }}>
             <li><Link href="/products" className="hover:text-accent-400">Tất cả sản phẩm</Link></li>
             <li><Link href="/about" className="hover:text-accent-400">Giới thiệu</Link></li>
-            <li><Link href="/wholesale" className="hover:text-accent-400">Đặt hàng sỉ / F&B</Link></li>
-            <li><Link href="/news" className="hover:text-accent-400">Tin tức</Link></li>
           </ul>
         </div>
 
