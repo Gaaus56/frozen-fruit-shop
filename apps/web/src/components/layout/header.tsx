@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
 import { useTheme } from "@/lib/theme-context";
+import { LogoBadge } from "./logo-badge";
 
 const NAV_LINKS = [
   { href: "/", label: "Trang chủ" },
@@ -106,14 +106,7 @@ export function Header() {
           className="absolute left-4 top-0 z-50 flex h-[10.5rem] w-40 justify-center rounded-b-full bg-[#1f6b3f] pt-4 shadow-xl sm:left-6 lg:left-8"
         >
           <span className="logo-shine relative block h-32 w-32 overflow-hidden rounded-full ring-4 ring-white">
-            <Image
-              src="/images/logo.jpg"
-              alt="Logo Trái Cây Đông Lạnh 28"
-              width={1024}
-              height={1024}
-              priority
-              className="h-full w-full scale-[1.22] object-cover"
-            />
+            <LogoBadge className="h-full w-full" />
           </span>
         </Link>
       </div>
@@ -138,13 +131,7 @@ export function Header() {
             }`}
           >
             <span className="logo-shine relative block h-10 w-10 shrink-0 overflow-hidden rounded-full">
-              <Image
-                src="/images/logo.jpg"
-                alt=""
-                width={160}
-                height={160}
-                className="h-full w-full scale-[1.22] object-cover"
-              />
+              <LogoBadge className="h-full w-full" />
             </span>
             <span className="text-sm font-extrabold uppercase text-accent-700">Trái Cây Đông Lạnh 28</span>
           </Link>
