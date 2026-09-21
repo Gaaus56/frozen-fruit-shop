@@ -16,16 +16,23 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      models: read
     env:
       GH_TOKEN: ${{ github.token }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_MODEL: gemini-2.5-flash
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build review prompt from PR diff
+      - name: Review PR diff with Gemini (free tier)
         run: |
-          gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" > full.diff
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "::warning::Chưa có secret GEMINI_API_KEY, bỏ qua AI review."
+            exit 0
+          fi
+
+          gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" | head -c 150000 > full.diff
+
           {
             echo "Bạn là reviewer code cho monorepo Next.js (apps/web, apps/admin) + NestJS + Prisma (apps/api)."
             echo "Hãy review diff của pull request dưới đây bằng tiếng Việt, ngắn gọn."
@@ -34,23 +41,30 @@ jobs:
             echo "Bỏ qua lỗi định dạng mà ESLint đã bắt. Nhóm kết quả theo mức độ (Nghiêm trọng / Nên sửa / Gợi ý)."
             echo "Nếu không có vấn đề gì, chỉ cần viết một câu xác nhận."
             echo
-            echo "----- DIFF (đã cắt bớt nếu quá dài) -----"
-            head -c 24000 full.diff
+            echo "----- DIFF (có thể đã bị cắt nếu quá dài) -----"
+            cat full.diff
           } > prompt.txt
 
-      - name: Review with GitHub Models (free)
-        id: ai
-        uses: actions/ai-inference@v1
-        with:
-          model: openai/gpt-4o-mini
-          prompt-file: ./prompt.txt
-          max-tokens: 1500
+          jq -n --rawfile text prompt.txt \
+            '{contents:[{parts:[{text:$text}]}], generationConfig:{maxOutputTokens:2048}}' > request.json
 
-      - name: Post review comment
-        run: |
+          HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -H "x-goog-api-key: $GEMINI_API_KEY" \
+            -d @request.json \
+            "https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent")
+
+          REVIEW=$(jq -r '.candidates[0].content.parts[0].text // empty' response.json)
+
+          if [ "$HTTP_CODE" != "200" ] || [ -z "$REVIEW" ]; then
+            echo "::warning::Gemini không trả kết quả (HTTP $HTTP_CODE), bỏ qua AI review lần này."
+            cat response.json
+            exit 0
+          fi
+
           {
-            echo "### 🤖 AI review (GitHub Models, miễn phí)"
+            echo "### 🤖 AI review (Gemini, miễn phí)"
             echo
-            cat "${{ steps.ai.outputs.response-file }}"
+            echo "$REVIEW"
           } > comment.md
           gh pr comment "$PR_NUMBER" --repo "${{ github.repository }}" --body-file comment.md
