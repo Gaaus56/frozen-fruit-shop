@@ -1,0 +1,56 @@
+name: AI review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+concurrency:
+  group: ai-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: AI review
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      models: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build review prompt from PR diff
+        run: |
+          gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" > full.diff
+          {
+            echo "Bạn là reviewer code cho monorepo Next.js (apps/web, apps/admin) + NestJS + Prisma (apps/api)."
+            echo "Hãy review diff của pull request dưới đây bằng tiếng Việt, ngắn gọn."
+            echo "Chỉ nêu vấn đề thật sự: lỗi logic, bảo mật (auth, lộ bí mật, injection), import/route bị hỏng,"
+            echo "lỗi giao diện/responsive/truy cập, thiếu xử lý lỗi ở ranh giới hệ thống."
+            echo "Bỏ qua lỗi định dạng mà ESLint đã bắt. Nhóm kết quả theo mức độ (Nghiêm trọng / Nên sửa / Gợi ý)."
+            echo "Nếu không có vấn đề gì, chỉ cần viết một câu xác nhận."
+            echo
+            echo "----- DIFF (đã cắt bớt nếu quá dài) -----"
+            head -c 24000 full.diff
+          } > prompt.txt
+
+      - name: Review with GitHub Models (free)
+        id: ai
+        uses: actions/ai-inference@v1
+        with:
+          model: openai/gpt-4o-mini
+          prompt-file: ./prompt.txt
+          max-tokens: 1500
+
+      - name: Post review comment
+        run: |
+          {
+            echo "### 🤖 AI review (GitHub Models, miễn phí)"
+            echo
+            cat "${{ steps.ai.outputs.response-file }}"
+          } > comment.md
+          gh pr comment "$PR_NUMBER" --repo "${{ github.repository }}" --body-file comment.md

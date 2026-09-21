@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-lint:
+    name: Build & lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies (also builds shared packages)
+        run: npm ci
+
+      - name: Lint web
+        run: npm run lint:web
+
+      - name: Lint admin
+        run: npm run lint:admin
+
+      - name: Build web
+        run: npm run build:web
+
+      - name: Build admin
+        run: npm run build:admin
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: apps/api
+
+      - name: Build api
+        run: npm run build:api
