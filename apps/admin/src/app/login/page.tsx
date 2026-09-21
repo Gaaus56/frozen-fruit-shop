@@ -7,9 +7,9 @@ export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, undefined);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-xl font-bold text-slate-900">Frozen Fruit Shop</h1>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 ">
+        <h1 className="text-xl font-bold text-slate-900">Trái Cây Đông Lạnh 28</h1>
         <p className="mt-1 text-sm text-slate-500">Đăng nhập trang quản trị</p>
 
         <form action={formAction} className="mt-6 flex flex-col gap-4">
@@ -44,7 +44,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isPending}
-            className="mt-2 inline-flex items-center justify-center rounded-full bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
+            className="mt-2 inline-flex items-center justify-center  bg-accent-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-700 disabled:opacity-50"
           >
             {isPending ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </button>

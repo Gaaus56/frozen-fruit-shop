@@ -12,7 +12,7 @@ export function Sidebar() {
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-slate-200 bg-white">
       <div className="border-b border-slate-200 p-5">
-        <p className="font-bold text-emerald-700">🧊🍓 Frozen Fruit Shop</p>
+        <p className="font-extrabold uppercase tracking-tight text-emerald-600">Trái Cây Đông Lạnh 28</p>
         <p className="text-xs text-slate-500">Trang quản trị</p>
       </div>
 

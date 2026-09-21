@@ -1,18 +1,67 @@
 @import "tailwindcss";
 
+/* Cùng bảng màu với web bán hàng (đỏ hành động + xanh lá phụ, nền xám ấm, không bo góc),
+   nhưng gọn hơn: không có chế độ tối, banner hay hiệu ứng. Các màu slate và emerald
+   sẵn có được ánh xạ sang bảng màu này để không phải sửa từng component. */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f3f2f2;
+  --foreground: #201e1d;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-archivo);
+}
+
+@theme {
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+
+  --color-accent-50: #fff6f4;
+  --color-accent-100: #fff2ef;
+  --color-accent-200: #ffe0d9;
+  --color-accent-500: #ff563c;
+  --color-accent-600: #ec3013;
+  --color-accent-700: #ae1800;
+
+  /* Xám ấm (thay slate) */
+  --color-slate-50: #f8f7f7;
+  --color-slate-100: #f3f2f2;
+  --color-slate-200: #dedcdb;
+  --color-slate-300: #c4c1bf;
+  --color-slate-400: #9b9794;
+  --color-slate-500: #6f6b68;
+  --color-slate-600: #57534f;
+  --color-slate-700: #403d3a;
+  --color-slate-900: #201e1d;
+
+  /* Xanh lá thương hiệu (thay emerald) */
+  --color-emerald-50: #eef7f1;
+  --color-emerald-100: #d9eee2;
+  --color-emerald-500: #2f8a55;
+  --color-emerald-600: #1f6b3f;
+  --color-emerald-700: #154d2d;
+
+  --color-red-50: #fff6f4;
+  --color-red-200: #ffc4b8;
+  --color-red-600: #ae1800;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
