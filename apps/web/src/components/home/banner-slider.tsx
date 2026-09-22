@@ -38,17 +38,12 @@ const SLIDES = [
 
 export function BannerSlider() {
   const [index, setIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
 
   const go = (next: number) => setIndex((next + SLIDES.length) % SLIDES.length);
 
   return (
     <section aria-roledescription="carousel" aria-label="Banner nổi bật">
-      <div
-          className="relative aspect-[16/9] w-full overflow-hidden bg-surface sm:aspect-[21/8] sm:max-h-[80vh]"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface sm:aspect-[21/8] sm:max-h-[80vh]">
           {SLIDES.map((slide, i) => (
             <div
               key={slide.src}
@@ -114,7 +109,6 @@ export function BannerSlider() {
                     key={index}
                     className="banner-progress absolute inset-y-0 left-0 bg-accent-600"
                     onAnimationEnd={() => go(index + 1)}
-                    style={{ animationPlayState: isPaused ? "paused" : "running" }}
                   />
                 ) : null}
               </button>

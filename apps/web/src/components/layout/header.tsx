@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { categories } from "@frozen-fruit-shop/fixtures";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
@@ -19,22 +19,18 @@ const NAV_LINKS = [
 const FEATURES = [
   {
     title: "Chuẩn VietGAP",
-    description: "Đạt tiêu chuẩn an toàn thực phẩm",
     path: "M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z M9 12l2 2 4-4",
   },
   {
     title: "Không chất bảo quản",
-    description: "Cấp đông tự nhiên, giữ vị thật",
     path: "M4 20c8-1 14-7 15-16-9 1-15 7-16 16z M4 20c2-4 5-7 9-9",
   },
   {
     title: "Hút chân không",
-    description: "Giữ trọn dinh dưỡng",
     path: "M3 7l9-4 9 4-9 4-9-4z M3 7v10l9 4 9-4V7 M12 11v10",
   },
   {
     title: "Giao hàng lạnh toàn quốc",
-    description: "Thùng giữ lạnh chuyên dụng",
     path: "M2 7h13v9H2z M15 10h4l3 3v3h-7z",
   },
 ];
@@ -42,8 +38,10 @@ const FEATURES = [
 export function Header() {
   const { totalQuantity } = useCart();
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownSuppressed, setIsDropdownSuppressed] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const pathname = usePathname();
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
@@ -53,6 +51,12 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const q = searchValue.trim();
+    router.push(q ? `/products?q=${encodeURIComponent(q)}` : "/products");
+  };
 
   return (
     <>
@@ -66,18 +70,27 @@ export function Header() {
       </div>
 
       <div className="relative h-0 bg-background lg:h-auto">
-        <Container className="hidden h-16 items-center gap-6 lg:flex lg:pl-52">
-          <ul className="hidden flex-1 items-center lg:flex">
+        <Container
+          className="hidden h-16 items-center gap-6 pt-2.5 lg:flex lg:pl-[max(0px,13rem_-_max(0px,(100vw_-_80rem)/2))]"
+        >
+          <Link href="/" className="shrink-0 whitespace-nowrap leading-tight">
+            <span className="block text-xl font-extrabold uppercase tracking-tight text-accent-700">
+              Trái Cây Đông Lạnh 28
+            </span>
+            <span className="block text-xs font-semibold uppercase tracking-[0.08em] text-foreground/55">
+              Trái cây đông lạnh chất lượng
+            </span>
+          </Link>
+
+          <ul className="hidden flex-1 items-center justify-between border-l border-divider pl-6 lg:flex">
             {FEATURES.map((feature, index) => (
               <li
                 key={feature.title}
-                className={`flex flex-1 items-center gap-3 border-divider px-4 ${
-                  index > 0 ? "border-l" : ""
-                } ${index === FEATURES.length - 1 ? "hidden xl:flex" : ""}`}
+                className={`flex items-center gap-2.5 ${index === FEATURES.length - 1 ? "hidden xl:flex" : ""}`}
               >
                 <svg
-                  width="30"
-                  height="30"
+                  width="22"
+                  height="22"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -86,9 +99,8 @@ export function Header() {
                 >
                   <path d={feature.path} />
                 </svg>
-                <span>
-                  <span className="block text-sm font-extrabold leading-tight text-foreground">{feature.title}</span>
-                  <span className="block text-xs leading-snug text-foreground/65">{feature.description}</span>
+                <span className="block max-w-32 text-sm font-extrabold leading-tight text-foreground">
+                  {feature.title}
                 </span>
               </li>
             ))}
@@ -112,7 +124,7 @@ export function Header() {
         }`}
       >
         <Container
-          className={`flex h-16 items-center justify-between gap-3 transition-[padding] duration-300 lg:h-12 ${
+          className={`flex h-16 items-center justify-between gap-3 transition-[padding] duration-300 lg:h-11 ${
             isScrolled ? "pl-4 sm:pl-6 lg:pl-8" : "pl-28 sm:pl-28 lg:pl-52"
           }`}
         >
@@ -149,7 +161,7 @@ export function Header() {
             <span className="text-sm font-extrabold uppercase text-accent-700">Trái Cây Đông Lạnh 28</span>
           </Link>
 
-          <nav className="hidden items-center gap-1 rounded-full border border-divider bg-surface p-1 lg:flex">
+          <nav className="hidden items-center gap-8 lg:flex">
             {NAV_LINKS.map((link) => {
               const active = isActive(link.href);
               const hasDropdown = link.href === "/products";
@@ -164,13 +176,19 @@ export function Header() {
                     onClick={() => setIsDropdownSuppressed(true)}
                     aria-current={active ? "page" : undefined}
                     aria-haspopup={hasDropdown ? "menu" : undefined}
-                    className={`group flex items-center gap-1 rounded-full px-4 py-1.5 text-[14px] font-bold uppercase transition-colors ${
-                      active
-                        ? "bg-accent-700 text-white"
-                        : "text-foreground/85 hover:bg-background hover:text-accent-700"
+                    className={`group relative flex items-center gap-0.5 py-0.5 text-[15px] font-bold uppercase transition-colors hover:text-accent-700 ${
+                      active ? "text-accent-700" : "text-foreground/85"
                     }`}
                   >
-                    {link.label}
+                    <span className="relative">
+                      {link.label}
+                      <span
+                        aria-hidden
+                        className={`absolute bottom-0 left-0 h-[3px] w-full bg-accent-700 transition-opacity ${
+                          active ? "opacity-100" : "opacity-0"
+                        }`}
+                      />
+                    </span>
                     {hasDropdown ? <ChevronIcon /> : null}
                   </Link>
 
@@ -202,6 +220,27 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <form
+              onSubmit={submitSearch}
+              className="hidden items-center border border-divider focus-within:border-accent-600 lg:flex"
+            >
+              <input
+                type="text"
+                value={searchValue}
+                onChange={(event) => setSearchValue(event.target.value)}
+                placeholder="Tìm sản phẩm..."
+                aria-label="Tìm sản phẩm"
+                className="h-9 w-44 bg-background pl-3 text-sm text-foreground outline-none placeholder:text-foreground/45 xl:w-64"
+              />
+              <button
+                type="submit"
+                aria-label="Tìm kiếm"
+                className="flex h-9 w-9 shrink-0 items-center justify-center text-foreground/85 hover:text-accent-600"
+              >
+                <SearchIcon />
+              </button>
+            </form>
+
             <button
               type="button"
               onClick={toggleTheme}
@@ -259,6 +298,15 @@ function ChevronIcon({ open = false }: { open?: boolean }) {
       className={`transition-transform duration-200 group-hover/nav:rotate-180 ${open ? "rotate-180" : ""}`}
     >
       <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.3-4.3" />
     </svg>
   );
 }

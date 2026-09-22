@@ -149,10 +149,6 @@ h4 {
   animation: marquee-scroll 32s linear infinite;
 }
 
-.marquee:hover .marquee-track {
-  animation-play-state: paused;
-}
-
 .logo-shine::after {
   content: "";
   position: absolute;
