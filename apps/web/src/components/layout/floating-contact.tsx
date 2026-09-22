@@ -59,17 +59,11 @@ const CONTACTS: { key: string; label: string; href: string; color: string; icon:
   },
 ];
 
-const CHAT_ICON = (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M4 3h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9l-3.5 3v-3H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
-    <path d="M19 8h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-.5v3L16 19h-5a2 2 0 0 1-1.7-1h6.7a3 3 0 0 0 3-3V8z" />
-  </svg>
-);
-
-const CYCLE: { key: string; icon: ReactNode; label?: string; duration: number }[] = [
-  { key: "contact", icon: CHAT_ICON, label: "Liên hệ", duration: 4500 },
-  ...CONTACTS.map((contact) => ({ key: contact.key, icon: contact.icon, duration: 2000 })),
-];
+const CYCLE: { key: string; icon: ReactNode; label?: string; duration: number }[] = CONTACTS.map((contact) => ({
+  key: contact.key,
+  icon: contact.icon,
+  duration: 2000,
+}));
 
 export function FloatingContact() {
   const [isOpen, setIsOpen] = useState(false);
@@ -101,7 +95,10 @@ export function FloatingContact() {
   }, [isOpen]);
 
   return (
-    <div ref={rootRef} className="fixed bottom-6 right-6 z-50 isolate flex flex-col items-end gap-3">
+    <div
+      ref={rootRef}
+      className="fixed bottom-[0.85rem] left-1/2 z-50 isolate flex -translate-x-1/2 flex-col items-center gap-3 lg:bottom-6 lg:left-auto lg:right-6 lg:translate-x-0 lg:items-end"
+    >
       {isOpen ? (
         <ul className="w-56 bg-background p-2 shadow-2xl ring-1 ring-divider" role="menu">
           {CONTACTS.map((contact) => (
@@ -130,7 +127,7 @@ export function FloatingContact() {
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
         aria-label={isOpen ? "Đóng danh sách liên hệ" : "Liên hệ"}
-        className={`relative flex h-16 w-16 items-center justify-center rounded-full bg-[#1f6b3f] text-white shadow-lg shadow-black/30 transition-colors hover:bg-[#154d2d] ${
+        className={`relative flex h-14 w-14 items-center justify-center rounded-full bg-accent-700 text-white shadow-lg shadow-black/30 transition-colors max-lg:ring-4 max-lg:ring-background hover:bg-accent-800 lg:h-16 lg:w-16 ${
           isOpen ? "" : "contact-pulse"
         }`}
       >
