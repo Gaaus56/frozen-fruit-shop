@@ -8,7 +8,6 @@ export const business = {
   mapUrl: "https://maps.app.goo.gl/ZbaJ7F2CA8v12jGY9",
   email: "traicaydonglanhdanang28@gmail.com",
   facebookUrl: "https://www.facebook.com/traicaydonglanhdanang",
-  messengerUrl: "https://m.me/traicaydonglanhdanang",
   phone: "0396799579",
   phoneDisplay: "0396 799 579",
   hotlineHours: "24/24",

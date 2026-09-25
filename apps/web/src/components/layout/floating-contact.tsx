@@ -9,7 +9,7 @@ const CONTACTS: { key: string; label: string; href: string; color: string; icon:
   {
     key: "messenger",
     label: "Messenger",
-    href: business.messengerUrl,
+    href: business.facebookUrl,
     color: "#0084ff",
     external: true,
     icon: (

@@ -11,16 +11,17 @@ export const metadata: Metadata = {
 };
 
 interface ProductsPageProps {
-  searchParams: Promise<{ "category"?: string }>;
+  searchParams: Promise<{ "category"?: string; "q"?: string }>;
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = await searchParams;
   const activeCategorySlug = params["category"];
+  const query = params["q"]?.trim().toLowerCase();
 
-  const filteredProducts = activeCategorySlug
-    ? products.filter((product) => product.categorySlug === activeCategorySlug)
-    : products;
+  const filteredProducts = products
+    .filter((product) => !activeCategorySlug || product.categorySlug === activeCategorySlug)
+    .filter((product) => !query || product.name.toLowerCase().includes(query));
 
   return (
     <>
@@ -34,7 +35,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             eyebrow="Sản phẩm"
             title="Tất cả trái cây đông lạnh"
           tone="light"
-            description="Chọn loại trái cây và quy cách đóng gói phù hợp với nhu cầu của bạn."
+            description={
+              query
+                ? `Kết quả tìm kiếm cho "${params["q"]}" — ${filteredProducts.length} sản phẩm.`
+                : "Chọn loại trái cây và quy cách đóng gói phù hợp với nhu cầu của bạn."
+            }
           />
 
           <div className="mt-6 flex flex-wrap gap-2">
@@ -68,7 +73,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
       <section className="bg-accent-600/[0.06] py-12">
         <Container>
-          <ProductGrid products={filteredProducts} />
+          <ProductGrid
+            products={filteredProducts}
+            emptyMessage={query ? `Không tìm thấy sản phẩm nào khớp với "${params["q"]}".` : undefined}
+          />
         </Container>
       </section>
     </>
