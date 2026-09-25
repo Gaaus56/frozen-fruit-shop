@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 import { categories } from "@frozen-fruit-shop/fixtures";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
-import { useTheme } from "@/lib/theme-context";
 import { business } from "@/data/business";
 import { LogoBadge } from "./logo-badge";
 
@@ -44,7 +43,6 @@ const FEATURES = [
 
 export function Header() {
   const { totalQuantity } = useCart();
-  const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownSuppressed, setIsDropdownSuppressed] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -244,7 +242,7 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <div ref={searchRef} className="relative hidden lg:block">
+            <div ref={searchRef} className="lg:relative">
               <button
                 type="button"
                 onClick={() => {
@@ -265,7 +263,7 @@ export function Header() {
               <form
                 id="header-search"
                 onSubmit={submitSearch}
-                className={`absolute right-0 top-full z-50 mt-3 flex w-72 items-center border-t-2 border-accent-700 bg-background shadow-2xl ring-1 ring-divider transition-all duration-200 ${
+                className={`absolute right-[3.75rem] top-full z-50 mt-2 flex w-[min(18rem,calc(100%-10.25rem))] items-center sm:right-[4.25rem] sm:w-72 lg:right-0 lg:mt-3 border-t-2 border-accent-700 bg-background shadow-2xl ring-1 ring-divider transition-all duration-200 ${
                   isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0"
                 }`}
               >
@@ -289,16 +287,6 @@ export function Header() {
                 </button>
               </form>
             </div>
-
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="inline-flex h-9 w-9 items-center justify-center border border-divider text-foreground/85 hover:border-accent-600 hover:text-accent-600"
-              aria-label={theme === "dark" ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}
-              title="Chuyển giao diện sáng/tối"
-            >
-              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-            </button>
 
             <Link
               href="/cart"
@@ -420,19 +408,3 @@ function ContactIcon() {
   );
 }
 
-function SunIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
-    </svg>
-  );
-}

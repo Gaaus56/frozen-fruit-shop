@@ -9,15 +9,6 @@
   --divider: color-mix(in srgb, #201e1d 16%, transparent);
 }
 
-:root[data-theme="dark"] {
-  --background: #1b1a19;
-  --surface: #2b2927;
-  --foreground: #f3f2f2;
-  --price: #ff9783;
-  --leaf: #4fb37a;
-  --divider: color-mix(in srgb, #f3f2f2 20%, transparent);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);

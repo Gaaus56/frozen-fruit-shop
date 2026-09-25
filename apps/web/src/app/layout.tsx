@@ -5,7 +5,6 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { FloatingContact } from "@/components/layout/floating-contact";
 import { CartProvider } from "@/lib/cart-context";
-import { ThemeProvider } from "@/lib/theme-context";
 import { business } from "@/data/business";
 
 const archivo = Archivo({
@@ -27,14 +26,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="vi" className={`${archivo.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-background pb-24 font-sans text-foreground lg:pb-0">
-        <ThemeProvider>
-          <CartProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <FloatingContact />
-          </CartProvider>
-        </ThemeProvider>
+        <CartProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <FloatingContact />
+        </CartProvider>
       </body>
     </html>
   );
