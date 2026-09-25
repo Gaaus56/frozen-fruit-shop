@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ContactForm } from "@/components/contact/contact-form";
+import { business } from "@/data/business";
 
 export const metadata: Metadata = {
   title: "Liên hệ",
-  description: "Thông tin liên hệ và form hỗ trợ khách hàng của Trái Cây Đông Lạnh 28.",
+  description: `Thông tin liên hệ và form hỗ trợ khách hàng của ${business.name}.`,
 };
 
 export default function ContactPage() {
@@ -20,18 +21,29 @@ export default function ContactPage() {
           <div className="rounded-none border border-divider p-6">
             <p className="font-semibold text-foreground">Thông tin liên hệ</p>
             <ul className="mt-3 space-y-2 text-sm text-foreground/70">
-              <li>Hotline: 0934 568 196</li>
-              <li>Email: hello@frozenfruitshop.vn</li>
-              <li>Zalo: 0934 568 196</li>
-              <li>Giờ hỗ trợ: 8:00 – 20:00, tất cả các ngày trong tuần</li>
+              <li>Hotline {business.hotlineHours}: {business.phoneDisplay}</li>
+              <li>Zalo: {business.phoneDisplay}</li>
+              <li>Email: {business.email}</li>
+              <li>
+                Facebook:{" "}
+                <a href={business.facebookUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent-700 hover:underline">
+                  Trái cây đông lạnh Đà Nẵng
+                </a>
+              </li>
             </ul>
           </div>
 
           <div className="rounded-none border border-divider p-6">
             <p className="font-semibold text-foreground">Địa chỉ</p>
             <ul className="mt-3 space-y-2 text-sm text-foreground/70">
-              <li>TP. Hồ Chí Minh: đang cập nhật</li>
-              <li>Đà Nẵng: đang cập nhật</li>
+              <li>{business.address}</li>
+              <li>{business.addressLandmark}</li>
+              <li>
+                <a href={business.mapUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent-700 hover:underline">
+                  Xem bản đồ
+                </a>
+              </li>
+              <li>MST {business.taxCode} — {business.taxNote}</li>
             </ul>
           </div>
         </div>

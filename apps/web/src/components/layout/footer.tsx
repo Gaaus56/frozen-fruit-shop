@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
+import { business } from "@/data/business";
 
 const POLICY_LINKS = [
   { href: "/policies/how-to-order", label: "Hướng dẫn mua hàng" },
@@ -14,7 +15,7 @@ export function Footer() {
     <footer style={{ background: "#201e1d", color: "#f3f2f2" }}>
       <Container className="grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="text-lg font-extrabold">Trái Cây Đông Lạnh 28</p>
+          <p className="text-lg font-extrabold">{business.name}</p>
           <p className="mt-3 max-w-[26ch] text-sm" style={{ color: "rgba(243,242,242,.65)" }}>
             Trái cây đông lạnh chất lượng, cấp đông nhanh sau thu hoạch, không chất bảo quản, giao hàng lạnh toàn quốc.
           </p>
@@ -52,9 +53,19 @@ export function Footer() {
             Liên hệ
           </p>
           <ul className="mt-4 space-y-2.5 text-sm" style={{ color: "rgba(243,242,242,.8)" }}>
-            <li>Hotline: 0934 568 196</li>
-            <li>Email: hello@frozenfruitshop.vn</li>
-            <li>Zalo: 0934 568 196</li>
+            <li>Hotline {business.hotlineHours}: {business.phoneDisplay}</li>
+            <li>Zalo: {business.phoneDisplay}</li>
+            <li>Email: {business.email}</li>
+            <li>
+              <a href={business.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent-400">
+                Facebook
+              </a>
+            </li>
+            <li>
+              <a href={business.mapUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent-400">
+                {business.address}
+              </a>
+            </li>
             <li><Link href="/order-lookup" className="hover:text-accent-400">Tra cứu đơn hàng</Link></li>
           </ul>
         </div>
@@ -64,7 +75,7 @@ export function Footer() {
         className="border-t py-5 text-center text-xs"
         style={{ borderColor: "rgba(243,242,242,.15)", color: "rgba(243,242,242,.5)" }}
       >
-        © {new Date().getFullYear()} Trái Cây Đông Lạnh 28. Bảo lưu mọi quyền.
+        © {new Date().getFullYear()} {business.name}. MST {business.taxCode} — {business.taxNote}. Bảo lưu mọi quyền.
       </div>
     </footer>
   );

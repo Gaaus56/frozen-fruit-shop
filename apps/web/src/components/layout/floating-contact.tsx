@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { business } from "@/data/business";
 
-const PHONE = "0934568196";
+const PHONE = business.phone;
 
 const CONTACTS: { key: string; label: string; href: string; color: string; icon: ReactNode; external?: boolean }[] = [
   {
     key: "messenger",
     label: "Messenger",
-    href: "https://m.me/", // TODO: thay bằng https://m.me/<tên-fanpage>
+    href: business.messengerUrl,
     color: "#0084ff",
     external: true,
     icon: (
