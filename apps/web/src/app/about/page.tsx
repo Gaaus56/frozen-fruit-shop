@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { business } from "@/data/business";
 
 export const metadata: Metadata = {
   title: "Giới thiệu",
-  description: "Câu chuyện thương hiệu, tiêu chuẩn chất lượng và quy trình cấp đông của Trái Cây Đông Lạnh 28.",
+  description: `Câu chuyện thương hiệu, tiêu chuẩn chất lượng và quy trình cấp đông của ${business.name}.`,
 };
 
 const STANDARDS = [
@@ -31,13 +32,13 @@ export default function AboutPage() {
     <Container className="py-12">
       <SectionHeading
         eyebrow="Giới thiệu"
-        title="Về Trái Cây Đông Lạnh 28"
+        title={`Về ${business.name}`}
         description="Chúng tôi mang đến trái cây đông lạnh chất lượng, tiện lợi cho mọi gia đình và đối tác F&B."
       />
 
       <div className="mt-8 max-w-3xl space-y-4 text-foreground/70">
         <p>
-          Trái Cây Đông Lạnh 28 ra đời với sứ mệnh mang đến nguồn trái cây đông lạnh chất lượng cao, được
+          {business.name} ra đời với sứ mệnh mang đến nguồn trái cây đông lạnh chất lượng cao, được
           cấp đông ngay sau thu hoạch để giữ trọn hương vị và dinh dưỡng tự nhiên. Chúng tôi tin rằng
           trái cây đông lạnh không chỉ tiện lợi mà còn có thể ngon và bổ dưỡng không kém trái cây tươi.
         </p>

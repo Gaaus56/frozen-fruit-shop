@@ -7,6 +7,7 @@ import { categories } from "@frozen-fruit-shop/fixtures";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
 import { useTheme } from "@/lib/theme-context";
+import { business } from "@/data/business";
 import { LogoBadge } from "./logo-badge";
 
 const NAV_LINKS = [
@@ -61,8 +62,8 @@ export function Header() {
       <div className="overflow-hidden bg-accent-700 text-white">
         <div className="marquee py-2 text-[13px] font-semibold">
           <span className="marquee-track">
-            Chào mừng bạn đến với Trái Cây Đông Lạnh 28 — Trái cây đông lạnh cấp đông nhanh, không chất bảo quản —
-            Hotline: 0934 568 196 — Giao hàng lạnh toàn quốc
+            Chào mừng bạn đến với {business.name} — Trái cây đông lạnh cấp đông nhanh, không chất bảo quản —
+            Hotline {business.hotlineHours}: {business.phoneDisplay} — {business.addressLandmark}, {business.address}
           </span>
         </div>
       </div>
@@ -99,7 +100,7 @@ export function Header() {
 
         <Link
           href="/"
-          aria-label="Trái Cây Đông Lạnh 28 — Trang chủ"
+          aria-label={`${business.name} — Trang chủ`}
           className="absolute left-3 top-0 z-50 flex h-[5.75rem] w-20 justify-center rounded-b-full bg-[#1f6b3f] pt-2 shadow-xl lg:left-8 lg:h-[9.5rem] lg:w-36 lg:pt-3"
         >
           <span className="logo-shine relative block h-16 w-16 overflow-hidden rounded-full ring-2 ring-white lg:h-28 lg:w-28 lg:ring-4">
@@ -121,19 +122,12 @@ export function Header() {
           <div className={`min-w-0 leading-tight lg:hidden ${isScrolled ? "hidden" : "block"}`}>
             <Link
               href="/"
-              className="block truncate text-[13px] font-extrabold uppercase tracking-tight text-accent-700 min-[420px]:text-[15px]"
+              aria-label={business.name}
+              className="block whitespace-nowrap text-[13px] font-extrabold uppercase leading-tight tracking-tight text-accent-700 min-[400px]:text-sm min-[440px]:text-base"
             >
-              Trái Cây Đông Lạnh 28
+              <span className="block">Trái Cây Đông Lạnh</span>
+              <span className="block">Đà Nẵng 28</span>
             </Link>
-            <a
-              href="tel:0934568196"
-              className="mt-0.5 flex items-center gap-1 text-xs font-extrabold text-[#1f6b3f] min-[420px]:text-sm"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.3.2 2.5.6 3.6a1 1 0 0 1-.25 1z" />
-              </svg>
-              0934 568 196
-            </a>
           </div>
 
           <Link
@@ -141,14 +135,17 @@ export function Header() {
             aria-label="Trang chủ"
             tabIndex={isScrolled ? 0 : -1}
             aria-hidden={!isScrolled}
-            className={`flex items-center gap-2.5 overflow-hidden whitespace-nowrap transition-all duration-300 ${
-              isScrolled ? "max-w-[15rem] opacity-100" : "pointer-events-none max-w-0 opacity-0"
+            className={`flex min-w-0 items-center gap-2.5 overflow-hidden transition-all duration-300 ${
+              isScrolled ? "max-w-[20rem] opacity-100" : "pointer-events-none max-w-0 opacity-0"
             }`}
           >
             <span className="logo-shine relative block h-10 w-10 shrink-0 overflow-hidden rounded-full">
               <LogoBadge className="h-full w-full" />
             </span>
-            <span className="text-sm font-extrabold uppercase text-accent-700">Trái Cây Đông Lạnh 28</span>
+            <span className="text-[13px] font-extrabold uppercase leading-tight text-accent-700 sm:whitespace-nowrap sm:text-sm">
+              <span className="block sm:inline">Trái Cây Đông Lạnh</span>{" "}
+              <span className="block sm:inline">Đà Nẵng 28</span>
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex">

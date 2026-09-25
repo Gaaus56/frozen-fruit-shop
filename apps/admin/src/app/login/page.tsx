@@ -9,7 +9,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-xl font-bold text-slate-900">Frozen Fruit Shop</h1>
+        <h1 className="text-xl font-bold text-slate-900">Trái Cây Đông Lạnh Đà Nẵng 28</h1>
         <p className="mt-1 text-sm text-slate-500">Đăng nhập trang quản trị</p>
 
         <form action={formAction} className="mt-6 flex flex-col gap-4">

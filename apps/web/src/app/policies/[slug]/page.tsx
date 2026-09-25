@@ -30,7 +30,7 @@ export default async function PolicyPage({ params }: PolicyPageProps) {
   return (
     <Container className="py-12">
       <h1 className="text-2xl font-bold text-foreground">{policy.title}</h1>
-      <p className="mt-6 max-w-3xl text-foreground/70">{policy.content}</p>
+      <p className="mt-6 max-w-3xl whitespace-pre-line text-foreground/70">{policy.content}</p>
     </Container>
   );
 }

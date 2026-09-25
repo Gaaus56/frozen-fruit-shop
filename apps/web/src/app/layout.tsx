@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/footer";
 import { FloatingContact } from "@/components/layout/floating-contact";
 import { CartProvider } from "@/lib/cart-context";
 import { ThemeProvider } from "@/lib/theme-context";
+import { business } from "@/data/business";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -15,8 +16,8 @@ const archivo = Archivo({
 
 export const metadata: Metadata = {
   title: {
-    default: "Trái Cây Đông Lạnh 28 — Trái cây đông lạnh chất lượng",
-    template: "%s | Trái Cây Đông Lạnh 28",
+    default: `${business.name} — Trái cây đông lạnh chất lượng`,
+    template: `%s | ${business.name}`,
   },
   description:
     "Trái cây đông lạnh cấp đông nhanh sau thu hoạch, không chất bảo quản, đóng gói hút chân không, giao hàng lạnh toàn quốc.",

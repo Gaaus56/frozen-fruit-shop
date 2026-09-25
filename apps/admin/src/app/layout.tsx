@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Trang quản trị — Frozen Fruit Shop",
-    template: "%s | Quản trị Frozen Fruit Shop",
+    default: "Trang quản trị — Trái Cây Đông Lạnh Đà Nẵng 28",
+    template: "%s | Quản trị Trái Cây Đông Lạnh Đà Nẵng 28",
   },
   description: "Trang quản trị nội bộ để cập nhật sản phẩm, danh mục và bài viết.",
   robots: { index: false, follow: false },
