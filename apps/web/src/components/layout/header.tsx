@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { categories } from "@frozen-fruit-shop/fixtures";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
@@ -47,8 +47,45 @@ export function Header() {
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownSuppressed, setIsDropdownSuppressed] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const pathname = usePathname();
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+  useEffect(() => {
+    if (!isSearchOpen) return;
+    const focusTimer = window.setTimeout(() => searchInputRef.current?.focus(), 60);
+    const onPointerDown = (event: PointerEvent) => {
+      if (!searchRef.current?.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+        setSearchValue("");
+      }
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSearchOpen(false);
+        setSearchValue("");
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isSearchOpen]);
+
+  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const q = searchValue.trim();
+    router.push(q ? `/products?q=${encodeURIComponent(q)}` : "/products");
+    setIsSearchOpen(false);
+    setSearchValue("");
+  };
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 150);
@@ -123,7 +160,7 @@ export function Header() {
             <Link
               href="/"
               aria-label={business.name}
-              className="block whitespace-nowrap text-[13px] font-extrabold uppercase leading-tight tracking-tight text-accent-700 min-[400px]:text-sm min-[440px]:text-base"
+              className="block text-[13px] font-extrabold uppercase leading-tight tracking-tight text-accent-700 max-[340px]:text-[11px] min-[400px]:text-sm min-[440px]:text-base"
             >
               <span className="block">Trái Cây Đông Lạnh</span>
               <span className="block">Đà Nẵng 28</span>
@@ -207,6 +244,52 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <div ref={searchRef} className="relative hidden lg:block">
+              <button
+                type="button"
+                onClick={() => {
+                  if (isSearchOpen) setSearchValue("");
+                  setIsSearchOpen((open) => !open);
+                }}
+                aria-expanded={isSearchOpen}
+                aria-controls="header-search"
+                aria-label="Tìm kiếm sản phẩm"
+                title="Tìm kiếm"
+                className={`inline-flex h-9 w-9 items-center justify-center border transition-colors hover:border-accent-600 hover:text-accent-600 ${
+                  isSearchOpen ? "border-accent-600 text-accent-600" : "border-divider text-foreground/85"
+                }`}
+              >
+                <SearchIcon />
+              </button>
+
+              <form
+                id="header-search"
+                onSubmit={submitSearch}
+                className={`absolute right-0 top-full z-50 mt-3 flex w-72 items-center border-t-2 border-accent-700 bg-background shadow-2xl ring-1 ring-divider transition-all duration-200 ${
+                  isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0"
+                }`}
+              >
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchValue}
+                  onChange={(event) => setSearchValue(event.target.value)}
+                  tabIndex={isSearchOpen ? 0 : -1}
+                  placeholder="Tìm sản phẩm..."
+                  aria-label="Tìm sản phẩm"
+                  className="h-9 min-w-0 flex-1 bg-transparent px-3 text-sm text-foreground outline-none placeholder:text-foreground/45"
+                />
+                <button
+                  type="submit"
+                  tabIndex={isSearchOpen ? 0 : -1}
+                  aria-label="Tìm"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center bg-accent-600 text-white hover:bg-accent-700"
+                >
+                  <SearchIcon />
+                </button>
+              </form>
+            </div>
+
             <button
               type="button"
               onClick={toggleTheme}
@@ -263,6 +346,15 @@ function ChevronIcon({ open = false }: { open?: boolean }) {
       className={`transition-transform duration-200 group-hover/nav:rotate-180 ${open ? "rotate-180" : ""}`}
     >
       <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.3-4.3" />
     </svg>
   );
 }
