@@ -9,15 +9,6 @@
   --divider: color-mix(in srgb, #201e1d 16%, transparent);
 }
 
-:root[data-theme="dark"] {
-  --background: #1b1a19;
-  --surface: #2b2927;
-  --foreground: #f3f2f2;
-  --price: #ff9783;
-  --leaf: #4fb37a;
-  --divider: color-mix(in srgb, #f3f2f2 20%, transparent);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -123,7 +114,7 @@ h4 {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  background: #1f6b3f;
+  background: var(--color-accent-700);
   z-index: -1;
   animation: contact-ripple 2.4s ease-out infinite;
 }
@@ -147,10 +138,6 @@ h4 {
   padding-left: 100%;
   white-space: nowrap;
   animation: marquee-scroll 32s linear infinite;
-}
-
-.marquee:hover .marquee-track {
-  animation-play-state: paused;
 }
 
 .logo-shine::after {

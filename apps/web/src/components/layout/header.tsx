@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { categories } from "@frozen-fruit-shop/fixtures";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
-import { useTheme } from "@/lib/theme-context";
+import { business } from "@/data/business";
 import { LogoBadge } from "./logo-badge";
 
 const NAV_LINKS = [
@@ -42,28 +42,48 @@ const FEATURES = [
 ];
 
 export function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { totalQuantity } = useCart();
-  const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isDropdownSuppressed, setIsDropdownSuppressed] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const pathname = usePathname();
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   useEffect(() => {
-    if (!isMenuOpen) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsMenuOpen(false);
+    if (!isSearchOpen) return;
+    const focusTimer = window.setTimeout(() => searchInputRef.current?.focus(), 60);
+    const onPointerDown = (event: PointerEvent) => {
+      if (!searchRef.current?.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+        setSearchValue("");
+      }
     };
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSearchOpen(false);
+        setSearchValue("");
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
+      window.clearTimeout(focusTimer);
+      document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [isMenuOpen]);
+  }, [isSearchOpen]);
+
+  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const q = searchValue.trim();
+    router.push(q ? `/products?q=${encodeURIComponent(q)}` : "/products");
+    setIsSearchOpen(false);
+    setSearchValue("");
+  };
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 150);
@@ -77,8 +97,8 @@ export function Header() {
       <div className="overflow-hidden bg-accent-700 text-white">
         <div className="marquee py-2 text-[13px] font-semibold">
           <span className="marquee-track">
-            Chào mừng bạn đến với Trái Cây Đông Lạnh 28 — Trái cây đông lạnh cấp đông nhanh, không chất bảo quản —
-            Hotline: 0934 568 196 — Giao hàng lạnh toàn quốc
+            Chào mừng bạn đến với {business.name} — Trái cây đông lạnh cấp đông nhanh, không chất bảo quản —
+            Hotline {business.hotlineHours}: {business.phoneDisplay} — {business.addressLandmark}, {business.address}
           </span>
         </div>
       </div>
@@ -115,7 +135,7 @@ export function Header() {
 
         <Link
           href="/"
-          aria-label="Trái Cây Đông Lạnh 28 — Trang chủ"
+          aria-label={`${business.name} — Trang chủ`}
           className="absolute left-3 top-0 z-50 flex h-[5.75rem] w-20 justify-center rounded-b-full bg-[#1f6b3f] pt-2 shadow-xl lg:left-8 lg:h-[9.5rem] lg:w-36 lg:pt-3"
         >
           <span className="logo-shine relative block h-16 w-16 overflow-hidden rounded-full ring-2 ring-white lg:h-28 lg:w-28 lg:ring-4">
@@ -137,19 +157,12 @@ export function Header() {
           <div className={`min-w-0 leading-tight lg:hidden ${isScrolled ? "hidden" : "block"}`}>
             <Link
               href="/"
-              className="block truncate text-[13px] font-extrabold uppercase tracking-tight text-accent-700 min-[420px]:text-[15px]"
+              aria-label={business.name}
+              className="block text-[13px] font-extrabold uppercase leading-tight tracking-tight text-accent-700 max-[340px]:text-[11px] min-[400px]:text-sm min-[440px]:text-base"
             >
-              Trái Cây Đông Lạnh 28
+              <span className="block">Trái Cây Đông Lạnh</span>
+              <span className="block">Đà Nẵng 28</span>
             </Link>
-            <a
-              href="tel:0934568196"
-              className="mt-0.5 flex items-center gap-1 text-xs font-extrabold text-[#1f6b3f] min-[420px]:text-sm"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.3.2 2.5.6 3.6a1 1 0 0 1-.25 1z" />
-              </svg>
-              0934 568 196
-            </a>
           </div>
 
           <Link
@@ -157,14 +170,17 @@ export function Header() {
             aria-label="Trang chủ"
             tabIndex={isScrolled ? 0 : -1}
             aria-hidden={!isScrolled}
-            className={`flex items-center gap-2.5 overflow-hidden whitespace-nowrap transition-all duration-300 ${
-              isScrolled ? "max-w-[15rem] opacity-100" : "pointer-events-none max-w-0 opacity-0"
+            className={`flex min-w-0 items-center gap-2.5 overflow-hidden transition-all duration-300 ${
+              isScrolled ? "max-w-[20rem] opacity-100" : "pointer-events-none max-w-0 opacity-0"
             }`}
           >
             <span className="logo-shine relative block h-10 w-10 shrink-0 overflow-hidden rounded-full">
               <LogoBadge className="h-full w-full" />
             </span>
-            <span className="text-sm font-extrabold uppercase text-accent-700">Trái Cây Đông Lạnh 28</span>
+            <span className="text-[13px] font-extrabold uppercase leading-tight text-accent-700 sm:whitespace-nowrap sm:text-sm">
+              <span className="block sm:inline">Trái Cây Đông Lạnh</span>{" "}
+              <span className="block sm:inline">Đà Nẵng 28</span>
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex">
@@ -226,15 +242,51 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="hidden h-9 w-9 items-center justify-center border border-divider text-foreground/85 hover:border-accent-600 hover:text-accent-600 sm:inline-flex"
-              aria-label={theme === "dark" ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}
-              title="Chuyển giao diện sáng/tối"
-            >
-              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-            </button>
+            <div ref={searchRef} className="lg:relative">
+              <button
+                type="button"
+                onClick={() => {
+                  if (isSearchOpen) setSearchValue("");
+                  setIsSearchOpen((open) => !open);
+                }}
+                aria-expanded={isSearchOpen}
+                aria-controls="header-search"
+                aria-label="Tìm kiếm sản phẩm"
+                title="Tìm kiếm"
+                className={`inline-flex h-9 w-9 items-center justify-center border transition-colors hover:border-accent-600 hover:text-accent-600 ${
+                  isSearchOpen ? "border-accent-600 text-accent-600" : "border-divider text-foreground/85"
+                }`}
+              >
+                <SearchIcon />
+              </button>
+
+              <form
+                id="header-search"
+                onSubmit={submitSearch}
+                className={`absolute right-[3.75rem] top-full z-50 mt-2 flex w-[min(18rem,calc(100%-10.25rem))] items-center sm:right-[4.25rem] sm:w-72 lg:right-0 lg:mt-3 border-t-2 border-accent-700 bg-background shadow-2xl ring-1 ring-divider transition-all duration-200 ${
+                  isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0"
+                }`}
+              >
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchValue}
+                  onChange={(event) => setSearchValue(event.target.value)}
+                  tabIndex={isSearchOpen ? 0 : -1}
+                  placeholder="Tìm sản phẩm..."
+                  aria-label="Tìm sản phẩm"
+                  className="h-9 min-w-0 flex-1 bg-transparent px-3 text-sm text-foreground outline-none placeholder:text-foreground/45"
+                />
+                <button
+                  type="submit"
+                  tabIndex={isSearchOpen ? 0 : -1}
+                  aria-label="Tìm"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center bg-accent-600 text-white hover:bg-accent-700"
+                >
+                  <SearchIcon />
+                </button>
+              </form>
+            </div>
 
             <Link
               href="/cart"
@@ -248,122 +300,21 @@ export function Header() {
                 </span>
               ) : null}
             </Link>
-
-            <button
-              type="button"
-              className="inline-flex h-9 w-9 items-center justify-center border border-divider text-foreground/85 lg:hidden"
-              aria-label="Mở menu"
-              aria-expanded={isMenuOpen}
-              aria-controls="mobile-menu"
-              onClick={() => setIsMenuOpen((open) => !open)}
-            >
-              <MenuIcon />
-            </button>
           </div>
         </Container>
       </header>
 
-      <div
-        className={`fixed inset-0 z-[60] bg-black/50 transition-opacity duration-300 lg:hidden ${
-          isMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-        onClick={() => setIsMenuOpen(false)}
-        aria-hidden
-      />
-      <aside
-        id="mobile-menu"
-        aria-label="Menu"
-        aria-hidden={!isMenuOpen}
-        className="fixed inset-y-0 left-0 z-[70] flex w-80 max-w-[85vw] flex-col bg-background shadow-2xl lg:hidden"
-        style={{
-          transform: isMenuOpen ? "translateX(0)" : "translateX(-105%)",
-          visibility: isMenuOpen ? "visible" : "hidden",
-          transition: `transform 300ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear ${isMenuOpen ? "0s" : "300ms"}`,
-        }}
+      <nav
+        aria-label="Điều hướng chính"
+        className="fixed inset-x-3 bottom-3 z-50 flex items-center justify-between rounded-full border border-divider bg-background/95 p-1.5 shadow-xl shadow-black/15 backdrop-blur lg:hidden"
       >
-        <div className="flex h-16 shrink-0 items-center justify-between gap-3 bg-[#1f6b3f] px-4 text-white">
-          <span className="flex min-w-0 items-center gap-3">
-            <span className="logo-shine relative block h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-white">
-              <LogoBadge className="h-full w-full" />
-            </span>
-            <span className="truncate text-sm font-extrabold uppercase">Trái Cây Đông Lạnh 28</span>
-          </span>
-          <button
-            type="button"
-            onClick={() => setIsMenuOpen(false)}
-            aria-label="Đóng menu"
-            className="flex h-9 w-9 shrink-0 items-center justify-center hover:bg-white/15"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
-        </div>
-
-        <nav className="flex-1 overflow-y-auto py-2">
-          {NAV_LINKS.map((link) => (
-            <div key={link.href} className="border-b border-divider">
-              <div className="flex items-stretch">
-                <Link
-                  href={link.href}
-                  className={`flex-1 border-l-4 px-4 py-3.5 text-sm font-bold uppercase hover:bg-surface hover:text-accent-700 ${
-                    isActive(link.href) ? "border-accent-700 text-accent-700" : "border-transparent text-foreground/85"
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-                {link.href === "/products" ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsProductsOpen((open) => !open)}
-                    aria-expanded={isProductsOpen}
-                    aria-label="Xem các loại sản phẩm"
-                    className="px-5 text-foreground/70 hover:text-accent-700"
-                  >
-                    <ChevronIcon open={isProductsOpen} />
-                  </button>
-                ) : null}
-              </div>
-              {link.href === "/products" && isProductsOpen ? (
-                <ul className="bg-surface/60 pb-2">
-                  {categories.map((category) => (
-                    <li key={category.id}>
-                      <Link
-                        href={`/products?category=${category.slug}`}
-                        className="block px-9 py-2.5 text-sm text-foreground/75 hover:text-accent-700"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {category.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          ))}
-        </nav>
-
-        <div className="flex flex-col gap-3 border-t border-divider p-4">
-          <a
-            href="tel:0934568196"
-            className="flex items-center justify-center gap-2 bg-[#1f6b3f] px-4 py-3 text-sm font-extrabold text-white hover:bg-[#154d2d]"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-              <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.3.2 2.5.6 3.6a1 1 0 0 1-.25 1z" />
-            </svg>
-            Gọi 0934 568 196
-          </a>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="flex items-center justify-center gap-2 border border-divider px-4 py-2.5 text-sm font-bold text-foreground/85 hover:border-accent-600 hover:text-accent-600"
-          >
-            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-            {theme === "dark" ? "Giao diện sáng" : "Giao diện tối"}
-          </button>
-        </div>
-      </aside>
+        <TabLink href="/" label="Trang chủ" active={isActive("/")} icon={<HomeIcon />} />
+        <TabLink href="/products" label="Sản phẩm" active={isActive("/products")} icon={<GridIcon />} />
+        {/* Chỗ trống cho nút liên hệ nổi (FloatingContact) nằm giữa thanh. */}
+        <span aria-hidden className="w-14 shrink-0" />
+        <TabLink href="/about" label="Giới thiệu" active={isActive("/about")} icon={<InfoIcon />} />
+        <TabLink href="/contact" label="Liên hệ" active={isActive("/contact")} icon={<ContactIcon />} />
+      </nav>
     </>
   );
 }
@@ -387,6 +338,15 @@ function ChevronIcon({ open = false }: { open?: boolean }) {
   );
 }
 
+function SearchIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.3-4.3" />
+    </svg>
+  );
+}
+
 function CartIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -397,29 +357,54 @@ function CartIcon() {
   );
 }
 
-function MenuIcon() {
+function TabLink({ href, label, active, icon }: { href: string; label: string; active: boolean; icon: ReactNode }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <line x1="3" y1="12" x2="21" y2="12" />
-      <line x1="3" y1="18" x2="21" y2="18" />
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 px-1 py-1.5 text-[11px] font-bold transition-colors ${
+        active ? "text-accent-700" : "text-foreground/65"
+      }`}
+    >
+      {icon}
+      <span className="truncate">{label}</span>
+    </Link>
+  );
+}
+
+function HomeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
+      <path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V11z" />
     </svg>
   );
 }
 
-function SunIcon() {
+function GridIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
     </svg>
   );
 }
 
-function MoonIcon() {
+function InfoIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5M12 8h.01" />
     </svg>
   );
 }
+
+function ContactIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.6-.8L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z" />
+    </svg>
+  );
+}
+

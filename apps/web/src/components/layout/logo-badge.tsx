@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { business } from "@/data/business";
 
 const COLORS = {
   edge: "#8a0f0b",
@@ -10,7 +11,7 @@ const COLORS = {
 };
 
 const BRAND_TEXT = "TRÁI CÂY ĐÔNG LẠNH";
-const PHONE_TEXT = "0934568196";
+const LOCATION_TEXT = "ĐÀ NẴNG";
 
 function Snowflake({ cx, cy, r }: { cx: number; cy: number; r: number }) {
   return (
@@ -36,10 +37,10 @@ export function LogoBadge({ className }: { className?: string }) {
   const bottomPath = `bottom-${uid}`;
 
   return (
-    <svg viewBox="0 0 1000 1000" role="img" aria-label="Logo Trái Cây Đông Lạnh 28" className={className}>
+    <svg viewBox="0 0 1000 1000" role="img" aria-label={`Logo ${business.name}`} className={className}>
       <defs>
-        <path id={topPath} d="M 185 500 A 315 315 0 0 1 815 500" />
-        <path id={bottomPath} d="M 125 500 A 375 375 0 0 0 875 500" />
+        <path id={topPath} d="M 173 500 A 327 327 0 0 1 827 500" />
+        <path id={bottomPath} d="M 113 500 A 387 387 0 0 0 887 500" />
       </defs>
 
       <circle cx="500" cy="500" r="500" fill={COLORS.cream} />
@@ -61,15 +62,15 @@ export function LogoBadge({ className }: { className?: string }) {
             {BRAND_TEXT}
           </textPath>
         </text>
-        <text fontSize="88" textLength="700" lengthAdjust="spacing">
+        <text fontSize="88" textLength="500" lengthAdjust="spacing">
           <textPath href={`#${bottomPath}`} startOffset="50%">
-            {PHONE_TEXT}
+            {LOCATION_TEXT}
           </textPath>
         </text>
       </g>
 
-      <Snowflake cx={122} cy={500} r={34} />
-      <Snowflake cx={878} cy={500} r={34} />
+      <Snowflake cx={142.5} cy={500} r={36} />
+      <Snowflake cx={857.5} cy={500} r={36} />
 
       <image href="/images/logo-28fruit.png" x="285" y="290" width="430" height="414" />
     </svg>

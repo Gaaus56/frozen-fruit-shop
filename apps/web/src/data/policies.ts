@@ -1,3 +1,5 @@
+import { business } from "./business";
+
 export interface Policy {
   slug: string;
   title: string;
@@ -32,8 +34,31 @@ export const policies: Policy[] = [
   {
     slug: "returns",
     title: "Chính sách đổi trả",
-    content:
-      "Do đặc thù hàng đông lạnh, chúng tôi chỉ hỗ trợ đổi/trả khi sản phẩm còn nguyên bao bì, chưa rã đông, và phát hiện lỗi ngay khi nhận hàng. Vui lòng quay lại video/chụp ảnh tình trạng hàng khi nhận và liên hệ trong vòng 24 giờ.",
+    content: [
+      "1. Điều kiện đổi trả",
+      "Khách hàng được đổi trả khi thuộc một trong các trường hợp sau:",
+      "• Hàng lỗi do nhà sản xuất (sượn, đắng, chua, lên men).",
+      "• Hư hỏng do quá trình vận chuyển.",
+      "• Giao sai sản phẩm, sai khối lượng hoặc sai với yêu cầu trong đơn đặt hàng.",
+      "• Sản phẩm bị rã đông hoàn toàn trước khi đến tay khách hàng (cần quay video mở thùng làm bằng chứng).",
+      "",
+      "Lưu ý quan trọng: bắt buộc quay video mở thùng hàng ngay khi nhận hàng. Video phải rõ ràng, không chỉnh sửa, không cắt ghép, thể hiện đầy đủ quá trình mở thùng và kiểm tra sản phẩm. Cửa hàng không giải quyết khiếu nại nếu không có video mở thùng hàng.",
+      "",
+      "2. Thời gian đổi trả",
+      "• Nội thành: đổi trả ngay trong 1–3 giờ.",
+      "• Ngoại tỉnh: cấp đông lại trong 24 giờ sau khi nhận hàng, rồi đóng thùng gửi về cửa hàng.",
+      "",
+      "3. Hình thức đổi trả",
+      "• Đổi sản phẩm mới cùng loại nếu có hàng sẵn.",
+      "• Hoàn tiền hoặc đổi sang sản phẩm khác.",
+      "• Không hỗ trợ đổi trả nếu hàng đã bị mở ra hoặc rã đông do bảo quản sai cách sau khi nhận hàng.",
+      "",
+      "4. Liên hệ hỗ trợ",
+      `Hotline/Zalo ${business.hotlineHours}: ${business.phoneDisplay}`,
+      `Địa chỉ cửa hàng: ${business.address} (${business.addressLandmark}).`,
+      "",
+      "Lưu ý bảo quản: trái cây đông lạnh cần được bảo quản ở nhiệt độ -18°C (tủ đông) ngay sau khi nhận hàng. Rã đông bằng nhiệt độ phòng hoặc ngăn mát tủ lạnh trong 6–8 tiếng; ngoài ra có thể rã đông bằng nước trong 5–15 phút.",
+    ].join("\n"),
   },
   {
     slug: "terms-of-service",

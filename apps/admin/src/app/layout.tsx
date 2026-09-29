@@ -10,8 +10,8 @@ const archivo = Archivo({
 
 export const metadata: Metadata = {
   title: {
-    default: "Trang quản trị — Trái Cây Đông Lạnh 28",
-    template: "%s | Quản trị Trái Cây Đông Lạnh 28",
+    default: "Trang quản trị — Trái Cây Đông Lạnh Đà Nẵng 28",
+    template: "%s | Quản trị Trái Cây Đông Lạnh Đà Nẵng 28",
   },
   description: "Trang quản trị nội bộ để cập nhật sản phẩm, danh mục và bài viết.",
   robots: { index: false, follow: false },
