@@ -154,7 +154,7 @@ export interface SiteSettings {
 }
 
 /**
- * Thông tin cửa hàng mặc định (từ docs/info/WEB_info.md) — dùng khi ADMIN chưa lưu cài đặt lần nào,
+ * Thông tin cửa hàng mặc định (từ docs/01-product/business-info.md) — dùng khi ADMIN chưa lưu cài đặt lần nào,
  * hoặc khi web không kết nối được API. Đây là cấu hình doanh nghiệp, không phải dữ liệu mẫu.
  */
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {

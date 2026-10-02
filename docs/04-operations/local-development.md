@@ -1,11 +1,12 @@
-# Cài đặt, vận hành và triển khai
+# Chạy trên máy dev
 
 ## 1. Yêu cầu
 
 - Node.js 22+ và npm 10+
 - Docker (chạy PostgreSQL)
+- Git
 
-## 2. Chạy trên máy dev (lần đầu)
+## 2. Lần đầu
 
 Chạy từ thư mục gốc repo:
 
@@ -27,6 +28,8 @@ npm run dev:admin                             # http://localhost:3002
 
 Sau đó đăng nhập admin, lần lượt nhập: **Thông tin cửa hàng → Danh mục → Sản phẩm → Banner → Chính sách → Bài viết**. Database không có dữ liệu mẫu.
 
+Kiểm tra nhanh: `http://localhost:4000/health` trả OK; trang chủ web hiện thông tin cửa hàng.
+
 ## 3. Lệnh thường dùng
 
 | Lệnh | Tác dụng |
@@ -34,6 +37,7 @@ Sau đó đăng nhập admin, lần lượt nhập: **Thông tin cửa hàng →
 | `npm run dev:web` / `dev:admin` / `dev:api` | Chạy từng app ở chế độ phát triển |
 | `npm run build:web` / `build:admin` / `build:api` | Build production |
 | `npm run lint:web` / `lint:admin` | Kiểm tra ESLint |
+| `npm run build:packages` | Build lại `packages/types` sau khi sửa |
 | `npm run db:up` / `db:down` | Bật / tắt PostgreSQL Docker (dữ liệu giữ trong volume) |
 | `npm run db:migrate` | Sau khi sửa `schema.prisma`: tạo migration mới và áp dụng (chỉ máy dev) |
 | `npm run db:deploy` | Áp migration có sẵn (máy chủ, database mới) |
@@ -58,45 +62,19 @@ Sau đó đăng nhập admin, lần lượt nhập: **Thông tin cửa hàng →
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` | — | Chỉ dùng cho `npm run admin:create` |
 
 ### `apps/web/.env.local`
-`NEXT_PUBLIC_API_URL`, `API_URL` (tuỳ chọn), `REVALIDATE_SECRET` — xem [web.md](web.md#5-biến-môi-trường-appswebenvlocal).
+`NEXT_PUBLIC_API_URL`, `API_URL` (tuỳ chọn), `REVALIDATE_SECRET` — xem [web.md](../03-apps/web.md#5-biến-môi-trường-appswebenvlocal).
 
 ### `apps/admin/.env.local`
 `API_URL` — địa chỉ API cho server admin.
 
-## 5. Triển khai lên VPS
+Biến môi trường production: [deployment.md](deployment.md#3-biến-môi-trường-production).
 
-Chuẩn bị sẵn trong thư mục `deploy/`: Docker Compose gồm **postgres, api, web, admin, caddy** (Caddy tự cấp HTTPS).
+## 5. Sự cố thường gặp
 
-| Tên miền | Dịch vụ |
+| Hiện tượng | Nguyên nhân / cách xử lý |
 |---|---|
-| `<DOMAIN>` (và `www.` chuyển hướng về) | Web khách hàng |
-| `api.<DOMAIN>` | API + ảnh `/uploads` |
-| `admin.<DOMAIN>` | Trang quản trị |
-
-Các bước:
-1. VPS Ubuntu 24.04 (2 vCPU / 2 GB RAM), cài Docker. Trỏ DNS ba tên miền trên về IP VPS.
-2. `cp deploy/.env.example deploy/.env`, điền `DOMAIN`, mật khẩu Postgres, `JWT_SECRET` (`openssl rand -base64 48`), `REVALIDATE_SECRET` (`openssl rand -hex 24`).
-3. `docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env up -d --build` — API tự áp migration khi khởi động.
-4. Tạo ADMIN:
-   ```bash
-   docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env run --rm \
-     -e ADMIN_EMAIL=... -e ADMIN_PASSWORD=... api npm run prisma:create-admin -w apps/api
-   ```
-5. Tường lửa chỉ mở 22, 80, 443.
-6. Cập nhật phiên bản: `git pull` rồi chạy lại lệnh ở bước 3.
-
-Ghi chú:
-- `NEXT_PUBLIC_API_URL` của web được đóng gói lúc build (`https://api.<DOMAIN>`) — đổi tên miền phải build lại web.
-- Ảnh nằm ở volume `uploads_data`, database ở `postgres_data`. **Không chạy `docker compose down -v`** trên máy thật.
-- Realtime (SSE) chạy qua Caddy: `Caddyfile` đã tắt nén gzip cho `/events`, `/admin/events` (api) và `/api/events` (admin). Nếu đổi sang Nginx: `proxy_buffering off;` và `proxy_read_timeout` > 30 giây cho các đường dẫn này.
-
-## 6. Sao lưu
-
-- Database: `deploy/backup.sh` (pg_dump, giữ 14 bản), chạy bằng cron mỗi đêm.
-- Ảnh: sao lưu volume `uploads_data`, ví dụ
-  `docker run --rm -v <project>_uploads_data:/data -v /var/backups/ffs:/backup alpine tar czf /backup/uploads-$(date +%F).tar.gz -C /data .`
-- Nên đẩy bản sao lưu ra ngoài VPS (Cloudflare R2, Backblaze B2, Google Drive) và thử khôi phục định kỳ.
-
-## 7. CI
-
-`.github/workflows/ci.yml` chạy khi mở PR vào `main`: cài đặt, lint web + admin, build web + admin, `prisma generate`, build API. Build web không cần API hay database.
+| API báo không kết nối được database | Chưa `npm run db:up`, hoặc `DATABASE_URL` sai cổng (dev dùng **5434**) |
+| Web không thấy dữ liệu mới sau khi sửa ở admin | `WEB_REVALIDATE_URL` / `REVALIDATE_SECRET` chưa khớp giữa API và web → đợi ≤ 5 phút hoặc sửa `.env` |
+| Lỗi type `@frozen-fruit-shop/types` sau khi sửa package | Chạy `npm run build:packages` |
+| Ảnh không hiện trên web | `NEXT_PUBLIC_API_URL` sai → `next/image` chặn tên miền ảnh |
+| Quên mật khẩu ADMIN | Đổi `ADMIN_PASSWORD` trong `apps/api/.env` rồi `npm run admin:create` |

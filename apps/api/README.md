@@ -1,6 +1,6 @@
 # Trái Cây Đông Lạnh Đà Nẵng 28 — API
 
-Backend NestJS 12 (ESM) + Prisma 6 + PostgreSQL. Workspace con của monorepo gốc — xem `docs/guide/` ở gốc repo, đặc biệt [api.md](../../docs/guide/api.md) (danh sách endpoint) và [database.md](../../docs/guide/database.md) (mô hình dữ liệu).
+Backend NestJS 12 (ESM) + Prisma 6 + PostgreSQL. Workspace con của monorepo gốc — xem [docs/](../../docs/README.md) ở gốc repo, đặc biệt [api.md](../../docs/03-apps/api.md) (danh sách endpoint) và [database.md](../../docs/03-apps/database.md) (mô hình dữ liệu).
 
 ## Chạy cục bộ
 

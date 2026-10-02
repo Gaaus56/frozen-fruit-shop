@@ -3,16 +3,21 @@
 ```
 frozen-fruit-shop/
 ├── apps/
-│   ├── web/                 # Website khách hàng (Next.js) — xem web.md
-│   ├── admin/               # Trang quản trị (Next.js) — xem admin.md
-│   └── api/                 # Backend NestJS + Prisma — xem api.md, database.md
+│   ├── web/                 # Website khách hàng (Next.js) — xem 03-apps/web.md
+│   ├── admin/               # Trang quản trị (Next.js) — xem 03-apps/admin.md
+│   └── api/                 # Backend NestJS + Prisma — xem 03-apps/api.md, database.md
 ├── packages/
 │   └── types/               # Hợp đồng dữ liệu dùng chung cho cả 3 app
 ├── deploy/                  # Docker Compose production, Dockerfile, Caddyfile, backup.sh
-├── docs/
-│   ├── guide/               # Tài liệu kỹ thuật (thư mục này)
-│   ├── info/                # Thông tin doanh nghiệp gốc
-│   └── plan/                # Kế hoạch ban đầu (tham khảo)
+├── design/                  # Bảng màu, bản thiết kế HTML tham khảo
+├── docs/                    # Tài liệu — mục lục ở docs/README.md
+│   ├── 01-product/          # Tổng quan, tính năng, thông tin cửa hàng
+│   ├── 02-architecture/     # Kiến trúc, luồng hoạt động, bảo mật, cây thư mục
+│   ├── 03-apps/             # web, admin, api, database
+│   ├── 04-operations/       # Chạy máy dev, triển khai, giám sát & sao lưu, CI/CD
+│   ├── 05-roadmap/          # Lộ trình, checklist production, quyết định kỹ thuật
+│   └── archive/             # Kế hoạch cũ (lỗi thời)
+├── .github/workflows/       # CI (lint + build khi mở PR vào main)
 ├── docker-compose.yml       # PostgreSQL cho máy dev (cổng 5434)
 └── package.json             # npm workspaces + lệnh chung
 ```
@@ -82,7 +87,7 @@ prisma/
 ├── schema.prisma            # mô hình dữ liệu
 ├── migrations/              # lịch sử migration
 └── create-admin.ts          # tạo / đặt lại mật khẩu ADMIN duy nhất
-src/                         # xem api.md mục 6
+src/                         # xem 03-apps/api.md mục 6
 uploads/                     # ảnh tải lên (không commit)
 ```
 

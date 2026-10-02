@@ -33,7 +33,7 @@ Thành phần chung:
 
 Cache tag: `catalog` (sản phẩm, danh mục), `content` (bài viết, banner, chính sách), `settings` (thông tin cửa hàng). API gọi `/api/revalidate` khi dữ liệu tương ứng thay đổi.
 
-**Realtime**: `components/layout/live-updates.tsx` (trong layout gốc) nghe `GET {NEXT_PUBLIC_API_URL}/events`. Admin sửa dữ liệu → trang khách đang mở tự `router.refresh()` sau khi cache đã xoá, không mất giỏ hàng; trang thanh toán báo giá lại (sự kiện window `traicay28:data-changed`). Chi tiết: [architecture.md](architecture.md#cập-nhật-realtime-giữa-web-và-admin).
+**Realtime**: `components/layout/live-updates.tsx` (trong layout gốc) nghe `GET {NEXT_PUBLIC_API_URL}/events`. Admin sửa dữ liệu → trang khách đang mở tự `router.refresh()` sau khi cache đã xoá, không mất giỏ hàng; trang thanh toán báo giá lại (sự kiện window `traicay28:data-changed`). Chi tiết: [request-flows.md](../02-architecture/request-flows.md#5-cập-nhật-realtime).
 
 Ảnh sản phẩm dùng `next/image`; `next.config.ts` chỉ cho phép ảnh từ `${NEXT_PUBLIC_API_URL}/uploads/**`. Sản phẩm chưa có ảnh hiển thị `public/images/placeholder.svg`.
 

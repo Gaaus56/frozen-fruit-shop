@@ -54,7 +54,7 @@ Bộ đếm nằm trong bộ nhớ tiến trình (đủ cho một máy chủ). A
 | POST | `/orders` | Tạo đơn: `items`, `customerName`, `customerPhone`, `customerEmail?`, `shippingAddress`, `customerNote?`, `paymentMethod` (cod/bank_transfer), `website` (honeypot). Trả `{ orderNumber, total }` |
 | GET | `/orders/lookup?orderNumber=&phone=` | Tra cứu đơn (phải khớp cả hai) |
 | POST | `/inquiries` | Liên hệ / báo giá sỉ: `type` (contact/wholesale), `name`, `phone`, `email`, `company`, `quantity`, `message`, `website` |
-| GET | `/events` | Luồng SSE: `{ type: "changed", tags }` khi dữ liệu hiển thị trên web thay đổi (xem [architecture.md](architecture.md#cập-nhật-realtime-giữa-web-và-admin)) |
+| GET | `/events` | Luồng SSE: `{ type: "changed", tags }` khi dữ liệu hiển thị trên web thay đổi (xem [request-flows.md](../02-architecture/request-flows.md#5-cập-nhật-realtime)) |
 
 Phí vận chuyển của đơn mới là 0 — cửa hàng gọi khách xác nhận rồi nhập phí ở trang quản trị.
 

@@ -3,7 +3,7 @@
 Docker Compose gồm Postgres, API, web, admin và Caddy (HTTPS tự động qua Let's Encrypt). Ba tên miền: `<DOMAIN>` (web khách), `api.<DOMAIN>`, `admin.<DOMAIN>`.
 
 Hướng dẫn đầy đủ (chuẩn bị VPS, DNS, biến môi trường, tạo tài khoản admin, sao lưu):
-**[docs/guide/operations.md](../docs/guide/operations.md#5-triển-khai-lên-vps)**
+**[docs/04-operations/deployment.md](../docs/04-operations/deployment.md)**
 
 Tóm tắt lệnh khởi chạy trên VPS:
 

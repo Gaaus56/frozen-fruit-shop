@@ -10,7 +10,7 @@ apps/
 packages/
 └── types/    # Kiểu dữ liệu dùng chung giữa web / admin / api
 deploy/       # Triển khai production (Docker Compose + Caddy)
-docs/guide/   # Tài liệu kỹ thuật — bắt đầu từ đây
+docs/         # Tài liệu — bắt đầu từ docs/README.md
 ```
 
 ## Bắt đầu nhanh
@@ -35,6 +35,12 @@ Database khởi tạo **rỗng** — không có dữ liệu mẫu. Đăng nhập
 
 ## Tài liệu
 
-Toàn bộ tài liệu kỹ thuật (kiến trúc, tính năng từng app, API, database, phân quyền, cài đặt, triển khai) nằm ở **[docs/guide/](docs/guide/README.md)**.
+Mục lục đầy đủ: **[docs/README.md](docs/README.md)**.
 
-Thông tin doanh nghiệp gốc: `docs/info/WEB_info.md`. Tài liệu kế hoạch ban đầu (tham khảo lịch sử): `docs/plan/`.
+| Cần biết | Đọc |
+|---|---|
+| Dự án là gì, có tính năng gì | [overview](docs/01-product/overview.md) · [features](docs/01-product/features.md) |
+| Kiến trúc và luồng hoạt động | [system-overview](docs/02-architecture/system-overview.md) · [request-flows](docs/02-architecture/request-flows.md) |
+| Từng app | [web](docs/03-apps/web.md) · [admin](docs/03-apps/admin.md) · [api](docs/03-apps/api.md) · [database](docs/03-apps/database.md) |
+| Chạy, triển khai, sao lưu | [local-development](docs/04-operations/local-development.md) · [deployment](docs/04-operations/deployment.md) · [monitoring-and-backup](docs/04-operations/monitoring-and-backup.md) |
+| Làm gì tiếp theo | [roadmap](docs/05-roadmap/roadmap.md) · [production-readiness](docs/05-roadmap/production-readiness.md) |
