@@ -1,59 +1,73 @@
-import type { BlogPost } from '@frozen-fruit-shop/types';
-import { apiGet } from '@/lib/api';
-import { PageHeader } from '@/components/ui/page-header';
-import { LinkButton } from '@/components/ui/button';
-import { DeleteButton } from '@/components/ui/delete-button';
-import { deleteBlogPostAction } from './actions';
+import Link from "next/link";
+import type { Post } from "@frozen-fruit-shop/types";
+import { Badge } from "@/components/ui/badge";
+import { LinkButton } from "@/components/ui/button";
+import { DeleteButton } from "@/components/ui/delete-button";
+import { PageHeader } from "@/components/ui/page-header";
+import { Table, Td, Th } from "@/components/ui/table";
+import { api } from "@/lib/api";
+import { formatDateTime } from "@/lib/format";
+import { deletePostAction } from "./actions";
 
-export default async function BlogPostsPage() {
-  const posts = await apiGet<BlogPost[]>('/blog-posts');
+export const metadata = { title: "Bài viết" };
+
+const isScheduled = (post: Post) => new Date(post.publishedAt).getTime() > Date.now();
+
+export default async function PostsPage() {
+  const posts = await api<Post[]>("/admin/posts");
 
   return (
     <div>
       <PageHeader
         title="Bài viết"
-        description="Nội dung hiển thị ở mục Tin tức trên website."
-        action={<LinkButton href="/posts/new">+ Thêm bài viết</LinkButton>}
+        description="Tin tức, công thức, mẹo bảo quản hiển thị ở mục Tin tức trên web."
+        action={<LinkButton href="/posts/new">+ Viết bài</LinkButton>}
       />
-
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-slate-500">
-            <tr>
-              <th className="px-4 py-3 font-medium">Tiêu đề</th>
-              <th className="px-4 py-3 font-medium">Danh mục</th>
-              <th className="px-4 py-3 font-medium">Ngày đăng</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {posts.map((post) => (
-              <tr key={post.id}>
-                <td className="max-w-sm truncate px-4 py-3 font-medium text-slate-900">{post.title}</td>
-                <td className="px-4 py-3 text-slate-500">{post.category}</td>
-                <td className="px-4 py-3 text-slate-500">
-                  {new Intl.DateTimeFormat('vi-VN').format(new Date(post.publishedAt))}
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-end gap-2">
-                    <LinkButton href={`/posts/${post.slug}`} variant="secondary">
-                      Sửa
-                    </LinkButton>
-                    <DeleteButton action={deleteBlogPostAction.bind(null, post.slug)} itemLabel={post.title} />
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {posts.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-slate-500">
-                  Chưa có bài viết nào.
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        empty={posts.length === 0 && "Chưa có bài viết nào."}
+        head={
+          <>
+            <Th>Bài viết</Th>
+            <Th>Chuyên mục</Th>
+            <Th>Ngày đăng</Th>
+            <Th>Trạng thái</Th>
+            <Th />
+          </>
+        }
+      >
+        {posts.map((post) => (
+          <tr key={post.id}>
+            <Td>
+              <div className="flex items-center gap-3">
+                <span className="relative h-11 w-16 shrink-0 overflow-hidden bg-muted">
+                  {post.coverImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- ảnh nhỏ từ API
+                    <img src={post.coverImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  ) : null}
+                </span>
+                <Link href={`/posts/${post.id}`} className="font-bold hover:text-accent-700">{post.title}</Link>
+              </div>
+            </Td>
+            <Td className="text-foreground/70">{post.category || "—"}</Td>
+            <Td className="whitespace-nowrap">{formatDateTime(post.publishedAt)}</Td>
+            <Td>
+              {!post.isPublished ? (
+                <Badge>Bản nháp</Badge>
+              ) : isScheduled(post) ? (
+                <Badge tone="blue">Hẹn giờ đăng</Badge>
+              ) : (
+                <Badge tone="green">Đang hiển thị</Badge>
+              )}
+            </Td>
+            <Td>
+              <div className="flex justify-end gap-2">
+                <LinkButton href={`/posts/${post.id}`} variant="secondary" size="sm">Sửa</LinkButton>
+                <DeleteButton action={deletePostAction.bind(null, post.id)} itemLabel={post.title} />
+              </div>
+            </Td>
+          </tr>
+        ))}
+      </Table>
     </div>
   );
 }

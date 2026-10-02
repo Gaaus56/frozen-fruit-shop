@@ -47,9 +47,6 @@ h4 {
   letter-spacing: -0.015em;
 }
 
-.grayscale-photo {
-  filter: grayscale(1) contrast(1.08);
-}
 
 @keyframes marquee-scroll {
   from {

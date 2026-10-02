@@ -1,14 +1,18 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { LinkButton } from "@/components/ui/button";
 import { useCart } from "@/lib/cart-context";
 import { formatCurrency } from "@/lib/format";
+import { ProductImage } from "@/components/product/product-image";
 
 export default function CartPage() {
-  const { items, updateQuantity, removeItem, subtotal } = useCart();
+  const { items, updateQuantity, removeItem, subtotal, isHydrated } = useCart();
+
+  if (!isHydrated) {
+    return <Container className="py-20 text-center text-foreground/60">Đang tải giỏ hàng...</Container>;
+  }
 
   if (items.length === 0) {
     return (
@@ -30,13 +34,13 @@ export default function CartPage() {
           {items.map((item) => (
             <div
               key={item.variantId}
-              className="flex items-center gap-4 rounded-none border border-divider p-4"
+              className="flex flex-wrap items-center gap-4 border border-divider p-4 sm:flex-nowrap"
             >
-              <div className="relative h-20 w-20 shrink-0 rounded-none bg-surface">
-                <Image src={item.image} alt={item.productName} fill className="object-contain p-2" />
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden bg-surface">
+                <ProductImage src={item.image} alt={item.productName} sizes="80px" />
               </div>
 
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <Link href={`/products/${item.productSlug}`} className="font-semibold text-foreground hover:text-accent-600">
                   {item.productName}
                 </Link>
@@ -44,7 +48,7 @@ export default function CartPage() {
                 <p className="mt-1 font-bold text-price">{formatCurrency(item.unitPrice)}</p>
               </div>
 
-              <div className="flex items-center rounded-none border border-divider">
+              <div className="flex items-center border border-divider">
                 <button
                   type="button"
                   className="px-3 py-1.5 text-lg text-foreground/70"
@@ -76,7 +80,7 @@ export default function CartPage() {
           ))}
         </div>
 
-        <div className="h-fit rounded-none border border-divider p-6">
+        <div className="h-fit border border-divider p-6">
           <h2 className="font-semibold text-foreground">Tóm tắt đơn hàng</h2>
           <div className="mt-4 flex items-center justify-between text-sm text-foreground/70">
             <span>Tạm tính</span>
@@ -84,7 +88,7 @@ export default function CartPage() {
           </div>
           <div className="mt-2 flex items-center justify-between text-sm text-foreground/70">
             <span>Phí vận chuyển</span>
-            <span>Tính ở bước thanh toán</span>
+            <span>Cửa hàng báo khi xác nhận</span>
           </div>
           <div className="mt-4 flex items-center justify-between border-t border-divider pt-4 font-semibold text-foreground">
             <span>Tổng cộng</span>

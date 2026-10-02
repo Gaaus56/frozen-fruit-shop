@@ -25,6 +25,9 @@ out/
 dist/
 **/dist/
 
+# ảnh admin tải lên (apps/api/uploads) — dữ liệu runtime, không commit
+**/uploads/
+
 # prisma
 **/prisma/generated/
 

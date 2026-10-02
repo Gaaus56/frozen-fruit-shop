@@ -1,95 +1,57 @@
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-import { apiMutate } from '@/lib/api';
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { api, runAction, type ActionState } from "@/lib/api";
+import { checked, int, text } from "@/lib/format";
 
-export interface ProductFormState {
-  error?: string;
-}
-
-function splitLines(value: FormDataEntryValue | null): string[] {
-  return String(value ?? '')
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-function splitCommaList(value: FormDataEntryValue | null): string[] {
-  return String(value ?? '')
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function buildPayload(formData: FormData) {
-  const variantsJson = String(formData.get('variantsJson') ?? '[]');
-  let variants: unknown;
+function parseJson<T>(value: FormDataEntryValue | null, fallback: T): T {
   try {
-    variants = JSON.parse(variantsJson);
+    return JSON.parse(String(value ?? "")) as T;
   } catch {
-    variants = [];
+    return fallback;
   }
+}
 
+function payload(formData: FormData) {
+  const images = parseJson<string[]>(formData.get("images"), []);
   return {
-    slug: String(formData.get('slug') ?? '').trim(),
-    name: String(formData.get('name') ?? '').trim(),
-    categorySlug: String(formData.get('categorySlug') ?? '').trim(),
-    images: splitLines(formData.get('images')),
-    shortDescription: String(formData.get('shortDescription') ?? '').trim(),
-    description: String(formData.get('description') ?? '').trim(),
-    storageInfo: {
-      temperature: String(formData.get('temperature') ?? '').trim(),
-      shelfLifeDays: Number(formData.get('shelfLifeDays') ?? 0),
-      thawInstructions: String(formData.get('thawInstructions') ?? '').trim(),
-    },
-    tags: splitCommaList(formData.get('tags')),
-    isWholesaleAvailable: formData.get('isWholesaleAvailable') === 'on',
-    relatedProductIds: splitCommaList(formData.get('relatedProductIds')),
-    variants,
+    name: text(formData, "name"),
+    slug: text(formData, "slug") || undefined,
+    categoryId: text(formData, "categoryId"),
+    shortDescription: text(formData, "shortDescription"),
+    description: String(formData.get("description") ?? ""),
+    storageTemperature: text(formData, "storageTemperature"),
+    shelfLifeDays: int(formData, "shelfLifeDays"),
+    thawInstructions: text(formData, "thawInstructions"),
+    isFeatured: checked(formData, "isFeatured"),
+    isWholesaleAvailable: checked(formData, "isWholesaleAvailable"),
+    isActive: checked(formData, "isActive"),
+    sortOrder: int(formData, "sortOrder") ?? 0,
+    images: images.map((url) => ({ url })),
+    variants: parseJson<unknown[]>(formData.get("variants"), []),
   };
 }
 
-export async function createProductAction(
-  _prevState: ProductFormState | undefined,
-  formData: FormData,
-): Promise<ProductFormState> {
-  const payload = buildPayload(formData);
-  if (!Array.isArray(payload.variants) || payload.variants.length === 0) {
-    return { error: 'Cần ít nhất một quy cách đóng gói (biến thể).' };
-  }
-
-  try {
-    await apiMutate('/products', { method: 'POST', body: JSON.stringify(payload) });
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Có lỗi xảy ra, vui lòng thử lại.' };
-  }
-
-  revalidatePath('/products');
-  redirect('/products');
+export async function saveProductAction(id: string | null, _prev: ActionState | undefined, formData: FormData): Promise<ActionState> {
+  const result = await runAction(() =>
+    id
+      ? api(`/admin/products/${id}`, { method: "PATCH", json: payload(formData) })
+      : api("/admin/products", { method: "POST", json: payload(formData) }),
+  );
+  if (result.error) return result;
+  revalidatePath("/products");
+  redirect("/products");
 }
 
-export async function updateProductAction(
-  slug: string,
-  _prevState: ProductFormState | undefined,
-  formData: FormData,
-): Promise<ProductFormState> {
-  const payload = buildPayload(formData);
-  if (!Array.isArray(payload.variants) || payload.variants.length === 0) {
-    return { error: 'Cần ít nhất một quy cách đóng gói (biến thể).' };
-  }
-
-  try {
-    await apiMutate(`/products/${slug}`, { method: 'PATCH', body: JSON.stringify(payload) });
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Có lỗi xảy ra, vui lòng thử lại.' };
-  }
-
-  revalidatePath('/products');
-  redirect('/products');
+export async function deleteProductAction(id: string) {
+  const result = await runAction(() => api(`/admin/products/${id}`, { method: "DELETE" }));
+  revalidatePath("/products");
+  return result;
 }
 
-export async function deleteProductAction(slug: string) {
-  await apiMutate(`/products/${slug}`, { method: 'DELETE' });
-  revalidatePath('/products');
+/** Bật/tắt nhanh hiển thị sản phẩm ngay từ danh sách. */
+export async function toggleProductActiveAction(id: string, isActive: boolean) {
+  await api(`/admin/products/${id}`, { method: "PATCH", json: { isActive } });
+  revalidatePath("/products");
 }

@@ -1,3 +1,7 @@
+// Schema cơ sở dữ liệu — mô tả chi tiết ở docs/guide/database.md.
+// Quy ước: bảng đặt tên snake_case số nhiều (@@map), tiền lưu kiểu Int (đơn vị: đồng),
+// ảnh lưu đường dẫn tương đối "/uploads/..." (API tự đổi thành URL tuyệt đối khi trả về).
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,24 +11,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model AdminUser {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  name         String
+// ───────────────────────────── Tài khoản quản trị ─────────────────────────────
+
+enum Role {
+  ADMIN // duy nhất 1 tài khoản, toàn quyền (sau này bắt buộc OTP khi đăng nhập)
+  STAFF // nhân viên do ADMIN tạo, không xem được thống kê, tài khoản, cài đặt cửa hàng
+}
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String
+  passwordHash      String
+  role              Role      @default(STAFF)
+  isActive          Boolean   @default(true)
+  failedLoginCount  Int       @default(0)
+  lockedUntil       DateTime?
+  lastLoginAt       DateTime?
+  /// Mọi access token phát hành trước mốc này bị coi là hết hiệu lực (đổi/đặt lại mật khẩu).
+  passwordChangedAt DateTime  @default(now())
+
+  orderLogs OrderStatusLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("admin_users")
+  @@map("users")
 }
+
+// ───────────────────────────── Danh mục & sản phẩm ─────────────────────────────
 
 model Category {
   id          String    @id @default(cuid())
   slug        String    @unique
   name        String
-  image       String
-  description String
+  description String    @default("")
+  image       String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
   products    Product[]
 
   createdAt DateTime @default(now())
@@ -34,29 +58,43 @@ model Category {
 }
 
 model Product {
-  id                  String           @id @default(cuid())
-  slug                String           @unique
-  name                String
-  categoryId          String
-  category            Category         @relation(fields: [categoryId], references: [id])
-  images              String[]
-  shortDescription    String
-  description         String
-  storageTemperature  String
-  shelfLifeDays       Int
-  thawInstructions    String
-  rating              Float            @default(0)
-  reviewCount         Int              @default(0)
-  tags                String[]
-  isWholesaleAvailable Boolean         @default(false)
-  relatedProductIds   String[]        @default([])
-  variants            ProductVariant[]
-  orderItems          OrderItem[]
+  id                   String  @id @default(cuid())
+  slug                 String  @unique
+  name                 String
+  categoryId           String
+  category             Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  shortDescription     String  @default("")
+  description          String  @default("")
+  storageTemperature   String  @default("")
+  shelfLifeDays        Int?
+  thawInstructions     String  @default("")
+  isFeatured           Boolean @default(false)
+  isWholesaleAvailable Boolean @default(false)
+  isActive             Boolean @default(true)
+  sortOrder            Int     @default(0)
+
+  images     ProductImage[]
+  variants   ProductVariant[]
+  orderItems OrderItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([categoryId])
+  @@index([isActive, sortOrder])
   @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String  @default("")
+  sortOrder Int     @default(0)
+
+  @@index([productId])
+  @@map("product_images")
 }
 
 enum StockStatus {
@@ -66,130 +104,218 @@ enum StockStatus {
 }
 
 model ProductVariant {
-  id            String      @id @default(cuid())
-  productId     String
-  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  packageSize   String
-  price         Int
-  pricePerKg    Int
-  stockStatus   StockStatus @default(in_stock)
-  sku           String      @unique
-  orderItems    OrderItem[]
+  id             String      @id @default(cuid())
+  productId      String
+  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  /// Nhãn hiển thị cho khách, ví dụ "500g", "Túi 1kg".
+  packageSize    String
+  /// Khối lượng tịnh (gram) — dùng để tính giá/kg, có thể để trống.
+  weightGrams    Int?
+  price          Int
+  /// Giá gốc trước khuyến mãi (gạch ngang), để trống nếu không giảm giá.
+  compareAtPrice Int?
+  stockStatus    StockStatus @default(in_stock)
+  sku            String?     @unique
+  sortOrder      Int         @default(0)
+  isActive       Boolean     @default(true)
+
+  orderItems OrderItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([productId])
   @@map("product_variants")
 }
 
-model BlogPost {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  title       String
-  coverImage  String
-  excerpt     String
-  content     String
-  category    String
-  publishedAt DateTime
+// ───────────────────────────── Đơn hàng ─────────────────────────────
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("blog_posts")
-}
-
-model DeliveryZone {
-  id                     String  @id @default(cuid())
-  province               String  @unique
-  isSupported            Boolean @default(true)
-  estimatedDeliveryDays  Int
-  shippingFeeBase        Int
-
-  @@map("delivery_zones")
-}
-
-model Customer {
-  id        String    @id @default(cuid())
-  name      String
-  email     String    @unique
-  phone     String
-  addresses Address[]
-  orders    Order[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("customers")
-}
-
-model Address {
-  id          String   @id @default(cuid())
-  customerId  String
-  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  label       String
-  province    String
-  district    String
-  ward        String
-  addressLine String
-  isDefault   Boolean  @default(false)
-
-  @@map("addresses")
+enum OrderStatus {
+  pending   // chờ xác nhận
+  confirmed // đã xác nhận (đã gọi khách, chốt phí ship)
+  packing   // đang đóng gói
+  shipping  // đang giao
+  delivered // đã giao
+  cancelled // đã huỷ
 }
 
 enum PaymentMethod {
   cod
   bank_transfer
-  online_payment
 }
 
-enum OrderStatus {
-  pending
-  confirmed
-  packing
-  shipping
-  delivered
-  cancelled
+enum PaymentStatus {
+  unpaid
+  paid
+  refunded
 }
 
 model Order {
-  id                  String        @id @default(cuid())
-  orderNumber         String        @unique
-  customerId          String?
-  customer            Customer?     @relation(fields: [customerId], references: [id])
-  customerName        String
-  customerPhone       String
-  customerEmail       String
-  shippingProvince    String
-  shippingDistrict    String
-  shippingWard        String
-  shippingAddressLine String
-  shippingMethod      String
-  paymentMethod       PaymentMethod
-  status              OrderStatus   @default(pending)
-  subtotal            Int
-  shippingFee         Int
-  discount            Int           @default(0)
-  total               Int
-  items               OrderItem[]
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique
+  customerName    String
+  customerPhone   String
+  customerEmail   String?
+  shippingAddress String
+  customerNote    String        @default("")
+  paymentMethod   PaymentMethod @default(cod)
+  paymentStatus   PaymentStatus @default(unpaid)
+  status          OrderStatus   @default(pending)
+  subtotal        Int
+  shippingFee     Int           @default(0)
+  discount        Int           @default(0)
+  total           Int
+  /// Ghi chú nội bộ của cửa hàng, khách không thấy.
+  internalNote    String        @default("")
+
+  items OrderItem[]
+  logs  OrderStatusLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([status, createdAt])
+  @@index([createdAt])
+  @@index([customerPhone])
   @@map("orders")
 }
 
+/// Mỗi dòng lưu lại tên/quy cách/giá tại thời điểm đặt, nên sửa hoặc xoá sản phẩm sau này
+/// không làm thay đổi đơn cũ (productId/variantId chuyển thành null khi sản phẩm bị xoá).
 model OrderItem {
-  id          String         @id @default(cuid())
+  id          String          @id @default(cuid())
   orderId     String
-  order       Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId   String
-  product     Product        @relation(fields: [productId], references: [id])
-  variantId   String
-  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variantId   String?
+  variant     ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
   productName String
   packageSize String
   unitPrice   Int
   quantity    Int
+  lineTotal   Int
 
+  @@index([orderId])
+  @@index([productId])
   @@map("order_items")
+}
+
+model OrderStatusLog {
+  id          String       @id @default(cuid())
+  orderId     String
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromStatus  OrderStatus?
+  toStatus    OrderStatus
+  note        String       @default("")
+  changedById String?
+  changedBy   User?        @relation(fields: [changedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime     @default(now())
+
+  @@index([orderId])
+  @@map("order_status_logs")
+}
+
+// ───────────────────────────── Liên hệ / báo giá sỉ ─────────────────────────────
+
+enum InquiryType {
+  contact
+  wholesale
+}
+
+enum InquiryStatus {
+  new
+  in_progress
+  done
+}
+
+model Inquiry {
+  id        String        @id @default(cuid())
+  type      InquiryType
+  name      String
+  phone     String        @default("")
+  email     String        @default("")
+  company   String        @default("")
+  quantity  String        @default("")
+  message   String        @default("")
+  status    InquiryStatus @default(new)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@map("inquiries")
+}
+
+// ───────────────────────────── Nội dung trang khách hàng ─────────────────────────────
+
+model Post {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String   @default("")
+  content     String   @default("")
+  coverImage  String?
+  category    String   @default("")
+  isPublished Boolean  @default(true)
+  publishedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isPublished, publishedAt])
+  @@map("posts")
+}
+
+model Banner {
+  id          String  @id @default(cuid())
+  title       String  @default("")
+  description String  @default("")
+  image       String
+  linkUrl     String?
+  ctaLabel    String?
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("banners")
+}
+
+model Policy {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  title     String
+  content   String  @default("")
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("policies")
+}
+
+/// Thông tin cửa hàng hiển thị trên web (một dòng duy nhất, id = 1).
+/// Khi chưa có dòng này, API trả về giá trị mặc định trong settings.defaults.ts.
+model SiteSetting {
+  id              Int      @id @default(1)
+  storeName       String
+  shortName       String
+  phone           String
+  hotlineHours    String   @default("")
+  email           String   @default("")
+  address         String   @default("")
+  addressLandmark String   @default("")
+  mapUrl          String   @default("")
+  facebookUrl     String   @default("")
+  zaloPhone       String   @default("")
+  taxCode         String   @default("")
+  taxNote         String   @default("")
+  marqueeText     String   @default("")
+  /// Hướng dẫn chuyển khoản hiển thị ở trang thanh toán (số tài khoản, ngân hàng, nội dung CK).
+  bankTransferInfo String  @default("")
+  updatedAt       DateTime @updatedAt
+
+  @@map("site_settings")
 }

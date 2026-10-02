@@ -1,25 +1,23 @@
-import 'server-only';
-import { cookies } from 'next/headers';
+import "server-only";
+import { cookies } from "next/headers";
 
-const COOKIE_NAME = 'admin_token';
+export const SESSION_COOKIE = "admin_token";
 
 export async function getToken(): Promise<string | undefined> {
-  const cookieStore = await cookies();
-  return cookieStore.get(COOKIE_NAME)?.value;
+  return (await cookies()).get(SESSION_COOKIE)?.value;
 }
 
-export async function setToken(token: string): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, token, {
+/** Lưu access token trong cookie httpOnly — JavaScript phía trình duyệt không đọc được. */
+export async function setToken(token: string, expiresAt: string): Promise<void> {
+  (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    expires: new Date(expiresAt),
   });
 }
 
 export async function clearToken(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
+  (await cookies()).delete(SESSION_COOKIE);
 }

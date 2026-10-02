@@ -9,7 +9,7 @@ ENV NODE_ENV=production
 COPY package.json package-lock.json ./
 COPY packages ./packages
 COPY apps/api ./apps/api
-# npm ci chạy postinstall của root (build packages/types và packages/fixtures).
+# npm ci chạy postinstall của root (build packages/types).
 # NODE_ENV phải để "development" lúc cài để có devDependencies (nest CLI, prisma, tsx).
 RUN NODE_ENV=development npm ci --workspace apps/api --include-workspace-root
 RUN npx --workspace apps/api prisma generate && npm run build -w apps/api

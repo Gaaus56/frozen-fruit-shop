@@ -1,10 +1,26 @@
 # Caddy tự xin và gia hạn chứng chỉ HTTPS (Let's Encrypt). DOMAIN lấy từ deploy/.env.
-api.{$DOMAIN} {
+{$DOMAIN} {
 	encode gzip
-	reverse_proxy api:4000
+	reverse_proxy web:3000
+}
+
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}
+
+# Luồng sự kiện realtime (SSE) không nén: nén gzip có thể gom dữ liệu làm sự kiện đến trễ.
+api.{$DOMAIN} {
+	@compressible not path /events /admin/events
+	encode @compressible gzip
+	reverse_proxy api:4000 {
+		flush_interval -1
+	}
 }
 
 admin.{$DOMAIN} {
-	encode gzip
-	reverse_proxy admin:3002
+	@compressible not path /api/events
+	encode @compressible gzip
+	reverse_proxy admin:3002 {
+		flush_interval -1
+	}
 }

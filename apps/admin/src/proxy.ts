@@ -1,26 +1,27 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from "next/server";
 
-const COOKIE_NAME = 'admin_token';
-const PUBLIC_PATHS = ['/login'];
+const SESSION_COOKIE = "admin_token";
+// /api/*: route handler tự kiểm tra phiên và trả 401 (EventSource không xử lý được chuyển hướng tới trang HTML).
+const PUBLIC_PATHS = ["/login", "/logout", "/api"];
 
+/**
+ * Chặn sớm các trang quản trị khi chưa có cookie phiên. Việc kiểm tra token thật (hết hạn, bị khoá,
+ * đúng vai trò) do API đảm nhiệm ở mỗi request — proxy chỉ để chuyển hướng nhanh.
+ */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
-  const token = request.cookies.get(COOKIE_NAME)?.value;
+  const isPublic = PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  const hasToken = Boolean(request.cookies.get(SESSION_COOKIE)?.value);
 
-  if (!token && !isPublicPath) {
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
+  if (!hasToken && !isPublic) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
-
-  if (token && pathname === '/login') {
-    return NextResponse.redirect(new URL('/', request.url));
+  if (hasToken && pathname === "/login") {
+    return NextResponse.redirect(new URL("/", request.url));
   }
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ["/((?!_next/static|_next/image|images/|icon.png|favicon.ico).*)"],
 };

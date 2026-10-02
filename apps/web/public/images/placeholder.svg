@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <rect width="400" height="400" fill="#eae9e9"/>
+  <g stroke="#c9c4c2" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M200 120v160M130 160l140 80M270 160l-140 80"/>
+    <path d="M200 120l-18-18M200 120l18-18M200 280l-18 18M200 280l18 18"/>
+    <path d="M130 160l-24 6M130 160l6-24M270 240l24-6M270 240l-6 24"/>
+    <path d="M270 160l6-24M270 160l24 6M130 240l-6 24M130 240l-24-6"/>
+  </g>
+</svg>

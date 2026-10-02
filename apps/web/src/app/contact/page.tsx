@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
+import { formatPhone } from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ContactForm } from "@/components/contact/contact-form";
-import { business } from "@/data/business";
+import { getSettings } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Liên hệ",
-  description: `Thông tin liên hệ và form hỗ trợ khách hàng của ${business.name}.`,
+  description: "Thông tin liên hệ và form hỗ trợ khách hàng.",
 };
 
-export default function ContactPage() {
+const linkClass = "font-semibold text-accent-700 hover:underline";
+
+export default async function ContactPage() {
+  const settings = await getSettings();
+
   return (
     <Container className="py-12">
       <SectionHeading eyebrow="Liên hệ" title="Chúng tôi luôn sẵn sàng hỗ trợ" />
@@ -18,34 +23,59 @@ export default function ContactPage() {
         <ContactForm />
 
         <div className="space-y-6">
-          <div className="rounded-none border border-divider p-6">
+          <div className="border border-divider p-6">
             <p className="font-semibold text-foreground">Thông tin liên hệ</p>
             <ul className="mt-3 space-y-2 text-sm text-foreground/70">
-              <li>Hotline {business.hotlineHours}: {business.phoneDisplay}</li>
-              <li>Zalo: {business.phoneDisplay}</li>
-              <li>Email: {business.email}</li>
               <li>
-                Facebook:{" "}
-                <a href={business.facebookUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent-700 hover:underline">
-                  Trái cây đông lạnh Đà Nẵng
-                </a>
+                Hotline{settings.hotlineHours ? ` ${settings.hotlineHours}` : ""}:{" "}
+                <a href={`tel:${settings.phone}`} className={linkClass}>{formatPhone(settings.phone)}</a>
               </li>
+              {settings.zaloPhone ? (
+                <li>
+                  Zalo:{" "}
+                  <a href={`https://zalo.me/${settings.zaloPhone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                    {formatPhone(settings.zaloPhone)}
+                  </a>
+                </li>
+              ) : null}
+              {settings.email ? (
+                <li>
+                  Email: <a href={`mailto:${settings.email}`} className={linkClass}>{settings.email}</a>
+                </li>
+              ) : null}
+              {settings.facebookUrl ? (
+                <li>
+                  Facebook:{" "}
+                  <a href={settings.facebookUrl} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                    {settings.storeName}
+                  </a>
+                </li>
+              ) : null}
             </ul>
           </div>
 
-          <div className="rounded-none border border-divider p-6">
-            <p className="font-semibold text-foreground">Địa chỉ</p>
-            <ul className="mt-3 space-y-2 text-sm text-foreground/70">
-              <li>{business.address}</li>
-              <li>{business.addressLandmark}</li>
-              <li>
-                <a href={business.mapUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent-700 hover:underline">
-                  Xem bản đồ
-                </a>
-              </li>
-              <li>MST {business.taxCode} — {business.taxNote}</li>
-            </ul>
-          </div>
+          {settings.address ? (
+            <div className="border border-divider p-6">
+              <p className="font-semibold text-foreground">Địa chỉ cửa hàng</p>
+              <ul className="mt-3 space-y-2 text-sm text-foreground/70">
+                <li>{settings.address}</li>
+                {settings.addressLandmark ? <li>{settings.addressLandmark}</li> : null}
+                {settings.mapUrl ? (
+                  <li>
+                    <a href={settings.mapUrl} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                      Xem bản đồ chỉ đường
+                    </a>
+                  </li>
+                ) : null}
+                {settings.taxCode ? (
+                  <li>
+                    MST {settings.taxCode}
+                    {settings.taxNote ? ` — ${settings.taxNote}` : ""}
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+          ) : null}
         </div>
       </div>
     </Container>

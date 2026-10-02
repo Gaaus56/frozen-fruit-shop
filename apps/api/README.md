@@ -1,50 +1,47 @@
-# Frozen Fruit Shop — API
+# Trái Cây Đông Lạnh Đà Nẵng 28 — API
 
-Backend NestJS + Prisma + PostgreSQL cho website bán trái cây đông lạnh. Đây là một workspace trong monorepo gốc — xem `docs/guide/` ở thư mục gốc repo để hiểu toàn bộ cấu trúc.
+Backend NestJS 12 (ESM) + Prisma 6 + PostgreSQL. Workspace con của monorepo gốc — xem `docs/guide/` ở gốc repo, đặc biệt [api.md](../../docs/guide/api.md) (danh sách endpoint) và [database.md](../../docs/guide/database.md) (mô hình dữ liệu).
 
 ## Chạy cục bộ
 
-Chạy các lệnh sau từ **thư mục gốc repo** (không phải từ `apps/api`), vì đây là npm workspace:
+Chạy từ **thư mục gốc repo** (npm workspace):
 
 ```bash
-npm install                 # cài dependency cho toàn bộ monorepo
-npm run db:up                # khởi động PostgreSQL qua Docker (cổng 5434)
+npm install
+npm run db:up                # PostgreSQL qua Docker, cổng 5434
 cp apps/api/.env.example apps/api/.env
-npm run db:migrate           # tạo schema từ prisma/schema.prisma
-npm run db:seed              # nạp dữ liệu mẫu từ packages/fixtures
-npm run dev:api               # chạy API ở chế độ watch, http://localhost:4000
+npm run db:deploy            # áp migration, tạo bảng
+npm run admin:create         # tạo tài khoản ADMIN duy nhất (dùng ADMIN_EMAIL/ADMIN_PASSWORD trong .env)
+npm run dev:api              # http://localhost:4000, chế độ watch
 ```
+
+Không có `db:seed` / dữ liệu mẫu — database khởi tạo rỗng ngoài tài khoản ADMIN.
 
 ## Cấu trúc
 
 ```
 apps/api/
 ├── prisma/
-│   ├── schema.prisma   # định nghĩa model (Product, Category, Order...)
-│   ├── migrations/     # lịch sử migration do Prisma sinh ra
-│   └── seed.ts         # nạp dữ liệu mẫu từ @frozen-fruit-shop/fixtures
+│   ├── schema.prisma      # mô hình dữ liệu (User, Category, Product, Order...)
+│   ├── migrations/        # lịch sử migration
+│   └── create-admin.ts    # tạo / đặt lại mật khẩu tài khoản ADMIN duy nhất
 └── src/
-    ├── prisma/          # PrismaService/PrismaModule dùng chung
-    ├── products/        # module sản phẩm (controller + service)
-    ├── categories/      # module danh mục
-    ├── blog-posts/      # module bài viết
-    ├── app.module.ts
+    ├── auth/, users/       # đăng nhập, phiên, tài khoản nhân viên
+    ├── categories/, products/
+    ├── orders/, inquiries/
+    ├── content/            # posts, banners, policies, settings
+    ├── uploads/, stats/, revalidate/
+    ├── common/, config/, prisma/
     └── main.ts
 ```
 
-## Endpoint hiện có
+## Script hữu ích (chạy từ gốc repo)
 
-- `GET /products` — danh sách sản phẩm, có thể lọc `?category=<slug>`
-- `GET /products/:slug` — chi tiết một sản phẩm
-- `GET /categories`, `GET /categories/:slug`
-- `GET /blog-posts`, `GET /blog-posts/:slug`
-
-## Script hữu ích
-
-| Lệnh (chạy từ gốc repo) | Mục đích |
+| Lệnh | Mục đích |
 |---|---|
 | `npm run dev:api` | Chạy API ở chế độ watch |
 | `npm run build:api` | Build production (`dist/`) |
-| `npm run db:migrate` | Áp dụng migration mới sau khi sửa `schema.prisma` |
-| `npm run db:seed` | Nạp lại dữ liệu mẫu |
-| `npm run db:studio` | Mở Prisma Studio để xem/sửa dữ liệu trực quan |
+| `npm run db:migrate` | Tạo migration mới sau khi sửa `schema.prisma` (máy dev) |
+| `npm run db:deploy` | Áp migration có sẵn, không xoá dữ liệu (máy chủ) |
+| `npm run db:studio` | Mở Prisma Studio |
+| `npm run admin:create` | Tạo ADMIN, hoặc đặt lại mật khẩu nếu đã tồn tại |

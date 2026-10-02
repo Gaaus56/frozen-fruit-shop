@@ -1,5 +1,4 @@
 import { useId } from "react";
-import { business } from "@/data/business";
 
 const COLORS = {
   edge: "#8a0f0b",
@@ -31,13 +30,13 @@ function Snowflake({ cx, cy, r }: { cx: number; cy: number; r: number }) {
   );
 }
 
-export function LogoBadge({ className }: { className?: string }) {
+export function LogoBadge({ className, label = "Logo cửa hàng" }: { className?: string; label?: string }) {
   const uid = useId().replace(/:/g, "");
   const topPath = `top-${uid}`;
   const bottomPath = `bottom-${uid}`;
 
   return (
-    <svg viewBox="0 0 1000 1000" role="img" aria-label={`Logo ${business.name}`} className={className}>
+    <svg viewBox="0 0 1000 1000" role="img" aria-label={label} className={className}>
       <defs>
         <path id={topPath} d="M 173 500 A 327 327 0 0 1 827 500" />
         <path id={bottomPath} d="M 113 500 A 387 387 0 0 0 887 500" />

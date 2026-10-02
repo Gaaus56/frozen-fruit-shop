@@ -1,36 +1,27 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
-import { getPolicyBySlug, policies } from "@/data/policies";
+import { getPolicy } from "@/lib/api";
 
 interface PolicyPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return policies.map((policy) => ({ slug: policy.slug }));
-}
-
 export async function generateMetadata({ params }: PolicyPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const policy = getPolicyBySlug(slug);
-  if (!policy) return {};
-
-  return { title: policy.title };
+  const policy = await getPolicy(slug);
+  return { title: policy?.title ?? "Không tìm thấy trang" };
 }
 
 export default async function PolicyPage({ params }: PolicyPageProps) {
   const { slug } = await params;
-  const policy = getPolicyBySlug(slug);
-
-  if (!policy) {
-    notFound();
-  }
+  const policy = await getPolicy(slug);
+  if (!policy) notFound();
 
   return (
     <Container className="py-12">
-      <h1 className="text-2xl font-bold text-foreground">{policy.title}</h1>
-      <p className="mt-6 max-w-3xl whitespace-pre-line text-foreground/70">{policy.content}</p>
+      <h1 className="text-2xl uppercase text-foreground sm:text-3xl">{policy.title}</h1>
+      <div className="mt-6 max-w-3xl whitespace-pre-line leading-relaxed text-foreground/80">{policy.content}</div>
     </Container>
   );
 }

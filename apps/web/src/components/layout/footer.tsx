@@ -1,81 +1,98 @@
 import Link from "next/link";
+import { formatPhone, type Policy, type SiteSettings } from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
-import { business } from "@/data/business";
 
-const POLICY_LINKS = [
-  { href: "/policies/how-to-order", label: "Hướng dẫn mua hàng" },
-  { href: "/policies/privacy", label: "Chính sách bảo mật" },
-  { href: "/policies/payment", label: "Chính sách thanh toán" },
-  { href: "/policies/shipping", label: "Chính sách vận chuyển" },
-  { href: "/policies/returns", label: "Chính sách đổi trả" },
-];
+const muted = { color: "rgba(243,242,242,.65)" };
+const heading = { color: "rgba(243,242,242,.5)" };
+const body = { color: "rgba(243,242,242,.8)" };
 
-export function Footer() {
+export function Footer({ settings, policies }: { settings: SiteSettings; policies: Policy[] }) {
   return (
     <footer style={{ background: "#201e1d", color: "#f3f2f2" }}>
       <Container className="grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="text-lg font-extrabold">{business.name}</p>
-          <p className="mt-3 max-w-[26ch] text-sm" style={{ color: "rgba(243,242,242,.65)" }}>
-            Trái cây đông lạnh chất lượng, cấp đông nhanh sau thu hoạch, không chất bảo quản, giao hàng lạnh toàn quốc.
+          <p className="text-lg font-extrabold">{settings.storeName}</p>
+          <p className="mt-3 max-w-[30ch] text-sm" style={muted}>
+            Trái cây đông lạnh cấp đông nhanh sau thu hoạch, đóng gói hút chân không, giữ trọn hương vị.
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "rgba(243,242,242,.5)" }}>
+          <p className="text-[11px] font-semibold uppercase tracking-wide" style={heading}>
             Danh mục
           </p>
-          <ul className="mt-4 space-y-2.5 text-sm" style={{ color: "rgba(243,242,242,.8)" }}>
+          <ul className="mt-4 space-y-2.5 text-sm" style={body}>
             <li><Link href="/products" className="hover:text-accent-400">Tất cả sản phẩm</Link></li>
             <li><Link href="/about" className="hover:text-accent-400">Giới thiệu</Link></li>
             <li><Link href="/wholesale" className="hover:text-accent-400">Đặt hàng sỉ / F&B</Link></li>
             <li><Link href="/news" className="hover:text-accent-400">Tin tức</Link></li>
+            <li><Link href="/order-lookup" className="hover:text-accent-400">Tra cứu đơn hàng</Link></li>
           </ul>
         </div>
 
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "rgba(243,242,242,.5)" }}>
+          <p className="text-[11px] font-semibold uppercase tracking-wide" style={heading}>
             Chính sách
           </p>
-          <ul className="mt-4 space-y-2.5 text-sm" style={{ color: "rgba(243,242,242,.8)" }}>
-            {POLICY_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="hover:text-accent-400">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {policies.length > 0 ? (
+            <ul className="mt-4 space-y-2.5 text-sm" style={body}>
+              {policies.map((policy) => (
+                <li key={policy.id}>
+                  <Link href={`/policies/${policy.slug}`} className="hover:text-accent-400">
+                    {policy.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 text-sm" style={muted}>Đang cập nhật.</p>
+          )}
         </div>
 
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "rgba(243,242,242,.5)" }}>
+          <p className="text-[11px] font-semibold uppercase tracking-wide" style={heading}>
             Liên hệ
           </p>
-          <ul className="mt-4 space-y-2.5 text-sm" style={{ color: "rgba(243,242,242,.8)" }}>
-            <li>Hotline {business.hotlineHours}: {business.phoneDisplay}</li>
-            <li>Zalo: {business.phoneDisplay}</li>
-            <li>Email: {business.email}</li>
+          <ul className="mt-4 space-y-2.5 text-sm" style={body}>
             <li>
-              <a href={business.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent-400">
-                Facebook
-              </a>
+              Hotline{settings.hotlineHours ? ` ${settings.hotlineHours}` : ""}:{" "}
+              <a href={`tel:${settings.phone}`} className="hover:text-accent-400">{formatPhone(settings.phone)}</a>
             </li>
-            <li>
-              <a href={business.mapUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent-400">
-                {business.address}
-              </a>
-            </li>
-            <li><Link href="/order-lookup" className="hover:text-accent-400">Tra cứu đơn hàng</Link></li>
+            {settings.zaloPhone ? <li>Zalo: {formatPhone(settings.zaloPhone)}</li> : null}
+            {settings.email ? (
+              <li>
+                Email: <a href={`mailto:${settings.email}`} className="hover:text-accent-400">{settings.email}</a>
+              </li>
+            ) : null}
+            {settings.facebookUrl ? (
+              <li>
+                <a href={settings.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent-400">
+                  Facebook
+                </a>
+              </li>
+            ) : null}
+            {settings.address ? (
+              <li>
+                {settings.mapUrl ? (
+                  <a href={settings.mapUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent-400">
+                    {settings.address}
+                  </a>
+                ) : (
+                  settings.address
+                )}
+              </li>
+            ) : null}
           </ul>
         </div>
       </Container>
 
       <div
-        className="border-t py-5 text-center text-xs"
+        className="border-t px-4 py-5 text-center text-xs"
         style={{ borderColor: "rgba(243,242,242,.15)", color: "rgba(243,242,242,.5)" }}
       >
-        © {new Date().getFullYear()} {business.name}. MST {business.taxCode} — {business.taxNote}. Bảo lưu mọi quyền.
+        © {new Date().getFullYear()} {settings.storeName}.
+        {settings.taxCode ? ` MST ${settings.taxCode}${settings.taxNote ? ` — ${settings.taxNote}` : ""}.` : ""} Bảo lưu
+        mọi quyền.
       </div>
     </footer>
   );

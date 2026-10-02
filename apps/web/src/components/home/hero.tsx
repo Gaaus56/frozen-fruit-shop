@@ -30,7 +30,8 @@ export function Hero() {
             src="/images/hero-fruit.svg"
             alt="Trái cây đông lạnh"
             fill
-            className="grayscale-photo object-contain p-6"
+            className="object-contain p-6"
+            unoptimized
             sizes="(min-width: 1024px) 512px, 90vw"
             priority
           />

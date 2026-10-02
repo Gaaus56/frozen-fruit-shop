@@ -1,14 +1,11 @@
 {
   "name": "@frozen-fruit-shop/api",
   "version": "0.0.1",
-  "description": "Frozen Fruit Shop backend API (NestJS + Prisma).",
+  "description": "Backend API cho Trái Cây Đông Lạnh Đà Nẵng 28 (NestJS + Prisma + PostgreSQL).",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "type": "module",
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
@@ -18,12 +15,11 @@
     "start:prod": "node dist/main.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "prisma db seed",
     "prisma:create-admin": "tsx prisma/create-admin.ts",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "prisma:deploy": "prisma migrate deploy"
   },
   "dependencies": {
-    "@frozen-fruit-shop/fixtures": "0.1.0",
     "@frozen-fruit-shop/types": "0.1.0",
     "@nestjs/common": "^12.0.1",
     "@nestjs/core": "^12.0.1",

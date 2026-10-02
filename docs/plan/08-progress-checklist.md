@@ -14,6 +14,7 @@
 - [ ] Đánh giá sản phẩm (review)
 - [ ] Mã giảm giá/voucher
 - [ ] **Gọi dữ liệu thật từ `apps/api`** — hiện vẫn đọc từ `packages/fixtures` tĩnh, chưa đồng bộ với dữ liệu admin sửa
+- [x] Cập nhật realtime khi admin đổi dữ liệu (SSE `GET /events`, xem [architecture.md](../guide/architecture.md#cập-nhật-realtime-giữa-web-và-admin)) — checkout tự requote khi giá/tồn kho đổi giữa lúc điền form
 
 ## Backend (`apps/api`)
 
@@ -26,6 +27,7 @@
 - [ ] Module thanh toán (payments) — VNPay/MoMo/ZaloPay
 - [ ] Kiểm tra khu vực giao hàng (`delivery-zones`) — có schema, chưa có API
 - [ ] Upload ảnh trực tiếp (hiện nhập bằng đường dẫn text)
+- [x] Module `realtime` (SSE) — phát sự kiện `changed` (catalog/content/settings) công khai và `order.created`/`order.updated`/`inquiry.created`/`inquiry.updated` cho admin, kèm kiểm tra phiên đăng nhập định kỳ trên kết nối dài
 
 ## Trang quản trị (`apps/admin`)
 
@@ -34,6 +36,7 @@
 - [ ] Quản lý đơn hàng
 - [ ] Nhiều tài khoản quản trị / phân quyền
 - [ ] Upload ảnh trực tiếp
+- [x] Thông báo realtime đơn hàng/liên hệ mới (toast + âm báo + số việc mới trên tiêu đề tab), tự tải lại dữ liệu khi tài khoản khác vừa sửa — qua `/api/events` proxy tới `apps/api`
 
 ## Hạ tầng & vận hành
 

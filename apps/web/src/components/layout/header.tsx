@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { categories } from "@frozen-fruit-shop/fixtures";
+import { formatPhone, type Category, type SiteSettings } from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
-import { business } from "@/data/business";
 import { LogoBadge } from "./logo-badge";
 
 const NAV_LINKS = [
@@ -41,7 +40,12 @@ const FEATURES = [
   },
 ];
 
-export function Header() {
+interface HeaderProps {
+  settings: SiteSettings;
+  categories: Category[];
+}
+
+export function Header({ settings, categories }: HeaderProps) {
   const { totalQuantity } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownSuppressed, setIsDropdownSuppressed] = useState(false);
@@ -97,8 +101,14 @@ export function Header() {
       <div className="overflow-hidden bg-accent-700 text-white">
         <div className="marquee py-2 text-[13px] font-semibold">
           <span className="marquee-track">
-            Chào mừng bạn đến với {business.name} — Trái cây đông lạnh cấp đông nhanh, không chất bảo quản —
-            Hotline {business.hotlineHours}: {business.phoneDisplay} — {business.addressLandmark}, {business.address}
+            {settings.marqueeText ||
+              [
+                `Chào mừng bạn đến với ${settings.storeName}`,
+                `Hotline ${settings.hotlineHours}: ${formatPhone(settings.phone)}`,
+                [settings.addressLandmark, settings.address].filter(Boolean).join(", "),
+              ]
+                .filter(Boolean)
+                .join(" — ")}
           </span>
         </div>
       </div>
@@ -135,11 +145,11 @@ export function Header() {
 
         <Link
           href="/"
-          aria-label={`${business.name} — Trang chủ`}
+          aria-label={`${settings.storeName} — Trang chủ`}
           className="absolute left-3 top-0 z-50 flex h-[5.75rem] w-20 justify-center rounded-b-full bg-[#1f6b3f] pt-2 shadow-xl lg:left-8 lg:h-[9.5rem] lg:w-36 lg:pt-3"
         >
           <span className="logo-shine relative block h-16 w-16 overflow-hidden rounded-full ring-2 ring-white lg:h-28 lg:w-28 lg:ring-4">
-            <LogoBadge className="h-full w-full" />
+            <LogoBadge className="h-full w-full" label={`Logo ${settings.storeName}`} />
           </span>
         </Link>
       </div>
@@ -157,7 +167,7 @@ export function Header() {
           <div className={`min-w-0 leading-tight lg:hidden ${isScrolled ? "hidden" : "block"}`}>
             <Link
               href="/"
-              aria-label={business.name}
+              aria-label={settings.storeName}
               className="block text-[13px] font-extrabold uppercase leading-tight tracking-tight text-accent-700 max-[340px]:text-[11px] min-[400px]:text-sm min-[440px]:text-base"
             >
               <span className="block">Trái Cây Đông Lạnh</span>
@@ -175,7 +185,7 @@ export function Header() {
             }`}
           >
             <span className="logo-shine relative block h-10 w-10 shrink-0 overflow-hidden rounded-full">
-              <LogoBadge className="h-full w-full" />
+              <LogoBadge className="h-full w-full" label={`Logo ${settings.storeName}`} />
             </span>
             <span className="text-[13px] font-extrabold uppercase leading-tight text-accent-700 sm:whitespace-nowrap sm:text-sm">
               <span className="block sm:inline">Trái Cây Đông Lạnh</span>{" "}

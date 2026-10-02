@@ -1,58 +1,38 @@
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-import { apiMutate } from '@/lib/api';
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { api, runAction, type ActionState } from "@/lib/api";
+import { checked, text } from "@/lib/format";
 
-export interface BlogPostFormState {
-  error?: string;
-}
-
-function buildPayload(formData: FormData) {
+function payload(formData: FormData) {
+  // <input type="datetime-local"> không có múi giờ — hiểu theo giờ Việt Nam.
+  const publishedAt = text(formData, "publishedAt");
   return {
-    slug: String(formData.get('slug') ?? '').trim(),
-    title: String(formData.get('title') ?? '').trim(),
-    coverImage: String(formData.get('coverImage') ?? '').trim(),
-    excerpt: String(formData.get('excerpt') ?? '').trim(),
-    content: String(formData.get('content') ?? '').trim(),
-    category: String(formData.get('category') ?? '').trim(),
-    publishedAt: new Date(String(formData.get('publishedAt'))).toISOString(),
+    title: text(formData, "title"),
+    slug: text(formData, "slug") || undefined,
+    excerpt: text(formData, "excerpt"),
+    content: String(formData.get("content") ?? ""),
+    coverImage: text(formData, "coverImage") || null,
+    category: text(formData, "category"),
+    isPublished: checked(formData, "isPublished"),
+    publishedAt: publishedAt ? new Date(`${publishedAt}:00+07:00`).toISOString() : undefined,
   };
 }
 
-export async function createBlogPostAction(
-  _prevState: BlogPostFormState | undefined,
-  formData: FormData,
-): Promise<BlogPostFormState> {
-  try {
-    await apiMutate('/blog-posts', { method: 'POST', body: JSON.stringify(buildPayload(formData)) });
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Có lỗi xảy ra, vui lòng thử lại.' };
-  }
-
-  revalidatePath('/posts');
-  redirect('/posts');
+export async function savePostAction(id: string | null, _prev: ActionState | undefined, formData: FormData): Promise<ActionState> {
+  const result = await runAction(() =>
+    id
+      ? api(`/admin/posts/${id}`, { method: "PATCH", json: payload(formData) })
+      : api("/admin/posts", { method: "POST", json: payload(formData) }),
+  );
+  if (result.error) return result;
+  revalidatePath("/posts");
+  redirect("/posts");
 }
 
-export async function updateBlogPostAction(
-  slug: string,
-  _prevState: BlogPostFormState | undefined,
-  formData: FormData,
-): Promise<BlogPostFormState> {
-  try {
-    await apiMutate(`/blog-posts/${slug}`, {
-      method: 'PATCH',
-      body: JSON.stringify(buildPayload(formData)),
-    });
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Có lỗi xảy ra, vui lòng thử lại.' };
-  }
-
-  revalidatePath('/posts');
-  redirect('/posts');
-}
-
-export async function deleteBlogPostAction(slug: string) {
-  await apiMutate(`/blog-posts/${slug}`, { method: 'DELETE' });
-  revalidatePath('/posts');
+export async function deletePostAction(id: string) {
+  const result = await runAction(() => api(`/admin/posts/${id}`, { method: "DELETE" }));
+  revalidatePath("/posts");
+  return result;
 }
