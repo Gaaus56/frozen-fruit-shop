@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import type { SiteSettings } from "@frozen-fruit-shop/types";
 import { SubmitButton } from "@/components/ui/button";
-import { Field, FormAlert, Section, inputClass } from "@/components/ui/form";
+import { Checkbox, Field, FormAlert, Section, inputClass } from "@/components/ui/form";
 import { saveSettingsAction } from "./actions";
 
 export function SettingsForm({ settings }: { settings: SiteSettings }) {
@@ -20,6 +20,12 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
             <input id="shortName" name="shortName" required maxLength={60} defaultValue={settings.shortName} className={inputClass} />
           </Field>
         </div>
+        <Checkbox
+          name="marqueeEnabled"
+          label="Hiện dải chữ chạy đỏ ở đầu trang"
+          defaultChecked={settings.marqueeEnabled}
+          hint="Bỏ chọn để ẩn hoàn toàn dải này trên website."
+        />
         <Field label="Dòng chữ chạy đầu trang" htmlFor="marqueeText" hint="Để trống để tự ghép từ hotline, địa chỉ, giờ mở cửa.">
           <input id="marqueeText" name="marqueeText" maxLength={500} defaultValue={settings.marqueeText} className={inputClass} />
         </Field>

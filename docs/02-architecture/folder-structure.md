@@ -16,6 +16,7 @@ frozen-fruit-shop/
 │   ├── 03-apps/             # web, admin, api, database
 │   ├── 04-operations/       # Chạy máy dev, triển khai, giám sát & sao lưu, CI/CD
 │   ├── 05-roadmap/          # Lộ trình, checklist production, quyết định kỹ thuật
+│   ├── 06-testing/          # Kịch bản test thủ công + lỗi phát hiện
 │   └── archive/             # Kế hoạch cũ (lỗi thời)
 ├── .github/workflows/       # CI (lint + build khi mở PR vào main)
 ├── docker-compose.yml       # PostgreSQL cho máy dev (cổng 5434)
@@ -86,7 +87,9 @@ src/
 prisma/
 ├── schema.prisma            # mô hình dữ liệu
 ├── migrations/              # lịch sử migration
-└── create-admin.ts          # tạo / đặt lại mật khẩu ADMIN duy nhất
+├── create-admin.ts          # tạo / đặt lại mật khẩu ADMIN duy nhất
+├── seed-test.ts             # máy dev: xoá sạch + nạp dữ liệu kiểm thử (npm run db:seed:test)
+└── seed-assets/             # ảnh mẫu cho seed
 src/                         # xem 03-apps/api.md mục 6
 uploads/                     # ảnh tải lên (không commit)
 ```

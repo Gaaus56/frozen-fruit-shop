@@ -5,7 +5,7 @@ import { api, runAction, type ActionState } from "@/lib/api";
 import { int, text } from "@/lib/format";
 
 export async function updateOrderAction(id: string, _prev: ActionState | undefined, formData: FormData): Promise<ActionState> {
-  const status = text(formData, "status");
+  const status = text(formData, "quickStatus") || text(formData, "status");
   const payload = {
     status: status || undefined,
     paymentStatus: text(formData, "paymentStatus") || undefined,

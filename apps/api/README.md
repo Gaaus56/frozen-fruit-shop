@@ -15,7 +15,7 @@ npm run admin:create         # tạo tài khoản ADMIN duy nhất (dùng ADMIN_
 npm run dev:api              # http://localhost:4000, chế độ watch
 ```
 
-Không có `db:seed` / dữ liệu mẫu — database khởi tạo rỗng ngoài tài khoản ADMIN.
+Production không có dữ liệu mẫu — database khởi tạo rỗng ngoài tài khoản ADMIN. Muốn có dữ liệu để thử trên máy dev: `npm run db:seed:test` (**xoá sạch** rồi nạp bộ dữ liệu kiểm thử, script `prisma/seed-test.ts`).
 
 ## Cấu trúc
 
@@ -45,3 +45,4 @@ apps/api/
 | `npm run db:deploy` | Áp migration có sẵn, không xoá dữ liệu (máy chủ) |
 | `npm run db:studio` | Mở Prisma Studio |
 | `npm run admin:create` | Tạo ADMIN, hoặc đặt lại mật khẩu nếu đã tồn tại |
+| `npm run db:seed:test` | Máy dev: xoá sạch DB, nạp dữ liệu kiểm thử (`admin@test.vn` / `Admin@123456`) |

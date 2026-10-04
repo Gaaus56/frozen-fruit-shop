@@ -43,7 +43,7 @@ Quy tắc phiên đăng nhập:
 | `/banners` | Banner trang chủ (ảnh 21:8, tiêu đề, mô tả, liên kết, chữ trên nút, thứ tự) |
 | `/posts` | Bài viết: ảnh bìa, chuyên mục, tóm tắt, nội dung, bản nháp / hẹn giờ đăng |
 | `/policies` | Trang chính sách. Có **mẫu soạn sẵn** "Chính sách bảo hành & đổi trả" lấy từ tài liệu cửa hàng |
-| `/settings` (ADMIN) | Tên cửa hàng, hotline, giờ nghe máy, Zalo, email, Facebook, địa chỉ, link bản đồ, thông tin chuyển khoản, MST, dòng chữ chạy |
+| `/settings` (ADMIN) | Tên cửa hàng, hotline, giờ nghe máy, Zalo, email, Facebook, địa chỉ, link bản đồ, thông tin chuyển khoản, MST, dòng chữ chạy (có công tắc bật/tắt) |
 | `/users` (ADMIN) | Danh sách tài khoản, tạo nhân viên, đặt lại mật khẩu, khoá/mở khoá, xoá |
 | `/account` | Thông tin tài khoản, đổi mật khẩu |
 

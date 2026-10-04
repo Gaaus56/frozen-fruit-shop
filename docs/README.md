@@ -49,6 +49,10 @@ Một website hoàn chỉnh = **Domain + DNS + Hosting + Frontend + Backend + Da
 | 5 | **[05-roadmap/](05-roadmap/)** | [roadmap.md](05-roadmap/roadmap.md) | **Kế hoạch tổng thể** — làm gì tiếp, theo thứ tự nào |
 | | | [production-readiness.md](05-roadmap/production-readiness.md) | Checklist 13 lớp "full-stack production" — đã đủ chưa? |
 | | | [decisions.md](05-roadmap/decisions.md) | Vì sao chọn công nghệ / cách làm hiện tại |
+| 6 | **[06-testing/](06-testing/)** | [README.md](06-testing/README.md) | Test khi nào, dữ liệu mẫu, cách ghi kết quả |
+| | | [web.md](06-testing/web.md) · [admin.md](06-testing/admin.md) · [api.md](06-testing/api.md) | Kịch bản test từng trang, nút bấm, trường hợp lỗi |
+| | | [e2e.md](06-testing/e2e.md) | Kịch bản xuyên suốt trước mỗi lần phát hành |
+| | | [findings.md](06-testing/findings.md) | Lỗi / điểm lệch đang mở |
 | — | [archive/](archive/) | `plan-v0/` | Kế hoạch ban đầu (lỗi thời, chỉ để tham khảo lịch sử) |
 
 ## Đọc theo vai trò
@@ -59,6 +63,7 @@ Một website hoàn chỉnh = **Domain + DNS + Hosting + Frontend + Backend + Da
 | **Dev frontend** | web.md / admin.md → request-flows → api.md |
 | **Dev backend** | api.md → database.md → security.md |
 | **Người triển khai / vận hành** | deployment → monitoring-and-backup → production-readiness |
+| **Người kiểm thử** | 06-testing/README → e2e → web / admin / api |
 | **Chủ dự án / lập kế hoạch** | overview → features → roadmap → production-readiness |
 
 ## Quy ước viết tài liệu

@@ -149,6 +149,7 @@ export interface SiteSettings {
   zaloPhone: string;
   taxCode: string;
   taxNote: string;
+  marqueeEnabled: boolean;
   marqueeText: string;
   bankTransferInfo: string;
 }
@@ -170,6 +171,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   zaloPhone: "0396799579",
   taxCode: "064196012614",
   taxNote: "Hộ kinh doanh nhóm 1",
+  marqueeEnabled: true,
   marqueeText: "",
   bankTransferInfo: "",
 };

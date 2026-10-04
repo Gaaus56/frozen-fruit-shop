@@ -20,7 +20,9 @@ export function BannerSlider({ banners }: { banners: Banner[] }) {
         {banners.map((slide, i) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-700 ${i === index ? "opacity-100" : "opacity-0"}`}
+            className={`absolute inset-0 transition-opacity duration-700 ${
+              i === index ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
             aria-hidden={i !== index}
           >
             <Image

@@ -3,6 +3,7 @@ import type { Banner } from "@frozen-fruit-shop/types";
 import { PageHeader } from "@/components/ui/page-header";
 import { ApiError, api } from "@/lib/api";
 import { BannerForm } from "../banner-form";
+import { getLinkOptionGroups } from "../link-options";
 
 export const metadata = { title: "Sửa banner" };
 
@@ -16,7 +17,7 @@ export default async function EditBannerPage({ params }: PageProps<"/banners/[id
   return (
     <div>
       <PageHeader back={{ href: "/banners", label: "Banner" }} title="Sửa banner" />
-      <BannerForm banner={banner} />
+      <BannerForm banner={banner} linkGroups={await getLinkOptionGroups()} />
     </div>
   );
 }

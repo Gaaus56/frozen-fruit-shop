@@ -49,7 +49,7 @@ Trạng thái: ✅ xong · 🟡 một phần · ⬜ chưa làm (đã lên kế h
 | Liên hệ & báo giá sỉ: trạng thái Mới / Đang xử lý / Xong | ✅ | |
 | Sản phẩm: nhiều ảnh (kéo thứ tự), nhiều quy cách, bật/tắt nhanh | ✅ | |
 | Danh mục, banner, bài viết, chính sách (có mẫu soạn sẵn) | ✅ | |
-| Thông tin cửa hàng (hotline, chuyển khoản, MST, dòng chữ chạy…) | ✅ | Chỉ ADMIN |
+| Thông tin cửa hàng (hotline, chuyển khoản, MST, dòng chữ chạy + bật/tắt…) | ✅ | Chỉ ADMIN |
 | Tài khoản nhân viên: tạo, khoá, đặt lại mật khẩu, xoá | ✅ | Chỉ ADMIN |
 | Thông báo realtime đơn / liên hệ mới (toast + âm báo + số trên tab) | ✅ | |
 | Tải ảnh trực tiếp (kiểm tra định dạng thật, ≤ 5 MB) | ✅ | |

@@ -31,7 +31,7 @@ npm run dev:web     # http://localhost:3000
 npm run dev:admin   # http://localhost:3002
 ```
 
-Database khởi tạo **rỗng** — không có dữ liệu mẫu. Đăng nhập trang quản trị rồi nhập lần lượt: thông tin cửa hàng → danh mục → sản phẩm → banner → chính sách → bài viết.
+Database khởi tạo **rỗng** — không có dữ liệu mẫu (muốn có dữ liệu để thử trên máy dev: `npm run db:seed:test`, **xoá sạch** DB rồi nạp lại). Đăng nhập trang quản trị rồi nhập lần lượt: thông tin cửa hàng → danh mục → sản phẩm → banner → chính sách → bài viết.
 
 ## Tài liệu
 

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Injectable, Put } from '@nestjs/common';
-import { IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import { DEFAULT_SITE_SETTINGS, type SiteSettings } from '@frozen-fruit-shop/types';
 import { Auth } from '../auth/auth.guard.js';
 import { Trim } from '../common/validators.js';
@@ -21,6 +21,7 @@ export class UpdateSettingsDto implements SiteSettings {
   @Trim() @Matches(/^[\d\s.+]{0,15}$/, { message: 'Số Zalo không hợp lệ' }) zaloPhone!: string;
   @Trim() @IsString() @MaxLength(30) taxCode!: string;
   @Trim() @IsString() @MaxLength(100) taxNote!: string;
+  @IsOptional() @IsBoolean() marqueeEnabled!: boolean;
   @IsOptional() @Trim() @IsString() @MaxLength(500) marqueeText!: string;
   @IsOptional() @IsString() @MaxLength(2000) bankTransferInfo!: string;
 }
@@ -40,7 +41,7 @@ export class SettingsService {
   }
 
   async update(dto: UpdateSettingsDto): Promise<SiteSettings> {
-    const data = { ...dto, marqueeText: dto.marqueeText ?? '', bankTransferInfo: dto.bankTransferInfo ?? '' };
+    const data = { ...dto, marqueeEnabled: dto.marqueeEnabled ?? true, marqueeText: dto.marqueeText ?? '', bankTransferInfo: dto.bankTransferInfo ?? '' };
     await this.prisma.siteSetting.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
     this.revalidate.notify('settings');
     return this.get();

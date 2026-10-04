@@ -17,6 +17,7 @@ Ghi lại **vì sao** hệ thống được làm như hiện tại, để ngư�
 | 11 | Không có dữ liệu mẫu (seed) | Đang áp dụng |
 | 12 | Một ADMIN duy nhất + nhiều STAFF | Đang áp dụng |
 | 13 | Bỏ chế độ tối (dark mode) ở web | Đang áp dụng |
+| 14 | Seed dữ liệu kiểm thử riêng cho máy dev (bổ sung #11) | Đang áp dụng |
 
 ---
 
@@ -75,3 +76,8 @@ Ghi lại **vì sao** hệ thống được làm như hiện tại, để ngư�
 ### 13. Bỏ dark mode
 - **Quyết định:** web chỉ có giao diện sáng theo màu logo (đỏ `#ec3013`, xanh lá `#1f6b3f`, nền kem) — xem `design/color.md`.
 - **Hệ quả:** ít CSS cần bảo trì, nhận diện thương hiệu nhất quán.
+
+### 14. Seed dữ liệu kiểm thử (bổ sung #11)
+- **Bối cảnh:** test thủ công ([06-testing](../06-testing/README.md)) cần cùng một bộ dữ liệu đủ mọi tình huống (hết hàng, danh mục ẩn, đơn mọi trạng thái, 13 tháng doanh thu); nhập tay mỗi lần mất cả giờ.
+- **Quyết định:** `npm run db:seed:test` (`apps/api/prisma/seed-test.ts`) xoá sạch rồi nạp lại bộ dữ liệu cố định. Production vẫn **không** có seed (#11 giữ nguyên).
+- **Hệ quả:** chạy lại được bất cứ lúc nào; script tự từ chối khi `NODE_ENV=production` hoặc `DATABASE_URL` không phải máy cục bộ. Ảnh mẫu (~600 KB) nằm ở `prisma/seed-assets/`, không đóng vào image Docker.

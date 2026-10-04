@@ -312,6 +312,8 @@ model SiteSetting {
   zaloPhone       String   @default("")
   taxCode         String   @default("")
   taxNote         String   @default("")
+  /// Bật/tắt dải chữ chạy đỏ ở đầu trang web.
+  marqueeEnabled  Boolean  @default(true)
   marqueeText     String   @default("")
   /// Hướng dẫn chuyển khoản hiển thị ở trang thanh toán (số tài khoản, ngân hàng, nội dung CK).
   bankTransferInfo String  @default("")

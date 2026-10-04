@@ -49,7 +49,8 @@ inquiries · posts · banners · policies · site_settings (1 dòng, id = 1)   �
 - Thư mục `apps/api/prisma/migrations/` — hiện có một migration khởi tạo `20260929000000_init`.
 - Máy dev, sau khi sửa `schema.prisma`: `npm run db:migrate` (tạo migration mới + áp dụng).
 - Máy chủ / database mới: `npm run db:deploy` (chỉ áp migration có sẵn, không bao giờ xoá dữ liệu). Image Docker của API tự chạy lệnh này khi khởi động.
-- **Không có seed.** Database mới chỉ cần tạo ADMIN: `npm run admin:create`.
+- **Không có seed cho production.** Database mới chỉ cần tạo ADMIN: `npm run admin:create`.
+- Máy dev / staging: `npm run db:seed:test` xoá sạch rồi nạp bộ dữ liệu kiểm thử ([06-testing/README.md §3](../06-testing/README.md#3-dữ-liệu-chuẩn-bị)). Từ chối chạy khi `NODE_ENV=production` hoặc database không ở máy cục bộ.
 
 ## 5. Ảnh
 

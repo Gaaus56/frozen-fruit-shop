@@ -22,6 +22,7 @@
     "db:migrate": "npm run prisma:migrate -w apps/api",
     "db:studio": "npm run prisma:studio -w apps/api",
     "db:deploy": "npm run prisma:deploy -w apps/api",
-    "admin:create": "npm run prisma:create-admin -w apps/api"
+    "admin:create": "npm run prisma:create-admin -w apps/api",
+    "db:seed:test": "npm run prisma:seed-test -w apps/api"
   }
 }

@@ -8,3 +8,5 @@ docs
 **/.env
 **/.env.local
 **/*.tsbuildinfo
+# Ảnh mẫu cho seed kiểm thử — chỉ dùng ở máy dev
+apps/api/prisma/seed-assets

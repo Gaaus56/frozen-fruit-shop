@@ -8,9 +8,17 @@ import {
   type OrderStatus,
   type PaymentStatus,
 } from "@frozen-fruit-shop/types";
-import { SubmitButton } from "@/components/ui/button";
+import { SubmitButton, buttonClass } from "@/components/ui/button";
 import { Field, FormAlert, inputClass } from "@/components/ui/form";
 import { updateOrderAction } from "../actions";
+
+/** Nút chuyển nhanh sang bước kế tiếp; "Huỷ đơn" luôn nằm riêng. */
+const PRIMARY_ACTION: Partial<Record<OrderStatus, string>> = {
+  pending: "Xác nhận đơn",
+  confirmed: "Bắt đầu đóng gói",
+  packing: "Giao cho vận chuyển",
+  shipping: "Đã giao thành công",
+};
 
 /** Phải khớp quy tắc chuyển trạng thái của API (apps/api/src/orders/orders.service.ts). */
 const NEXT_STATUSES: Record<OrderStatus, OrderStatus[]> = {
@@ -30,6 +38,31 @@ export function OrderUpdateForm({ order }: { order: OrderDetail }) {
   return (
     <form action={formAction} className="flex flex-col gap-4 border border-divider bg-surface p-5 xl:sticky xl:top-6">
       <h2 className="text-base">Xử lý đơn</h2>
+
+      {!isFinished ? (
+        <div className="flex flex-col gap-2">
+          <button
+            type="submit"
+            name="quickStatus"
+            value={nextStatuses[0]}
+            className={buttonClass("primary", "md", "w-full")}
+          >
+            {PRIMARY_ACTION[order.status]}
+          </button>
+          <button
+            type="submit"
+            name="quickStatus"
+            value="cancelled"
+            onClick={(e) => {
+              if (!window.confirm("Huỷ đơn này?")) e.preventDefault();
+            }}
+            className={buttonClass("secondary", "md", "w-full")}
+          >
+            Huỷ đơn
+          </button>
+          <p className="text-xs text-foreground/55">Phí ship / giảm giá bên dưới sẽ được lưu cùng lúc.</p>
+        </div>
+      ) : null}
 
       <Field label="Chuyển trạng thái" htmlFor="status" hint={isFinished ? "Đơn đã kết thúc, không đổi được trạng thái." : undefined}>
         <select id="status" name="status" defaultValue="" disabled={isFinished} className={inputClass}>

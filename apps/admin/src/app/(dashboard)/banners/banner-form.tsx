@@ -6,8 +6,10 @@ import { LinkButton, SubmitButton } from "@/components/ui/button";
 import { Checkbox, Field, FormAlert, inputClass } from "@/components/ui/form";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { saveBannerAction } from "./actions";
+import type { LinkOptionGroup } from "./link-options";
+import { LinkPicker } from "./link-picker";
 
-export function BannerForm({ banner }: { banner?: Banner }) {
+export function BannerForm({ banner, linkGroups }: { banner?: Banner; linkGroups: LinkOptionGroup[] }) {
   const [state, formAction] = useActionState(saveBannerAction.bind(null, banner?.id ?? null), undefined);
 
   return (
@@ -22,8 +24,8 @@ export function BannerForm({ banner }: { banner?: Banner }) {
         <textarea id="description" name="description" rows={2} maxLength={300} defaultValue={banner?.description} className={inputClass} />
       </Field>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Liên kết khi bấm" htmlFor="linkUrl" hint='Ví dụ: /products?category=xoai hoặc https://...'>
-          <input id="linkUrl" name="linkUrl" maxLength={500} defaultValue={banner?.linkUrl ?? ""} placeholder="/products" className={inputClass} />
+        <Field label="Liên kết khi bấm" htmlFor="linkUrl" hint="Chọn trang có sẵn, hoặc chọn «Link tự nhập» ở cuối danh sách.">
+          <LinkPicker groups={linkGroups} defaultValue={banner?.linkUrl ?? ""} />
         </Field>
         <Field label="Chữ trên nút" htmlFor="ctaLabel" hint="Để trống sẽ không hiện nút.">
           <input id="ctaLabel" name="ctaLabel" maxLength={40} defaultValue={banner?.ctaLabel ?? ""} placeholder="Mua ngay" className={inputClass} />

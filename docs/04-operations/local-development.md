@@ -28,6 +28,14 @@ npm run dev:admin                             # http://localhost:3002
 
 Sau đó đăng nhập admin, lần lượt nhập: **Thông tin cửa hàng → Danh mục → Sản phẩm → Banner → Chính sách → Bài viết**. Database không có dữ liệu mẫu.
 
+**Muốn có sẵn dữ liệu để thử** (thay cho bước nhập tay và `admin:create`):
+
+```bash
+npm run db:seed:test      # XOÁ SẠCH database rồi nạp dữ liệu kiểm thử; đăng nhập admin@test.vn / Admin@123456
+```
+
+Chi tiết bộ dữ liệu: [06-testing/README.md §3](../06-testing/README.md#3-dữ-liệu-chuẩn-bị).
+
 Kiểm tra nhanh: `http://localhost:4000/health` trả OK; trang chủ web hiện thông tin cửa hàng.
 
 ## 3. Lệnh thường dùng
@@ -43,6 +51,7 @@ Kiểm tra nhanh: `http://localhost:4000/health` trả OK; trang chủ web hiệ
 | `npm run db:deploy` | Áp migration có sẵn (máy chủ, database mới) |
 | `npm run db:studio` | Prisma Studio — xem/sửa dữ liệu trực quan |
 | `npm run admin:create` | Tạo ADMIN, hoặc **đặt lại mật khẩu ADMIN** (quên mật khẩu) theo `ADMIN_EMAIL`/`ADMIN_PASSWORD` trong `apps/api/.env` |
+| `npm run db:seed:test` | **Xoá sạch** database rồi nạp dữ liệu kiểm thử (chỉ máy dev / staging) |
 
 ## 4. Biến môi trường
 

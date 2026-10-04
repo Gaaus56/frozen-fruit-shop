@@ -98,20 +98,22 @@ export function Header({ settings, categories }: HeaderProps) {
 
   return (
     <>
-      <div className="overflow-hidden bg-accent-700 text-white">
-        <div className="marquee py-2 text-[13px] font-semibold">
-          <span className="marquee-track">
-            {settings.marqueeText ||
-              [
-                `Chào mừng bạn đến với ${settings.storeName}`,
-                `Hotline ${settings.hotlineHours}: ${formatPhone(settings.phone)}`,
-                [settings.addressLandmark, settings.address].filter(Boolean).join(", "),
-              ]
-                .filter(Boolean)
-                .join(" — ")}
-          </span>
+      {settings.marqueeEnabled ? (
+        <div className="overflow-hidden bg-accent-700 text-white">
+          <div className="marquee py-2 text-[13px] font-semibold">
+            <span className="marquee-track">
+              {settings.marqueeText ||
+                [
+                  `Chào mừng bạn đến với ${settings.storeName}`,
+                  `Hotline ${settings.hotlineHours}: ${formatPhone(settings.phone)}`,
+                  [settings.addressLandmark, settings.address].filter(Boolean).join(", "),
+                ]
+                  .filter(Boolean)
+                  .join(" — ")}
+            </span>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="relative h-0 bg-background lg:h-auto">
         <Container className="hidden h-16 items-center gap-6 lg:flex lg:pl-52">
