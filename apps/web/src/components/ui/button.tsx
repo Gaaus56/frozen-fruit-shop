@@ -1,13 +1,14 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "ghost" | "outline";
+type Variant = "primary" | "secondary" | "ghost" | "outline" | "dark";
 
 const variantClasses: Record<Variant, string> = {
   primary: "bg-accent-600 text-white hover:bg-accent-700",
   secondary: "bg-transparent text-foreground border border-divider hover:bg-foreground/5",
   ghost: "bg-transparent text-accent-600 hover:bg-accent-100",
   outline: "bg-transparent text-current border border-current/30 hover:border-current/60",
+  dark: "bg-accent-700 text-white hover:bg-accent-800",
 };
 
 const baseClasses =

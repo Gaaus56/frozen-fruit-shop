@@ -104,6 +104,12 @@ Chi tiết: [features.md](../01-product/features.md).
 
 ---
 
+## Tính năng AI (đề xuất, chưa xếp lịch)
+
+Các ý tưởng dùng LLM — viết hộ nội dung, phân loại liên hệ, gợi ý phí ship, trợ lý tư vấn trên web — cùng kiến trúc, nguyên tắc an toàn và thứ tự làm: [ai-features.md](ai-features.md). Chốt làm mục nào thì đưa vào bảng của giai đoạn tương ứng ở trên.
+
+---
+
 ## Cách cập nhật tài liệu này
 
 - Xong một việc → đánh dấu trong [features.md](../01-product/features.md) và [production-readiness.md](production-readiness.md), xoá dòng khỏi bảng giai đoạn ở đây (hoặc ghi ✅).

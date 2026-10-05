@@ -49,6 +49,7 @@ Một website hoàn chỉnh = **Domain + DNS + Hosting + Frontend + Backend + Da
 | 5 | **[05-roadmap/](05-roadmap/)** | [roadmap.md](05-roadmap/roadmap.md) | **Kế hoạch tổng thể** — làm gì tiếp, theo thứ tự nào |
 | | | [production-readiness.md](05-roadmap/production-readiness.md) | Checklist 13 lớp "full-stack production" — đã đủ chưa? |
 | | | [decisions.md](05-roadmap/decisions.md) | Vì sao chọn công nghệ / cách làm hiện tại |
+| | | [ai-features.md](05-roadmap/ai-features.md) | Đề xuất ứng dụng LLM (AI) cho admin và web |
 | 6 | **[06-testing/](06-testing/)** | [README.md](06-testing/README.md) | Test khi nào, dữ liệu mẫu, cách ghi kết quả |
 | | | [web.md](06-testing/web.md) · [admin.md](06-testing/admin.md) · [api.md](06-testing/api.md) | Kịch bản test từng trang, nút bấm, trường hợp lỗi |
 | | | [e2e.md](06-testing/e2e.md) | Kịch bản xuyên suốt trước mỗi lần phát hành |
