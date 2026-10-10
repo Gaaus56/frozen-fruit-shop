@@ -129,13 +129,14 @@ export interface Post {
   publishedAt: string;
 }
 
-export const BANNER_PLACEMENTS = ["home", "products", "news"] as const;
+export const BANNER_PLACEMENTS = ["home", "products", "news", "about"] as const;
 export type BannerPlacement = (typeof BANNER_PLACEMENTS)[number];
 
 export const BANNER_PLACEMENT_LABELS: Record<BannerPlacement, string> = {
   home: "Trang chủ (trình chiếu)",
   products: "Đầu trang Sản phẩm",
   news: "Đầu trang Tin tức",
+  about: "Đầu trang Giới thiệu",
 };
 
 export interface Banner {
@@ -159,6 +160,35 @@ export interface Policy {
   isActive: boolean;
 }
 
+/** Thẻ cam kết nhỏ dưới nút mua ở trang chi tiết sản phẩm (giao giữ lạnh, đổi trả, tư vấn...). */
+export interface ProductAssurance {
+  icon: string;
+  title: string;
+  text: string;
+  /** Trang trong web ("/policies/..."), link ngoài, hoặc "tel:{phone}"; để trống = thẻ không bấm được. */
+  linkUrl: string;
+}
+
+/** Số thẻ cam kết tối đa (một hàng 3 ô trên trang sản phẩm). */
+export const MAX_PRODUCT_ASSURANCES = 3;
+
+/** Biểu tượng admin chọn cho thẻ cam kết. */
+export const ASSURANCE_ICONS = ["❄️", "↺", "☎", "🚚", "✅", "🌿", "⏱️", "💳", "🎁", "🛡️"] as const;
+
+/** Dùng khi admin chưa chỉnh thẻ cam kết lần nào. `{phone}`, `{hotlineHours}` được thay bằng thông tin cửa hàng. */
+export const DEFAULT_PRODUCT_ASSURANCES: ProductAssurance[] = [
+  { icon: "❄️", title: "Giao hàng giữ lạnh", text: "Đóng thùng xốp + đá gel, giữ đông suốt đường đi.", linkUrl: "/policies/chinh-sach-giao-hang" },
+  { icon: "↺", title: "Đổi trả khi hàng lỗi", text: "Quay video lúc mở thùng để được đổi mới hoặc hoàn tiền.", linkUrl: "/policies/chinh-sach-doi-tra" },
+  { icon: "☎", title: "Tư vấn {hotlineHours}", text: "{phone}", linkUrl: "tel:{phone}" },
+];
+
+/** Thay `{phone}`, `{hotlineHours}` trong chữ admin nhập bằng thông tin cửa hàng hiện tại. */
+export function fillSettingsPlaceholders(value: string, settings: Pick<SiteSettings, "phone" | "hotlineHours">): string {
+  // Link gọi điện cần số liền ("tel:0396799579"); chữ hiển thị thì dùng số có khoảng cách cho dễ đọc.
+  const phone = value.startsWith("tel:") ? settings.phone.replace(/\s/g, "") : formatPhone(settings.phone);
+  return value.replace(/\{phone\}/g, phone).replace(/\{hotlineHours\}/g, settings.hotlineHours).replace(/\s+/g, " ").trim();
+}
+
 export interface SiteSettings {
   storeName: string;
   shortName: string;
@@ -175,6 +205,7 @@ export interface SiteSettings {
   marqueeEnabled: boolean;
   marqueeText: string;
   bankTransferInfo: string;
+  productAssurances: ProductAssurance[];
 }
 
 /**
@@ -197,6 +228,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   marqueeEnabled: true,
   marqueeText: "",
   bankTransferInfo: "",
+  productAssurances: DEFAULT_PRODUCT_ASSURANCES,
 };
 
 /** "0396799579" → "0396 799 579" */

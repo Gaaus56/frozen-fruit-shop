@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { SiteSettings } from "@frozen-fruit-shop/types";
 
@@ -10,6 +11,8 @@ interface ContactChannel {
   color: string;
   icon: ReactNode;
   external?: boolean;
+  /** Trang trong web (dùng Link) và chỉ hiện trên mobile — desktop đã có mục này trên menu chính. */
+  mobileOnly?: boolean;
 }
 
 function buildContacts(settings: SiteSettings): ContactChannel[] {
@@ -68,6 +71,20 @@ function buildContacts(settings: SiteSettings): ContactChannel[] {
         </svg>
       ),
     },
+    {
+      // Thanh điều hướng dưới trên mobile không có tab Liên hệ (đã nhường chỗ cho Tin tức).
+      key: "contact-page",
+      label: "Trang liên hệ",
+      href: "/contact",
+      color: "#cf2a10",
+      mobileOnly: true,
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <path d="m3.5 6.5 8.5 6 8.5-6" />
+        </svg>
+      ),
+    },
   ];
   // Ẩn kênh Facebook khi cửa hàng chưa cài link.
   return channels.filter((channel) => channel.key !== "messenger" || Boolean(settings.facebookUrl));
@@ -75,19 +92,34 @@ function buildContacts(settings: SiteSettings): ContactChannel[] {
 
 const CYCLE_DURATION_MS = 2000;
 
+const itemClass = "flex items-center gap-3 rounded-full px-2 py-2 text-sm font-semibold text-foreground hover:bg-surface";
+
+function ContactIcon({ contact }: { contact: ContactChannel }) {
+  return (
+    <span
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white [&>svg]:h-5 [&>svg]:w-5"
+      style={{ background: contact.color }}
+    >
+      {contact.icon}
+    </span>
+  );
+}
+
 export function FloatingContact({ settings }: { settings: SiteSettings }) {
   const contacts = useMemo(() => buildContacts(settings), [settings]);
+  // Icon xoay vòng trên nút chỉ gồm các kênh nhắn / gọi, không gồm mục "Trang liên hệ".
+  const channels = useMemo(() => contacts.filter((contact) => !contact.mobileOnly), [contacts]);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(
-      () => setActiveIndex((index) => (index + 1) % contacts.length),
+      () => setActiveIndex((index) => (index + 1) % channels.length),
       CYCLE_DURATION_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [activeIndex, contacts.length]);
+  }, [activeIndex, channels.length]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -108,34 +140,41 @@ export function FloatingContact({ settings }: { settings: SiteSettings }) {
   return (
     <div
       ref={rootRef}
-      className="pointer-events-none fixed bottom-[0.85rem] left-1/2 z-50 isolate flex -translate-x-1/2 flex-col items-center gap-3 lg:bottom-6 lg:left-auto lg:right-6 lg:translate-x-0 lg:items-end"
+      className="pointer-events-none fixed bottom-[0.85rem] left-1/2 z-50 isolate flex -translate-x-1/2 flex-col items-center gap-3 lg:bottom-6 lg:left-auto lg:right-6 lg:translate-x-0 lg:items-end lg:gap-4"
     >
       {/* Luôn render để có hiệu ứng cả lúc mở lẫn lúc đóng (xem .contact-menu trong globals.css);
           khi đóng thì `inert` để không bấm / Tab vào được. Khung ngoài pointer-events-none để phần
           trống không chặn cú bấm vào thanh điều hướng phía sau. */}
       <ul
-        className="contact-menu pointer-events-auto w-56 bg-card p-2 shadow-2xl ring-1 ring-divider"
+        className="contact-menu pointer-events-auto relative w-56 rounded-3xl border-2 border-accent-600 bg-card p-2 shadow-2xl shadow-black/20"
         role="menu"
         data-open={isOpen}
         inert={!isOpen}
         aria-hidden={!isOpen}
       >
         {contacts.map((contact, index) => (
-          <li key={contact.key} role="none" style={{ "--i": contacts.length - 1 - index } as CSSProperties}>
-            <a
-              role="menuitem"
-              href={contact.href}
-              {...(contact.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-              className="flex items-center gap-3 px-2 py-2 text-sm font-semibold text-foreground hover:bg-surface"
-            >
-              <span
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white [&>svg]:h-5 [&>svg]:w-5"
-                style={{ background: contact.color }}
+          <li
+            key={contact.key}
+            role="none"
+            className={contact.mobileOnly ? "lg:hidden" : undefined}
+            style={{ "--i": contacts.length - 1 - index } as CSSProperties}
+          >
+            {contact.mobileOnly ? (
+              <Link role="menuitem" href={contact.href} onClick={() => setIsOpen(false)} className={itemClass}>
+                <ContactIcon contact={contact} />
+                {contact.label}
+              </Link>
+            ) : (
+              <a
+                role="menuitem"
+                href={contact.href}
+                {...(contact.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className={itemClass}
               >
-                {contact.icon}
-              </span>
-              {contact.label}
-            </a>
+                <ContactIcon contact={contact} />
+                {contact.label}
+              </a>
+            )}
           </li>
         ))}
       </ul>
@@ -149,7 +188,7 @@ export function FloatingContact({ settings }: { settings: SiteSettings }) {
           isOpen ? "" : "contact-pulse"
         }`}
       >
-        {contacts.map((item, index) => (
+        {channels.map((item, index) => (
           <span
             key={item.key}
             aria-hidden

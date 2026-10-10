@@ -10,6 +10,13 @@ import { deleteBannerAction } from "./actions";
 
 export const metadata = { title: "Banner" };
 
+const PLACEMENT_TONE: Record<BannerPlacement, "neutral" | "blue" | "green" | "amber"> = {
+  home: "neutral",
+  products: "blue",
+  news: "green",
+  about: "amber",
+};
+
 export default async function BannersPage({ searchParams }: PageProps<"/banners">) {
   const params = await searchParams;
   const placement = BANNER_PLACEMENTS.find((value) => value === params.placement);
@@ -23,7 +30,7 @@ export default async function BannersPage({ searchParams }: PageProps<"/banners"
     <div>
       <PageHeader
         title="Banner"
-        description="Trang chủ: ảnh trình chiếu, ẩn khi không có banner nào đang bật. Trang Sản phẩm / Tin tức: ảnh nền đầu trang, dùng banner đang bật có thứ tự nhỏ nhất."
+        description="Trang chủ: ảnh trình chiếu, ẩn khi không có banner nào đang bật. Trang Sản phẩm / Tin tức / Giới thiệu: ảnh nền đầu trang, dùng banner đang bật có thứ tự nhỏ nhất."
         action={<LinkButton href={placement ? `/banners/new?placement=${placement}` : "/banners/new"}>+ Thêm banner</LinkButton>}
       />
 
@@ -62,7 +69,7 @@ export default async function BannersPage({ searchParams }: PageProps<"/banners"
               </div>
             </Td>
             <Td>
-              <Badge tone={banner.placement === "home" ? "neutral" : banner.placement === "products" ? "blue" : "green"}>{BANNER_PLACEMENT_LABELS[banner.placement]}</Badge>
+              <Badge tone={PLACEMENT_TONE[banner.placement]}>{BANNER_PLACEMENT_LABELS[banner.placement]}</Badge>
             </Td>
             <Td className="max-w-56 truncate text-foreground/70">{banner.linkUrl ?? "—"}</Td>
             <Td>{banner.sortOrder}</Td>

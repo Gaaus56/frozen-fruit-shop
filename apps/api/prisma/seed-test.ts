@@ -446,6 +446,7 @@ async function seedContent() {
     data: {
       id: 1,
       ...DEFAULT_SITE_SETTINGS,
+      productAssurances: undefined, // để NULL → API dùng bộ thẻ cam kết mặc định
       marqueeEnabled: true,
       marqueeText: 'Miễn phí giao hàng nội thành Đà Nẵng cho đơn từ 300.000đ — Hotline 0396 799 579',
       bankTransferInfo: 'Ngân hàng: Vietcombank\nSố tài khoản: 0123456789 (TÀI KHOẢN TEST)\nChủ tài khoản: NGUYEN VAN A\nNội dung: <mã đơn hàng>',

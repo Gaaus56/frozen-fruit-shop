@@ -1,10 +1,16 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-/** Hàng chip lọc trên nền ảnh tối của PageHero (danh mục sản phẩm, loại bài viết). */
+/**
+ * Hàng chip lọc trên nền ảnh tối của PageHero (danh mục sản phẩm, loại bài viết).
+ * Mobile: một hàng vuốt ngang (không xuống nhiều dòng) để banner các trang cao bằng nhau.
+ */
 export function FilterChips({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <nav aria-label={label} className="flex flex-wrap gap-2">
+    <nav
+      aria-label={label}
+      className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&>*]:shrink-0 [&>*]:whitespace-nowrap"
+    >
       {children}
     </nav>
   );

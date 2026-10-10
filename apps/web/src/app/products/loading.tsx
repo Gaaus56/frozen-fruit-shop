@@ -6,7 +6,7 @@ export default function ProductsLoading() {
   return (
     <>
       <section className="border-b border-divider bg-[#2a2f33]">
-        <Container className="py-12">
+        <Container className="flex min-h-80 flex-col justify-center py-10 sm:min-h-[16.25rem] sm:py-12">
           <span className="block h-3 w-20 animate-pulse rounded-full bg-white/20" />
           <span className="mt-4 block h-8 w-72 max-w-full animate-pulse rounded-full bg-white/20" />
           <span className="mt-3 block h-4 w-96 max-w-full animate-pulse rounded-full bg-white/15" />

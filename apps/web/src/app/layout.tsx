@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { FloatingContact } from "@/components/layout/floating-contact";
 import { LiveUpdates } from "@/components/layout/live-updates";
+import { NavigationTracker } from "@/components/ui/back-button";
 import { CartProvider } from "@/lib/cart-context";
 import { getCategories, getPolicies, getSettings } from "@/lib/api";
 
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <main className="flex-1">{children}</main>
           <Footer settings={settings} policies={policies} />
           <FloatingContact settings={settings} />
+          <NavigationTracker />
           <LiveUpdates />
         </CartProvider>
       </body>

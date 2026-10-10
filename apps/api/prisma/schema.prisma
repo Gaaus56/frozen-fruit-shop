@@ -273,11 +273,12 @@ model Post {
   @@map("posts")
 }
 
-/// Nơi hiển thị banner: trình chiếu trang chủ, hoặc ảnh nền đầu trang Sản phẩm / Tin tức.
+/// Nơi hiển thị banner: trình chiếu trang chủ, hoặc ảnh nền đầu trang Sản phẩm / Tin tức / Giới thiệu.
 enum BannerPlacement {
   home
   products
   news
+  about
 }
 
 model Banner {
@@ -332,6 +333,8 @@ model SiteSetting {
   marqueeText     String   @default("")
   /// Hướng dẫn chuyển khoản hiển thị ở trang thanh toán (số tài khoản, ngân hàng, nội dung CK).
   bankTransferInfo String  @default("")
+  /// Thẻ cam kết dưới nút mua ở trang sản phẩm: [{ icon, title, text, linkUrl }]. null = chưa chỉnh → dùng mặc định.
+  productAssurances Json?
   updatedAt       DateTime @updatedAt
 
   @@map("site_settings")

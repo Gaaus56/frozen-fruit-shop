@@ -1,13 +1,19 @@
 "use client";
 
 import { useActionState } from "react";
-import type { SiteSettings } from "@frozen-fruit-shop/types";
+import { ASSURANCE_ICONS, MAX_PRODUCT_ASSURANCES, type ProductAssurance, type SiteSettings } from "@frozen-fruit-shop/types";
 import { SubmitButton } from "@/components/ui/button";
 import { Checkbox, Field, FormAlert, Section, inputClass } from "@/components/ui/form";
+import { LinkPicker } from "../banners/link-picker";
+import type { LinkOptionGroup } from "../banners/link-options";
 import { saveSettingsAction } from "./actions";
 
-export function SettingsForm({ settings }: { settings: SiteSettings }) {
+const EMPTY_ASSURANCE: ProductAssurance = { icon: ASSURANCE_ICONS[0], title: "", text: "", linkUrl: "" };
+
+export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings; linkGroups: LinkOptionGroup[] }) {
   const [state, formAction] = useActionState(saveSettingsAction, undefined);
+  // Luôn hiện đủ số ô; ô trống tiêu đề sẽ bị bỏ khi lưu.
+  const assurances = Array.from({ length: MAX_PRODUCT_ASSURANCES }, (_, index) => settings.productAssurances[index] ?? EMPTY_ASSURANCE);
 
   return (
     <form action={formAction} className="flex max-w-4xl flex-col gap-6">
@@ -62,6 +68,39 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           <Field label="Link Google Maps" htmlFor="mapUrl" className="sm:col-span-2">
             <input id="mapUrl" name="mapUrl" type="url" maxLength={500} defaultValue={settings.mapUrl} className={inputClass} />
           </Field>
+        </div>
+      </Section>
+
+      <Section
+        title="Thẻ cam kết trang sản phẩm"
+        description="Các ô nhỏ dưới nút «Mua ngay» ở mọi trang chi tiết sản phẩm. Để trống tiêu đề để ẩn ô đó. Có thể gõ {phone} (hotline) và {hotlineHours} (giờ nhận điện thoại) — web tự thay bằng thông tin ở mục Liên hệ."
+      >
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {assurances.map((item, index) => (
+            <fieldset key={index} className="flex flex-col gap-3 border border-divider bg-card p-4">
+              <legend className="px-1 text-xs font-bold uppercase tracking-wide text-foreground/60">Ô {index + 1}</legend>
+              <Field label="Biểu tượng" htmlFor={`assurance${index}Icon`}>
+                <select id={`assurance${index}Icon`} name={`assurance${index}Icon`} defaultValue={item.icon} className={inputClass}>
+                  {/* Giữ biểu tượng cũ nếu không nằm trong danh sách (dữ liệu nhập tay trước đây). */}
+                  {(ASSURANCE_ICONS as readonly string[]).includes(item.icon) ? null : <option value={item.icon}>{item.icon}</option>}
+                  {ASSURANCE_ICONS.map((icon) => (
+                    <option key={icon} value={icon}>
+                      {icon}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Tiêu đề" htmlFor={`assurance${index}Title`}>
+                <input id={`assurance${index}Title`} name={`assurance${index}Title`} maxLength={60} defaultValue={item.title} className={inputClass} />
+              </Field>
+              <Field label="Mô tả ngắn" htmlFor={`assurance${index}Text`}>
+                <textarea id={`assurance${index}Text`} name={`assurance${index}Text`} rows={2} maxLength={160} defaultValue={item.text} className={inputClass} />
+              </Field>
+              <Field label="Bấm vào thì mở" htmlFor={`assurance${index}Link`}>
+                <LinkPicker groups={linkGroups} defaultValue={item.linkUrl} name={`assurance${index}Link`} id={`assurance${index}Link`} />
+              </Field>
+            </fieldset>
+          ))}
         </div>
       </Section>
 

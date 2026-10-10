@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
+import { PageHero } from "@/components/ui/page-hero";
 import { RichContent } from "@/components/ui/rich-content";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { getPage, getSettings } from "@/lib/api";
+import { getBanners, getPage, getSettings } from "@/lib/api";
+
+/** Ảnh nền khi admin chưa tạo banner nào cho trang Giới thiệu. */
+const FALLBACK_BANNER = "/images/banners/banner_v3.jpg";
 
 /** Nội dung trang do admin sửa ở "Trang Giới thiệu"; API trả nội dung mặc định khi chưa sửa lần nào. */
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,22 +17,24 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const [page, settings] = await Promise.all([getPage("about"), getSettings()]);
+  const [page, settings, banners] = await Promise.all([getPage("about"), getSettings(), getBanners("about")]);
+  const banner = banners[0];
+  // Chữ đặt trên banner (nếu có) thay cho tiêu đề / mô tả của "Trang Giới thiệu".
+  const title = banner?.title || page?.title || `Về ${settings.storeName}`;
+  const description = banner?.description || page?.description || undefined;
 
   return (
-    <Container className="py-12">
-      <SectionHeading
-        as="h1"
-        eyebrow="Giới thiệu"
-        title={page?.title || `Về ${settings.storeName}`}
-        description={page?.description || undefined}
-      />
-      {/* Khung trắng bo góc giống các khối ở trang chủ (SectionCard). */}
+    <>
+      <PageHero image={banner?.image ?? FALLBACK_BANNER} eyebrow="Giới thiệu" title={title} description={description} />
+
       {page?.content ? (
-        <div className="mt-8 rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm sm:px-10 sm:py-10">
-          <RichContent html={page.content} className="max-w-3xl" />
-        </div>
+        <Container className="pb-12 pt-8">
+          {/* Khung trắng bo góc giống các khối ở trang chủ (SectionCard). */}
+          <div className="rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm sm:px-10 sm:py-10">
+            <RichContent html={page.content} className="max-w-3xl" />
+          </div>
+        </Container>
       ) : null}
-    </Container>
+    </>
   );
 }

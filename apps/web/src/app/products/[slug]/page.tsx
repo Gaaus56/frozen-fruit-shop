@@ -3,11 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
 import { RichContent } from "@/components/ui/rich-content";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { SectionCard } from "@/components/ui/section-card";
+import { BackButton } from "@/components/ui/back-button";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { AddToCartForm } from "@/components/product/add-to-cart-form";
-import { formatPhone } from "@frozen-fruit-shop/types";
+import { fillSettingsPlaceholders } from "@frozen-fruit-shop/types";
 import { getPolicies, getProduct, getSettings } from "@/lib/api";
 
 interface ProductDetailPageProps {
@@ -30,17 +31,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const { slug } = await params;
   const [product, settings, policies] = await Promise.all([getProduct(slug), getSettings(), getPolicies()]);
   if (!product) notFound();
-  const returnPolicy = policies.find((policy) => policy.slug.includes("doi-tra")) ?? policies[0];
-  const assurances = [
-    { icon: "❄️", title: "Giao hàng giữ lạnh", text: "Đóng thùng xốp + đá gel, giữ đông suốt đường đi." },
-    {
-      icon: "↺",
-      title: "Đổi trả khi hàng lỗi",
-      text: "Quay video lúc mở thùng để được đổi mới hoặc hoàn tiền.",
-      href: returnPolicy ? `/policies/${returnPolicy.slug}` : undefined,
-    },
-    { icon: "☎", title: `Tư vấn ${settings.hotlineHours || ""}`.trim(), text: formatPhone(settings.phone), href: `tel:${settings.phone}` },
-  ];
+  // Thẻ cam kết do admin chỉnh ở "Thông tin cửa hàng". Link tới chính sách đã xoá / tắt thì bỏ link để khách không gặp trang 404.
+  const activePolicyPaths = new Set(policies.map((policy) => `/policies/${policy.slug}`));
+  const assurances = settings.productAssurances.map((item) => {
+    const href = fillSettingsPlaceholders(item.linkUrl, settings);
+    return {
+      icon: item.icon,
+      title: fillSettingsPlaceholders(item.title, settings),
+      text: fillSettingsPlaceholders(item.text, settings),
+      href: !href || (href.startsWith("/policies/") && !activePolicyPaths.has(href)) ? undefined : href,
+    };
+  });
 
   const { storageInfo } = product;
   const specs = [
@@ -51,22 +52,19 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   ].filter((spec) => spec.value);
 
   return (
-    <Container className="py-12">
-      <nav className="mb-6 text-sm text-foreground/65" aria-label="Breadcrumb">
-        <Link href="/products" className="inline-block py-1.5 hover:text-accent-600">Sản phẩm</Link>
-        {" / "}
-        <Link href={`/products?category=${product.category.slug}`} className="inline-block py-1.5 hover:text-accent-600">
-          {product.category.name}
-        </Link>
-        {" / "}
-        <span className="text-foreground/85">{product.name}</span>
-      </nav>
-
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
+    <Container className="flex flex-col gap-6 py-6 sm:py-8 lg:py-12">
+      {/* Khung trắng bo góc giống các khối ở trang chủ (SectionCard): ảnh + thông tin mua hàng. */}
+      <section className="grid grid-cols-1 gap-8 rounded-2xl border border-divider bg-card p-4 shadow-sm sm:p-7 lg:grid-cols-2 lg:gap-12">
         <ProductGallery images={product.images} name={product.name} />
 
         <div>
-          <p className="text-[13px] font-bold uppercase tracking-wide text-accent-600">{product.category.name}</p>
+          {/* Nút quay lại thay cho đường dẫn breadcrumb. */}
+          <div className="flex items-center gap-3">
+            <BackButton fallbackHref={`/products?category=${product.category.slug}`} label="Quay lại danh sách sản phẩm" />
+            <p className="text-[13px] font-bold uppercase tracking-wide text-accent-600">
+              <Link href={`/products?category=${product.category.slug}`} className="hover:underline">{product.category.name}</Link>
+            </p>
+          </div>
           <h1 className="mt-2 text-2xl uppercase text-foreground sm:text-3xl">{product.name}</h1>
           {product.shortDescription ? <p className="mt-4 text-foreground/70">{product.shortDescription}</p> : null}
 
@@ -74,60 +72,72 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             <AddToCartForm product={product} />
           </div>
 
-
-          <ul className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-3">
-            {assurances.map((item) => {
-              const body = (
-                <>
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-leaf/10 text-sm text-leaf" aria-hidden>
-                    {item.icon}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-xs font-bold text-foreground">{item.title}</span>
-                    <span className="block text-xs leading-snug text-foreground/65">{item.text}</span>
-                  </span>
-                </>
-              );
-              const className = "flex h-full items-start gap-2.5 rounded-xl bg-card p-3 ring-1 ring-divider/70";
-              return (
-                <li key={item.title}>
-                  {item.href ? (
-                    <a href={item.href} className={`${className} transition-colors hover:ring-leaf/40`}>{body}</a>
-                  ) : (
-                    <div className={className}>{body}</div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-
-          {specs.length > 0 ? (
-            <dl className="mt-6 flex flex-col rounded-xl bg-card px-4 text-sm ring-1 ring-divider/70">
-              {specs.map((spec) => (
-                <div key={spec.label} className="flex items-start justify-between gap-6 border-b border-divider py-2.5 last:border-b-0">
-                  <dt className="shrink-0 text-foreground/65">{spec.label}</dt>
-                  <dd className="text-right font-semibold text-foreground">{spec.value}</dd>
-                </div>
-              ))}
-            </dl>
+          {assurances.length > 0 ? (
+            <ul className={`mt-6 grid grid-cols-1 gap-2 ${assurances.length === 1 ? "" : assurances.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
+              {assurances.map((item, index) => {
+                const body = (
+                  <>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-leaf/10 text-sm text-leaf" aria-hidden>
+                      {item.icon}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-xs font-bold text-foreground">{item.title}</span>
+                      <span className="block text-xs leading-snug text-foreground/65">{item.text}</span>
+                    </span>
+                  </>
+                );
+                // Nằm trong khung trắng nên dùng nền xám ấm để tách thành ô riêng.
+                const className = "flex h-full items-start gap-2.5 rounded-xl bg-field p-3 ring-1 ring-divider/50";
+                return (
+                  <li key={index}>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        {...(/^https?:/.test(item.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                        className={`${className} transition-colors hover:ring-leaf/40`}
+                      >
+                        {body}
+                      </a>
+                    ) : (
+                      <div className={className}>{body}</div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           ) : null}
         </div>
-      </div>
+      </section>
 
-      {product.description ? (
-        <div className="mt-16 border-t border-divider pt-10">
-          <h2 className="text-xl uppercase text-foreground">Mô tả chi tiết</h2>
-          <RichContent html={product.description} className="mt-3 max-w-3xl" />
-        </div>
+      {specs.length > 0 || product.description ? (
+        <SectionCard title="Thông tin sản phẩm">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            {specs.length > 0 ? (
+              // Không có mô tả chi tiết: bảng thông tin đứng một mình, căn giữa khung.
+              <dl
+                className={`flex h-fit flex-col rounded-xl bg-field px-4 text-sm ring-1 ring-divider/50 ${
+                  product.description ? "lg:order-last" : "mx-auto w-full max-w-xl lg:col-span-3"
+                }`}
+              >
+                {specs.map((spec) => (
+                  <div key={spec.label} className="flex items-start justify-between gap-6 border-b border-divider py-2.5 last:border-b-0">
+                    <dt className="shrink-0 text-foreground/65">{spec.label}</dt>
+                    <dd className="text-right font-semibold text-foreground">{spec.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+            {product.description ? (
+              <RichContent html={product.description} className={specs.length > 0 ? "lg:col-span-2" : "lg:col-span-3"} />
+            ) : null}
+          </div>
+        </SectionCard>
       ) : null}
 
       {product.relatedProducts.length > 0 ? (
-        <div className="mt-16 border-t border-divider pt-10">
-          <SectionHeading title="Sản phẩm cùng loại" />
-          <div className="mt-6">
-            <ProductGrid products={product.relatedProducts} />
-          </div>
-        </div>
+        <SectionCard title="Sản phẩm cùng loại">
+          <ProductGrid products={product.relatedProducts} />
+        </SectionCard>
       ) : null}
     </Container>
   );

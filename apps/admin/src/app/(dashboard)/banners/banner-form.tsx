@@ -14,6 +14,8 @@ const IMAGE_HINT: Record<BannerPlacement, string> = {
   products:
     "Ảnh nền đầu trang Sản phẩm, khuyến nghị 2400×600 px. Ảnh được phủ lớp tối bên trái để chữ trắng dễ đọc — chọn ảnh có nội dung chính lệch phải.",
   news: "Ảnh nền đầu trang Tin tức, khuyến nghị 2400×600 px. Ảnh được phủ lớp tối bên trái để chữ trắng dễ đọc — chọn ảnh có nội dung chính lệch phải.",
+  about:
+    "Ảnh nền đầu trang Giới thiệu, khuyến nghị 2400×600 px. Ảnh được phủ lớp tối bên trái để chữ trắng dễ đọc — chọn ảnh có nội dung chính lệch phải.",
 };
 
 /** Tiêu đề mặc định của trang khi banner để trống tiêu đề. */
@@ -21,6 +23,7 @@ const DEFAULT_TITLE: Record<BannerPlacement, string> = {
   home: "",
   products: "Tất cả trái cây đông lạnh",
   news: "Tin tức",
+  about: "Tiêu đề trang Giới thiệu",
 };
 
 export function BannerForm({
@@ -77,7 +80,9 @@ export function BannerForm({
         hint={
           isHome
             ? "Không bắt buộc. Để trống nếu chữ đã có sẵn trong ảnh."
-            : `Không bắt buộc. Thay cho tiêu đề mặc định «${DEFAULT_TITLE[placement]}» (khi khách đang lọc thì hiện tên mục đang lọc).`
+            : placement === "about"
+              ? "Không bắt buộc. Để trống thì dùng tiêu đề đặt ở mục «Trang Giới thiệu»."
+              : `Không bắt buộc. Thay cho tiêu đề mặc định «${DEFAULT_TITLE[placement]}» (khi khách đang lọc thì hiện tên mục đang lọc).`
         }
       >
         <input id="title" name="title" maxLength={150} defaultValue={banner?.title} className={inputClass} />
@@ -91,7 +96,7 @@ export function BannerForm({
       </Field>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Banner đầu trang Sản phẩm / Tin tức chỉ là ảnh nền, không có nút bấm — vẫn giữ giá trị cũ trong form để không mất khi đổi qua lại. */}
+        {/* Banner đầu trang Sản phẩm / Tin tức / Giới thiệu chỉ là ảnh nền, không có nút bấm — vẫn giữ giá trị cũ trong form để không mất khi đổi qua lại. */}
         <div className={isHome ? "contents" : "hidden"}>
           <Field label="Liên kết khi bấm" htmlFor="linkUrl" hint="Chọn trang có sẵn, hoặc chọn «Link tự nhập» ở cuối danh sách.">
             <LinkPicker groups={linkGroups} defaultValue={banner?.linkUrl ?? ""} />

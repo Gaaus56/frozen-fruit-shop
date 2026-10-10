@@ -22,7 +22,10 @@ export default async function PolicyPage({ params }: PolicyPageProps) {
   return (
     <Container className="py-12">
       <h1 className="text-2xl uppercase text-foreground sm:text-3xl">{policy.title}</h1>
-      <RichContent html={policy.content} className="mt-6 max-w-3xl" />
+      {/* Khung trắng bo góc giống các khối ở trang chủ (SectionCard). */}
+      <div className="mt-6 rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm sm:px-10 sm:py-10">
+        <RichContent html={policy.content} className="max-w-3xl" />
+      </div>
     </Container>
   );
 }
