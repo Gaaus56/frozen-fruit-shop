@@ -48,3 +48,114 @@ h3 {
   font-weight: 800;
   letter-spacing: -0.015em;
 }
+
+/* ───────────── Trình soạn thảo (components/editor) ─────────────
+   Kiểu nội dung giữ giống .rich-content-flow ở apps/web để admin thấy đúng như khách sẽ thấy. */
+.rich-editor {
+  border: 1px solid var(--color-divider, #d6d4d3);
+  background: #fff;
+}
+.rich-editor-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 0.375rem;
+  border-bottom: 1px solid var(--color-divider, #d6d4d3);
+  background: #fbfbfb;
+}
+.rich-editor-content {
+  min-height: 22rem;
+  padding: 1.25rem 1.5rem;
+  outline: none;
+  line-height: 1.7;
+  color: #2b2827;
+}
+.rich-editor-content > * + * { margin-top: 0.85em; }
+.rich-editor-content h2 { font-size: 1.35rem; font-weight: 800; margin-top: 1.4em; color: #201e1d; }
+.rich-editor-content h3 { font-size: 1.1rem; font-weight: 800; margin-top: 1.2em; color: #201e1d; }
+.rich-editor-content ul { list-style: disc; padding-left: 1.5rem; }
+.rich-editor-content ol { list-style: decimal; padding-left: 1.5rem; }
+.rich-editor-content blockquote { border-left: 4px solid #1f6b3f; padding: 0.25rem 0 0.25rem 1rem; color: #4a4645; font-style: italic; }
+.rich-editor-content a { color: #ae1800; text-decoration: underline; }
+.rich-editor-content hr { border: 0; border-top: 1px solid #d6d4d3; margin: 1.5em 0; }
+.rich-editor-content aside { padding: 0.75rem 1rem; border-left: 4px solid; }
+.rich-editor-content aside[data-tone="green"] { background: #eef7f1; border-color: #1f6b3f; }
+.rich-editor-content aside[data-tone="red"] { background: #fff2ef; border-color: #ec3013; }
+.rich-editor-content aside > * + * { margin-top: 0.5em; }
+.rich-editor-content p.is-empty:first-child::before,
+.rich-editor-content h2.is-empty::before,
+.rich-editor-content h3.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: #a19c9a;
+}
+
+/* Ảnh có chú thích */
+.editor-figure { position: relative; margin: 1.25em 0; }
+.editor-figure img { display: block; max-width: 100%; margin: 0 auto; }
+.editor-figure.is-selected img { outline: 3px solid #1f6b3f; outline-offset: 2px; }
+.editor-figure figcaption {
+  min-height: 1.6em;
+  margin-top: 0.4rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b6664;
+}
+.editor-figure.is-empty figcaption::before {
+  content: attr(data-placeholder);
+  color: #a19c9a;
+  pointer-events: none;
+}
+.editor-figure-remove { position: absolute; top: 0.5rem; right: 0.5rem; opacity: 0; }
+.editor-figure:hover .editor-figure-remove,
+.editor-figure.is-selected .editor-figure-remove { opacity: 1; }
+
+/* Ô sản phẩm: thẻ dọc như trên web; các thẻ liền nhau xếp thành hàng (tối đa 4 thẻ / hàng). */
+.rich-editor-content .node-productEmbed {
+  display: inline-block;
+  width: calc(25% - 0.75rem);
+  min-width: 9rem;
+  margin: 0.5rem 0.75rem 0.5rem 0;
+  vertical-align: top;
+}
+.editor-product {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d6d4d3;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+  cursor: grab;
+}
+.editor-product.is-selected { outline: 3px solid #1f6b3f; outline-offset: 2px; }
+.editor-product-thumb { position: relative; display: block; aspect-ratio: 1; overflow: hidden; background: #eae9e9; }
+.editor-product-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.editor-product-body { display: block; padding: 0.5rem 0.625rem 0.625rem; text-align: center; line-height: 1.35; }
+.editor-product-name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #201e1d;
+}
+.editor-product-price { display: block; margin-top: 0.25rem; font-size: 0.875rem; font-weight: 800; color: #ae1800; }
+.editor-product-remove { position: absolute; top: 0.375rem; right: 0.375rem; opacity: 0; }
+.editor-product:hover .editor-product-remove,
+.editor-product.is-selected .editor-product-remove { opacity: 1; }
+.editor-chip-btn {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #fff;
+  color: #ae1800;
+  border: 1px solid #ffc4b8;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+}
+.editor-chip-btn:hover { background: #fff2ef; }

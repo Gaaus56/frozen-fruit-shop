@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { LinkButton } from "@/components/ui/button";
+import { PageHero } from "@/components/ui/page-hero";
+import { ClearFilterChip, FilterChip, FilterChips } from "@/components/ui/filter-chips";
 import { ProductGrid } from "@/components/product/product-grid";
-import { getCategories, getProducts, type ProductFilters } from "@/lib/api";
+import { getBanners, getCategories, getProducts, type ProductFilters } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Sản phẩm",
   description: "Danh sách trái cây đông lạnh cấp đông nhanh, đóng gói hút chân không.",
 };
+
+/** Ảnh nền khi admin chưa tạo banner nào cho trang Sản phẩm. */
+const FALLBACK_BANNER = "/images/banners/banner_v3.jpg";
+const DEFAULT_TITLE = "Tất cả trái cây đông lạnh";
+const DEFAULT_DESCRIPTION = "Chọn loại trái cây và quy cách đóng gói phù hợp với nhu cầu của bạn.";
 
 const SORTS: { value: NonNullable<ProductFilters["sort"]>; label: string }[] = [
   { value: "default", label: "Nổi bật" },
@@ -33,68 +40,64 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const query = params.q?.trim() || undefined;
   const sort = SORTS.find((item) => item.value === params.sort)?.value ?? "default";
 
-  const [categories, products] = await Promise.all([
+  const [categories, products, banners] = await Promise.all([
     getCategories(),
     getProducts({ category: params.category, q: query, sort }),
+    getBanners("products"),
   ]);
   const activeCategory = categories.find((category) => category.slug === params.category);
-
-  const chip = (active: boolean) =>
-    `border px-4 py-2 text-sm font-medium transition-colors ${
-      active ? "border-accent-600 bg-accent-600 text-white" : "border-white/40 text-white hover:border-white hover:bg-white/10"
-    }`;
+  const banner = banners[0];
+  const isFiltered = Boolean(activeCategory || query);
 
   return (
     <>
-      <section
-        className="relative border-b border-divider bg-[#2a2f33] bg-cover bg-center"
-        style={{ backgroundImage: "url(/images/banners/banner_v3.jpg)" }}
+      <PageHero
+        image={banner?.image ?? FALLBACK_BANNER}
+        eyebrow="Sản phẩm"
+        title={activeCategory ? activeCategory.name : banner?.title || DEFAULT_TITLE}
+        description={
+          query
+            ? `Kết quả tìm kiếm cho "${query}" — ${products.length} sản phẩm.`
+            : activeCategory
+              ? activeCategory.description || DEFAULT_DESCRIPTION
+              : banner?.description || DEFAULT_DESCRIPTION
+        }
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/20" aria-hidden />
-        <Container className="relative py-12">
-          <SectionHeading
-            eyebrow="Sản phẩm"
-            title={activeCategory ? activeCategory.name : "Tất cả trái cây đông lạnh"}
-            tone="light"
-            description={
-              query
-                ? `Kết quả tìm kiếm cho "${query}" — ${products.length} sản phẩm.`
-                : activeCategory?.description || "Chọn loại trái cây và quy cách đóng gói phù hợp với nhu cầu của bạn."
-            }
-          />
+        {categories.length > 0 || query ? (
+          <FilterChips label="Danh mục sản phẩm">
+            {query ? (
+              <ClearFilterChip href={buildHref({ category: params.category, sort })} label={`Xoá từ khoá tìm kiếm "${query}"`}>
+                “{query}”
+              </ClearFilterChip>
+            ) : null}
+            <FilterChip href={buildHref({ q: query, sort })} active={!activeCategory}>
+              Tất cả
+            </FilterChip>
+            {categories.map((category) => (
+              <FilterChip
+                key={category.id}
+                href={buildHref({ category: category.slug, q: query, sort })}
+                active={activeCategory?.id === category.id}
+              >
+                {category.name}
+              </FilterChip>
+            ))}
+          </FilterChips>
+        ) : null}
+      </PageHero>
 
-          {categories.length > 0 ? (
-            <div className="mt-6 flex flex-wrap gap-2">
-              <Link href={buildHref({ q: query, sort })} className={chip(!activeCategory)}>
-                Tất cả
-              </Link>
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={buildHref({ category: category.slug, q: query, sort })}
-                  className={chip(activeCategory?.id === category.id)}
-                >
-                  {category.name}
-                </Link>
-              ))}
-            </div>
-          ) : null}
-        </Container>
-      </section>
-
-      <section className="bg-accent-600/[0.06] py-12">
+      <section className="bg-accent-600/[0.06] pb-12 pt-6 sm:pt-8">
         <Container>
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-foreground/60">{products.length} sản phẩm</p>
-            <div className="flex flex-wrap items-center gap-1 text-sm" aria-label="Sắp xếp">
-              <span className="mr-1 text-foreground/55">Sắp xếp:</span>
+          <div className="mb-6">
+            <div className="grid grid-cols-2 gap-1 text-sm sm:flex sm:flex-wrap sm:items-center" aria-label="Sắp xếp">
+              <span className="col-span-2 mr-1 text-foreground/55 sm:col-span-1">Sắp xếp:</span>
               {SORTS.map((item) => (
                 <Link
                   key={item.value}
                   href={buildHref({ category: params.category, q: query, sort: item.value })}
                   aria-current={item.value === sort}
-                  className={`px-2.5 py-1 font-semibold ${
-                    item.value === sort ? "bg-foreground text-background" : "text-foreground/70 hover:text-accent-700"
+                  className={`rounded-full px-3 py-1 text-center font-semibold transition-colors ${
+                    item.value === sort ? "bg-leaf text-white" : "text-foreground/70 hover:bg-leaf/10 hover:text-leaf"
                   }`}
                 >
                   {item.label}
@@ -102,14 +105,22 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               ))}
             </div>
           </div>
-          <ProductGrid
-            products={products}
-            emptyMessage={
-              query
-                ? `Không tìm thấy sản phẩm nào khớp với "${query}".`
-                : "Chưa có sản phẩm nào trong mục này. Vui lòng quay lại sau."
-            }
-          />
+
+          {products.length > 0 ? (
+            <ProductGrid products={products} />
+          ) : (
+            <div className="flex flex-col items-center gap-4 rounded-xl bg-card px-6 py-14 text-center ring-1 ring-divider/70">
+              <span className="text-4xl" aria-hidden>
+                {query ? "🔍" : "🧊"}
+              </span>
+              <p className="max-w-md text-foreground/70">
+                {query
+                  ? `Không tìm thấy sản phẩm nào khớp với "${query}". Thử từ khoá ngắn hơn, ví dụ "xoài" hoặc "dâu".`
+                  : "Chưa có sản phẩm nào trong mục này. Vui lòng quay lại sau."}
+              </p>
+              {isFiltered ? <LinkButton href="/products" className="rounded-lg">Xem tất cả sản phẩm</LinkButton> : null}
+            </div>
+          )}
         </Container>
       </section>
     </>

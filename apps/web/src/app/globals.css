@@ -149,6 +149,78 @@ h4 {
   pointer-events: none;
 }
 
+/* Menu thả xuống (Sản phẩm, Tin tức): "chảy xuống" khi rê chuột / focus, "cuộn lên" khi rời đi.
+   clip-path cắt dần từ đáy panel; cạnh trái/phải/dưới mở rộng âm để không cắt mất bóng đổ. */
+.nav-dropdown {
+  visibility: hidden;
+  transition: visibility 0s linear 300ms;
+}
+/* Trạng thái đóng — transition ở đây chạy khi đóng: cuộn lên, nhanh dần. */
+.nav-dropdown-panel {
+  clip-path: inset(0 -2.5rem 100% -2.5rem);
+  opacity: 0;
+  transform: translateY(-0.375rem);
+  transition:
+    clip-path 300ms cubic-bezier(0.55, 0, 0.75, 0.5),
+    opacity 300ms ease-in,
+    transform 300ms ease-in;
+}
+.group\/nav:is(:hover, :has(:focus-visible)) > .nav-dropdown:not([data-suppressed]) {
+  visibility: visible;
+  transition-delay: 0s;
+}
+/* Trạng thái mở — transition ở đây chạy khi mở: chảy xuống, chậm dần về cuối. */
+.group\/nav:is(:hover, :has(:focus-visible)) > .nav-dropdown:not([data-suppressed]) .nav-dropdown-panel {
+  clip-path: inset(0 -2.5rem -3rem -2.5rem);
+  opacity: 1;
+  transform: none;
+  transition:
+    clip-path 380ms cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 200ms ease-out,
+    transform 380ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Danh sách nút liên hệ: nằm trên nút tròn nên mở từ dưới lên, từng mục hiện lần lượt (--i = thứ tự tính từ nút). */
+.contact-menu {
+  visibility: hidden;
+  clip-path: inset(100% -2rem -2rem -2rem);
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition:
+    clip-path 300ms cubic-bezier(0.22, 0.8, 0.3, 1),
+    opacity 220ms ease,
+    transform 300ms cubic-bezier(0.22, 0.8, 0.3, 1),
+    visibility 0s linear 300ms;
+}
+.contact-menu[data-open="true"] {
+  visibility: visible;
+  clip-path: inset(-2rem -2rem -2rem -2rem);
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+.contact-menu li {
+  opacity: 0;
+  transform: translateY(0.375rem);
+  transition:
+    opacity 200ms ease,
+    transform 250ms ease;
+}
+.contact-menu[data-open="true"] li {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i, 0) * 45ms + 60ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-dropdown,
+  .nav-dropdown-panel,
+  .contact-menu,
+  .contact-menu li {
+    transition: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-track,
   .banner-progress,
@@ -159,3 +231,59 @@ h4 {
     animation: none;
   }
 }
+
+/* ───────────── Nội dung có định dạng (RichContent) ─────────────
+   HTML do admin soạn bằng trình soạn thảo, đã được API lọc. Giữ giống .rich-editor-content ở apps/admin. */
+.rich-content-flow {
+  color: color-mix(in srgb, var(--foreground) 85%, transparent);
+  line-height: 1.75;
+}
+.rich-content-flow > * + * { margin-top: 0.9em; }
+.rich-content-flow h2 {
+  margin-top: 1.6em;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--foreground);
+}
+.rich-content-flow h3 {
+  margin-top: 1.3em;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+.rich-content-flow > :first-child { margin-top: 0; }
+.rich-content-flow strong { font-weight: 700; color: var(--foreground); }
+.rich-content-flow a { color: var(--color-accent-700); text-decoration: underline; text-underline-offset: 2px; }
+.rich-content-flow a:hover { color: var(--color-accent-600); }
+.rich-content-flow ul { list-style: disc; padding-left: 1.5rem; }
+.rich-content-flow ol { list-style: decimal; padding-left: 1.5rem; }
+.rich-content-flow li + li { margin-top: 0.35em; }
+.rich-content-flow li::marker { color: var(--leaf); }
+.rich-content-flow blockquote {
+  border-left: 4px solid var(--leaf);
+  padding: 0.25rem 0 0.25rem 1rem;
+  font-style: italic;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+.rich-content-flow hr { border: 0; border-top: 1px solid var(--divider); margin: 2em 0; }
+.rich-content-flow aside { border-radius: 0.75rem; border-left: 4px solid; padding: 0.875rem 1.125rem; }
+.rich-content-flow aside > * + * { margin-top: 0.5em; }
+.rich-content-flow aside[data-tone="green"] { background: color-mix(in srgb, var(--leaf) 8%, white); border-color: var(--leaf); }
+.rich-content-flow aside[data-tone="red"] { background: var(--color-accent-50); border-color: var(--color-accent-600); }
+.rich-content-flow figure { margin-top: 1.75em; margin-bottom: 1.75em; }
+.rich-content-flow figure img {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+  height: auto;
+  margin-inline: auto;
+  border-radius: 0.75rem;
+}
+.rich-content-flow figcaption {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+.rich-content-flow figcaption:empty { display: none; }

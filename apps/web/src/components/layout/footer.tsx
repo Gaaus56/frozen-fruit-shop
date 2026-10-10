@@ -24,8 +24,9 @@ export function Footer({ settings, policies }: { settings: SiteSettings; policie
           <ul className="mt-4 space-y-2.5 text-sm" style={body}>
             <li><Link href="/products" className="hover:text-accent-400">Tất cả sản phẩm</Link></li>
             <li><Link href="/about" className="hover:text-accent-400">Giới thiệu</Link></li>
-            <li><Link href="/wholesale" className="hover:text-accent-400">Đặt hàng sỉ / F&B</Link></li>
             <li><Link href="/news" className="hover:text-accent-400">Tin tức</Link></li>
+            <li><Link href="/news?type=tuyen-dung" className="hover:text-accent-400">Tuyển dụng</Link></li>
+            <li><Link href="/contact" className="hover:text-accent-400">Liên hệ</Link></li>
             <li><Link href="/order-lookup" className="hover:text-accent-400">Tra cứu đơn hàng</Link></li>
           </ul>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { SiteSettings } from "@frozen-fruit-shop/types";
 
 interface ContactChannel {
@@ -108,37 +108,44 @@ export function FloatingContact({ settings }: { settings: SiteSettings }) {
   return (
     <div
       ref={rootRef}
-      className="fixed bottom-[0.85rem] left-1/2 z-50 isolate flex -translate-x-1/2 flex-col items-center gap-3 lg:bottom-6 lg:left-auto lg:right-6 lg:translate-x-0 lg:items-end"
+      className="pointer-events-none fixed bottom-[0.85rem] left-1/2 z-50 isolate flex -translate-x-1/2 flex-col items-center gap-3 lg:bottom-6 lg:left-auto lg:right-6 lg:translate-x-0 lg:items-end"
     >
-      {isOpen ? (
-        <ul className="w-56 bg-background p-2 shadow-2xl ring-1 ring-divider" role="menu">
-          {contacts.map((contact) => (
-            <li key={contact.key} role="none">
-              <a
-                role="menuitem"
-                href={contact.href}
-                {...(contact.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="flex items-center gap-3 px-2 py-2 text-sm font-semibold text-foreground hover:bg-surface"
+      {/* Luôn render để có hiệu ứng cả lúc mở lẫn lúc đóng (xem .contact-menu trong globals.css);
+          khi đóng thì `inert` để không bấm / Tab vào được. Khung ngoài pointer-events-none để phần
+          trống không chặn cú bấm vào thanh điều hướng phía sau. */}
+      <ul
+        className="contact-menu pointer-events-auto w-56 bg-background p-2 shadow-2xl ring-1 ring-divider"
+        role="menu"
+        data-open={isOpen}
+        inert={!isOpen}
+        aria-hidden={!isOpen}
+      >
+        {contacts.map((contact, index) => (
+          <li key={contact.key} role="none" style={{ "--i": contacts.length - 1 - index } as CSSProperties}>
+            <a
+              role="menuitem"
+              href={contact.href}
+              {...(contact.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              className="flex items-center gap-3 px-2 py-2 text-sm font-semibold text-foreground hover:bg-surface"
+            >
+              <span
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white [&>svg]:h-5 [&>svg]:w-5"
+                style={{ background: contact.color }}
               >
-                <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white [&>svg]:h-5 [&>svg]:w-5"
-                  style={{ background: contact.color }}
-                >
-                  {contact.icon}
-                </span>
-                {contact.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+                {contact.icon}
+              </span>
+              {contact.label}
+            </a>
+          </li>
+        ))}
+      </ul>
 
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
         aria-label={isOpen ? "Đóng danh sách liên hệ" : "Liên hệ"}
-        className={`relative flex h-14 w-14 items-center justify-center rounded-full bg-accent-700 text-white shadow-lg shadow-black/30 transition-colors max-lg:ring-4 max-lg:ring-background hover:bg-accent-800 lg:h-16 lg:w-16 ${
+        className={`pointer-events-auto relative flex h-14 w-14 items-center justify-center rounded-full bg-accent-700 text-white shadow-lg shadow-black/30 transition-colors max-lg:ring-4 max-lg:ring-background hover:bg-accent-800 lg:h-16 lg:w-16 ${
           isOpen ? "" : "contact-pulse"
         }`}
       >

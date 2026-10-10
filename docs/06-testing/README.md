@@ -70,10 +70,10 @@ Các kịch bản test dùng đúng mã dưới đây. Sửa dữ liệu mẫu �
 |---|---|---|---|---|
 | `P1` | Xoài cát cắt miếng (`xoai-cat-cat-mieng`) | C1 | 500g (500 g – 85.000 – 100.000 – còn hàng, SKU `XCM-500`) · 1kg (1000 g – 160.000 – – còn hàng, `XCM-1K`) | Nổi bật, 3 ảnh |
 | `P2` | Dâu tây đông lạnh | C2 | 500g (– 120.000 – – **hết hàng**) | 1 ảnh |
-| `P3` | Sầu riêng Ri6 | C1 | 1kg (1000 g – 250.000 – – **sắp hết**) · 2kg (2000 g – 480.000 – – **hết hàng**) | Nổi bật, Nhận sỉ, **không ảnh** |
+| `P3` | Sầu riêng Ri6 | C1 | 1kg (1000 g – 250.000 – – **sắp hết**) · 2kg (2000 g – 480.000 – – **hết hàng**) | Nổi bật, **không ảnh** |
 | `P4` | Mãng cầu (ngừng bán) | C1 | 500g – 70.000 | **Đang bán = tắt** |
 | `P5` | Bơ sáp | C3 (ẩn) | 500g – 60.000 | |
-| `P6` | Thanh long ruột đỏ cắt hạt lựu | C5 | 500g 45.000 · 1kg 85.000 · Thùng 5kg 400.000 | Nhận sỉ |
+| `P6` | Thanh long ruột đỏ cắt hạt lựu | C5 | 500g 45.000 · 1kg 85.000 · Thùng 5kg 400.000 | |
 | `P7` | Nho xanh không hạt | C5 | 500g – 95.000 – 110.000 | 2 ảnh |
 | `P8` | Mít Thái múi | C5 | Hộp 500g – 55.000, **không khối lượng** | thiếu mô tả, bảo quản, ảnh (kiểm tra khối tự ẩn) |
 | `P9` | Dâu tây cắt lát | C2 | 250g – 65.000 · 500g – 120.000 **quy cách tắt bán** | web chỉ hiện 250g |
@@ -93,14 +93,15 @@ Các kịch bản test dùng đúng mã dưới đây. Sửa dữ liệu mẫu �
 | `…TSTH` | Chờ xác nhận | tên / địa chỉ / ghi chú chứa **mã HTML** (test XSS) |
 
 - **60 đơn lịch sử** rải đều 13 tháng (~88 % đã giao, ~12 % huỷ, COD và chuyển khoản) cho trang Tổng quan, biểu đồ 7/30/90/365 ngày và phân trang. Sinh theo hạt giống cố định — lần chạy nào cũng giống nhau (trừ ngày tính lùi từ hôm nay).
-- **8 liên hệ**: Mới / Đang xử lý / Xong, cả "Liên hệ" và "Báo giá sỉ", một liên hệ chứa mã HTML.
+- **8 liên hệ**: Mới / Đang xử lý / Xong; 3 liên hệ "Báo giá sỉ" đóng vai dữ liệu cũ (tính năng sỉ đã bỏ); một liên hệ chứa mã HTML.
 
 ### Nội dung
 | Mã | Loại | Thiết lập |
 |---|---|---|
 | `B1`, `B2`, `B3` | Banner | B1: tiêu đề + mô tả + liên kết `/products` + nút "Mua ngay"; B2: chỉ ảnh; B3: **tắt** |
 | `N1` | Bài viết | `cach-ra-dong-trai-cay` — đã đăng hôm qua, có ảnh bìa |
-| — | Bài viết | 2 bài đã đăng cũ hơn (1 bài không có ảnh bìa) |
+| — | Bài viết | 2 bài Kiến thức đã đăng cũ hơn (1 bài không có ảnh bìa) |
+| `N4` | Bài viết | `tuyen-nhan-vien-ban-hang` — **Tuyển dụng**, đã đăng 3 ngày trước |
 | `N2` | Bài viết | `bai-hen-gio` — hẹn giờ ngày mai |
 | `N3` | Bài viết | `bai-nhap` — tắt hiển thị |
 | `POL1` | Chính sách | `chinh-sach-doi-tra` — nội dung từ mẫu "Chính sách bảo hành & đổi trả" (xoá đi để test gợi ý mẫu, TC-ADM-330) |

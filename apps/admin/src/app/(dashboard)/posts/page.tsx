@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Post } from "@frozen-fruit-shop/types";
+import { POST_TYPES, POST_TYPE_LABELS, type Post, type PostType } from "@frozen-fruit-shop/types";
 import { Badge } from "@/components/ui/badge";
 import { LinkButton } from "@/components/ui/button";
 import { DeleteButton } from "@/components/ui/delete-button";
@@ -13,22 +13,38 @@ export const metadata = { title: "Bài viết" };
 
 const isScheduled = (post: Post) => new Date(post.publishedAt).getTime() > Date.now();
 
-export default async function PostsPage() {
-  const posts = await api<Post[]>("/admin/posts");
+export default async function PostsPage({ searchParams }: PageProps<"/posts">) {
+  const params = await searchParams;
+  const type = POST_TYPES.find((value) => value === params.type);
+  const allPosts = await api<Post[]>("/admin/posts");
+  const posts = type ? allPosts.filter((post) => post.type === type) : allPosts;
+  const tab = (value?: PostType) =>
+    `border-b-2 px-3 py-2 text-sm font-bold ${
+      type === value ? "border-accent-600 text-accent-700" : "border-transparent text-foreground/60 hover:text-foreground"
+    }`;
 
   return (
     <div>
       <PageHeader
         title="Bài viết"
-        description="Tin tức, công thức, mẹo bảo quản hiển thị ở mục Tin tức trên web."
-        action={<LinkButton href="/posts/new">+ Viết bài</LinkButton>}
+        description="Hiển thị ở mục Tin tức trên web, chia 2 loại: Kiến thức và Tuyển dụng."
+        action={<LinkButton href={type === "recruitment" ? "/posts/new?type=recruitment" : "/posts/new"}>+ Viết bài</LinkButton>}
       />
+
+      <nav className="mb-4 flex gap-1 border-b border-divider" aria-label="Lọc theo loại">
+        <Link href="/posts" className={tab(undefined)}>Tất cả ({allPosts.length})</Link>
+        {POST_TYPES.map((value) => (
+          <Link key={value} href={`/posts?type=${value}`} className={tab(value)}>
+            {POST_TYPE_LABELS[value]} ({allPosts.filter((post) => post.type === value).length})
+          </Link>
+        ))}
+      </nav>
       <Table
         empty={posts.length === 0 && "Chưa có bài viết nào."}
         head={
           <>
             <Th>Bài viết</Th>
-            <Th>Chuyên mục</Th>
+            <Th>Loại</Th>
             <Th>Ngày đăng</Th>
             <Th>Trạng thái</Th>
             <Th />
@@ -48,7 +64,9 @@ export default async function PostsPage() {
                 <Link href={`/posts/${post.id}`} className="font-bold hover:text-accent-700">{post.title}</Link>
               </div>
             </Td>
-            <Td className="text-foreground/70">{post.category || "—"}</Td>
+            <Td>
+              <Badge tone={post.type === "recruitment" ? "green" : "neutral"}>{POST_TYPE_LABELS[post.type]}</Badge>
+            </Td>
             <Td className="whitespace-nowrap">{formatDateTime(post.publishedAt)}</Td>
             <Td>
               {!post.isPublished ? (

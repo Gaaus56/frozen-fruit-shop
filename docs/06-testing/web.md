@@ -21,10 +21,12 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 ### 1.2. Menu chính (desktop ≥ 1024 px)
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
-| TC-WEB-010 | 6 mục menu | Bấm lần lượt Trang chủ, Sản phẩm, Giới thiệu, Đặt hàng sỉ, Tin tức, Liên hệ | Mở đúng `/`, `/products`, `/about`, `/wholesale`, `/news`, `/contact` | P1 | |
+| TC-WEB-010 | 5 mục menu | Bấm lần lượt Trang chủ, Sản phẩm, Giới thiệu, Tin tức, Liên hệ | Mở đúng `/`, `/products`, `/about`, `/news`, `/contact`; **không** còn mục Đặt hàng sỉ | P1 | |
 | TC-WEB-011 | Đánh dấu mục đang xem | Mở `/products/{slug P1}` | Mục "Sản phẩm" đỏ + gạch chân; mục khác không | P2 | |
 | TC-WEB-012 | Menu thả xuống danh mục | Rê chuột vào "Sản phẩm" | Hiện danh sách danh mục đang hiển thị (C1, C2, C4); **không** có C3 | P1 | |
 | TC-WEB-013 | Chọn danh mục từ menu | Rê vào "Sản phẩm" → bấm "Xoài đông lạnh" | Mở `/products?category={slug C1}`; menu thả xuống đóng lại, không tự mở lại khi chuột còn ở đó | P1 | |
+| TC-WEB-015 | Menu thả xuống Tin tức | Rê chuột vào "Tin tức" | Hiện Kiến thức, Tuyển dụng → mở `/news?type=kien-thuc`, `/news?type=tuyen-dung` | P1 | |
+| TC-WEB-016 | Hiệu ứng menu thả xuống | Rê chuột vào / ra "Sản phẩm", "Tin tức" | Danh sách chảy xuống (~0,4 s) khi mở, cuộn lên khi rời chuột; không giật; bật "Giảm chuyển động" trong hệ điều hành thì hiện / ẩn tức thì | P2 | |
 | TC-WEB-014 | Menu bằng bàn phím | Nhấn Tab tới "Sản phẩm" | Menu thả xuống hiện khi focus; Tab tiếp đi qua từng danh mục; Enter mở trang | P2 | |
 
 ### 1.3. Tìm kiếm
@@ -54,7 +56,7 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 ### 1.5. Thanh điều hướng dưới (điện thoại < 1024 px)
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
-| TC-WEB-050 | Hiển thị | Mở web trên điện thoại | Thanh bo tròn ở đáy: Trang chủ, Sản phẩm, [nút liên hệ ở giữa], Giới thiệu, Liên hệ; menu desktop ẩn | P1 | |
+| TC-WEB-050 | Hiển thị | Mở web trên điện thoại | Thanh bo tròn ở đáy: Trang chủ, Sản phẩm, [nút liên hệ ở giữa], Giới thiệu, **Tin tức**; menu desktop ẩn | P1 | |
 | TC-WEB-051 | Chuyển trang | Bấm từng mục | Mở đúng trang; mục đang xem đổi màu đỏ | P1 | |
 | TC-WEB-052 | Không che nội dung | Cuộn tới cuối trang / chân trang, nút "Đặt hàng" ở checkout | Nội dung cuối và các nút không bị thanh dưới che mất | P1 | |
 
@@ -68,13 +70,14 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-WEB-064 | Zalo | Bấm "Zalo Shop" | Mở `https://zalo.me/{số zalo, chỉ chữ số}` ở tab mới; nếu admin để trống số Zalo thì dùng hotline | P1 | |
 | TC-WEB-065 | SMS | Trên điện thoại, bấm "SMS" | Mở ứng dụng tin nhắn với số hotline | P2 | |
 | TC-WEB-066 | Gọi ngay | Trên điện thoại, bấm "Gọi ngay" | Mở trình gọi điện với số hotline | P1 | |
+| TC-WEB-069 | Hiệu ứng danh sách liên hệ | Bấm nút liên hệ, bấm lại để đóng | Danh sách mở từ dưới lên, các mục hiện lần lượt từ mục gần nút; đóng thì thu lại; khi đóng, các tab "Sản phẩm" / "Giới thiệu" cạnh nút vẫn bấm được và Tab bàn phím không đi vào danh sách ẩn | P1 | |
 | TC-WEB-067 | Đóng | Bấm ✕ / nhấn Esc / bấm ra ngoài | Danh sách đóng (cả 3 cách) | P2 | |
 | TC-WEB-068 | Vị trí | Desktop: góc phải dưới · điện thoại: giữa thanh điều hướng dưới | Không đè lên nút khác | P2 | |
 
 ### 1.7. Chân trang
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
-| TC-WEB-070 | Cột danh mục | Bấm Tất cả sản phẩm, Giới thiệu, Đặt hàng sỉ / F&B, Tin tức, Tra cứu đơn hàng | Mở đúng trang | P1 | |
+| TC-WEB-070 | Cột danh mục | Bấm Tất cả sản phẩm, Giới thiệu, Tin tức, Tuyển dụng, Liên hệ, Tra cứu đơn hàng | Mở đúng trang (Tuyển dụng → `/news?type=tuyen-dung`) | P1 | |
 | TC-WEB-071 | Cột chính sách | Có POL1 (hiện), POL2 (ẩn) | Chỉ có POL1; bấm → `/policies/{slug}` | P1 | |
 | TC-WEB-072 | Chưa có chính sách | Tắt hết chính sách | Cột hiện "Đang cập nhật." | P2 | |
 | TC-WEB-073 | Liên hệ | Bấm SĐT, email, Facebook, địa chỉ | `tel:`; `mailto:`; Facebook tab mới; địa chỉ mở Google Maps tab mới (nếu có link bản đồ, không thì là chữ thường) | P1 | |
@@ -128,6 +131,10 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-WEB-138 | Giá cao → thấp | Bấm | Giảm dần | P1 | |
 | TC-WEB-139 | Kết hợp | Chọn C1 → giá cao→thấp → tìm "xoai" | URL có cả `category`, `sort`, `q`; kết quả đúng cả 3 điều kiện; nút sắp xếp đang chọn tô đen | P1 | |
 | TC-WEB-140 | `sort` sai | Mở `/products?sort=abc` | Coi như "Nổi bật", không lỗi | P2 | |
+| TC-WEB-141 | Xoá từ khoá | Tìm "xoai" rồi bấm chip “xoai” × | Về danh sách theo danh mục / sắp xếp đang chọn, không còn `q` | P1 | |
+| TC-WEB-142 | Danh mục chưa có sản phẩm | Có danh mục đang hiện nhưng 0 sản phẩm (C4) | Chip C4 **vẫn hiện** (admin tạo và không ẩn); bấm vào → khung "Chưa có sản phẩm nào trong mục này" + nút xem tất cả | P2 | |
+| TC-WEB-143 | Khung chờ | Mạng chậm (Slow 3G), bấm đổi danh mục / sắp xếp | Hiện khung chờ (thẻ xám nhấp nháy, bo góc) thay vì đứng yên; mở trang chi tiết hiện khung chờ chi tiết | P2 | |
+| TC-WEB-144 | Không có kết quả | Tìm "abcxyz" | Khung trắng bo góc, biểu tượng 🔍, gợi ý từ khoá, nút "Xem tất cả sản phẩm" | P2 | |
 
 ### 3.1. Thẻ sản phẩm
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
@@ -166,7 +173,7 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-WEB-185 | Trần 99 khi cộng dồn | Giỏ có 500g × 98 → thêm 5 | Dòng thành 99 (không vượt) | P1 | |
 | TC-WEB-186 | Hai quy cách là hai dòng | Thêm 500g × 1 và 1kg × 1 | Giỏ có 2 dòng riêng | P1 | |
 | TC-WEB-187 | Mua ngay | Chọn 1kg × 2 → "Mua ngay" | Thêm vào giỏ rồi chuyển tới `/cart` | P0 | |
-| TC-WEB-188 | Link báo giá sỉ | Mở P3 (nhận sỉ) và P1 (không) | P3 có "Cần mua số lượng lớn? Gửi yêu cầu báo giá sỉ" → `/wholesale`; P1 không có | P2 | |
+| TC-WEB-188 | Không còn link sỉ | Mở P3, P6 | Không có dòng "Gửi yêu cầu báo giá sỉ" | P2 | |
 | TC-WEB-189 | Thông số bảo quản | Nhập đủ / thiếu từng trường ở admin | Chỉ hiện dòng có dữ liệu: Danh mục, Bảo quản, Hạn sử dụng "N ngày kể từ ngày sản xuất", Rã đông | P1 | |
 | TC-WEB-190 | Mô tả chi tiết | Mô tả có nhiều dòng | Giữ nguyên xuống dòng; không có mô tả → khối ẩn | P2 | |
 | TC-WEB-191 | Sản phẩm cùng loại | Mở P1 | Khối "Sản phẩm cùng loại" chỉ có sản phẩm cùng danh mục, đang bán, không gồm chính P1 | P2 | |
@@ -276,31 +283,34 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-WEB-335 | Nội dung toàn khoảng trắng | "   " | "Vui lòng nhập nội dung cần hỗ trợ." | P2 | |
 | TC-WEB-336 | SĐT / email sai | `12345` / `abc@` | "Số điện thoại không hợp lệ" / trình duyệt báo email sai | P1 | |
 | TC-WEB-337 | Họ tên 1 ký tự | "A" | Trình duyệt báo tối thiểu 2 ký tự | P2 | |
-| TC-WEB-338 | Gửi quá nhiều | Gửi 6 lần trong 10 phút (form liên hệ và form báo giá sỉ dùng **chung** bộ đếm vì cùng `POST /inquiries`) | Lần 6: "Bạn thao tác quá nhanh…" | P1 | |
+| TC-WEB-338 | Gửi quá nhiều | Gửi form liên hệ 6 lần trong 10 phút | Lần 6: "Bạn thao tác quá nhanh…" | P1 | |
 | TC-WEB-339 | Bot | Điền ô ẩn `website` | Vẫn hiện "Cảm ơn…" nhưng admin **không** có liên hệ mới | P1 | |
 
-## 9. Đặt hàng sỉ `/wholesale`
+## 9. Trang đã bỏ
 
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
-| TC-WEB-350 | Nội dung | Mở trang | 3 thẻ lợi ích; danh sách sản phẩm **có cờ "Nhận sỉ"** (P3); không có cờ nào thì khối ẩn | P1 | |
-| TC-WEB-351 | Gửi hợp lệ | Người liên hệ + SĐT (+ tên quán, nhu cầu, ghi chú) → "Gửi yêu cầu báo giá" | "Cảm ơn bạn đã gửi yêu cầu! …"; admin có liên hệ loại "Báo giá sỉ" kèm nhu cầu | P0 | |
-| TC-WEB-352 | Thiếu SĐT | Bỏ trống SĐT | Trình duyệt báo bắt buộc | P1 | |
-| TC-WEB-353 | Không ghi chú | Chỉ tên + SĐT | Gửi được (khác form liên hệ: nội dung không bắt buộc) | P2 | |
-| TC-WEB-354 | Giới hạn độ dài | Nhu cầu 101 ký tự; tên quán 151 | Ô chỉ nhận 100 / 150 ký tự | P2 | |
+| TC-WEB-350 | Trang sỉ đã bỏ | Mở `/wholesale` | Trang 404; không còn link nào trên web dẫn tới đây | P1 | |
 
 ## 10. Tin tức, chính sách, giới thiệu
 
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
-| TC-WEB-370 | Danh sách tin | Mở `/news` | Chỉ N1 (bài đã bật và tới ngày đăng); mới nhất trước | P1 | |
+| TC-WEB-370 | Danh sách tin | Mở `/news` | Tab "Tất cả" đang chọn; chỉ bài đã bật và tới ngày đăng, mới nhất trước; mỗi thẻ có nhãn loại (Kiến thức / Tuyển dụng), bài tuyển dụng có nhãn xanh trên ảnh | P1 | |
+| TC-WEB-378 | Tab loại bài | Bấm "Kiến thức", "Tuyển dụng", "Tất cả" | URL `?type=kien-thuc` / `?type=tuyen-dung` / không có `type`; tiêu đề trang đổi theo; khi đã lọc thì thẻ không lặp nhãn loại | P1 | |
+| TC-WEB-379 | Đầu trang Tin tức | Mở `/news` ở 375 px và 1440 px | Cùng kiểu với trang Sản phẩm: ảnh nền + lớp tối, tiêu đề trắng, chip bo tròn (đỏ = đang chọn); chip **không** dính khi cuộn; không bị logo che | P2 | |
+| TC-WEB-380 | Chưa có tin tuyển dụng | Tắt mọi bài tuyển dụng → mở tab Tuyển dụng | "Hiện cửa hàng chưa có vị trí tuyển dụng…" kèm link Zalo | P2 | |
+| TC-WEB-381 | Bài tuyển dụng | Mở một bài tuyển dụng | Breadcrumb "Tin tức / Tuyển dụng / {tiêu đề}"; cuối bài có khối "Ứng tuyển": Nhắn Zalo (tab mới), Gọi (`tel:`), Gửi email (`mailto:` có sẵn tiêu đề "Ứng tuyển: …"; ẩn nếu chưa cài email) | P1 | |
+| TC-WEB-382 | `type` sai | Mở `/news?type=abc` | Coi như "Tất cả", không lỗi | P2 | |
 | TC-WEB-371 | Chưa có bài | Tắt mọi bài | "Chưa có bài viết nào. Vui lòng quay lại sau." | P2 | |
 | TC-WEB-372 | Hẹn giờ đăng | Đặt N2 đăng sau 2 phút → đợi → tải lại | Trước giờ: không thấy, `/news/{slug N2}` 404. Sau giờ (≤ 5 phút do cache): thấy | P1 | |
-| TC-WEB-373 | Chi tiết bài | Bấm N1 | Breadcrumb "Tin tức / {tiêu đề}"; chuyên mục · ngày; ảnh bìa; tóm tắt in đậm; nội dung giữ xuống dòng | P1 | |
+| TC-WEB-373 | Chi tiết bài | Bấm N1 | Breadcrumb "Tin tức / Kiến thức / {tiêu đề}"; loại (bấm được) · ngày; ảnh bìa; tóm tắt in đậm; nội dung giữ xuống dòng | P1 | |
 | TC-WEB-374 | Bài ẩn / không tồn tại | Mở slug N3, slug sai | 404, tiêu đề tab "Không tìm thấy bài viết" | P1 | |
 | TC-WEB-375 | Chính sách | Mở POL1 từ chân trang | Tiêu đề + nội dung giữ xuống dòng | P1 | |
 | TC-WEB-376 | Chính sách ẩn | Mở `/policies/{slug POL2}` | 404 | P1 | |
-| TC-WEB-377 | Giới thiệu | Mở `/about` | Nội dung hiển thị đúng, ảnh không vỡ, link hoạt động | P2 | |
+| TC-WEB-377 | Giới thiệu | Mở `/about` | Tiêu đề, dòng giới thiệu, nội dung theo "Trang Giới thiệu" của admin; ảnh không vỡ, link hoạt động | P1 | |
+| TC-WEB-383 | Nội dung có định dạng | Mở bài có tiêu đề, đậm, danh sách, trích dẫn, khung ghi chú, ảnh có chú thích, ô sản phẩm (375 px và 1440 px) | Hiển thị đúng kiểu; ảnh nhỏ không bị kéo giãn mờ, ảnh lớn co vừa khung; ô sản phẩm không gạch chân, bấm vào mở trang sản phẩm; không cuộn ngang | P0 | |
+| TC-WEB-384 | Hàng sản phẩm tự lướt | Bài có 6 ô sản phẩm liền nhau và một hàng 2 ô; xem ở 1440 px và 375 px, đợi 6 giây | Mỗi hàng nằm trên **một dòng**; hàng 6 ô tự lướt sang 1 thẻ mỗi ~5 giây, chạy vòng không thấy giật lùi; vuốt tay được, chạm / giữ chuột thì dừng; hàng 2 ô đứng yên; thẻ cao bằng nhau; bật "Giảm chuyển động" thì không tự lướt | P1 | |
 
 ---
 
@@ -318,6 +328,7 @@ Mở web ở một cửa sổ, admin ở cửa sổ khác.
 | TC-WEB-405 | Đang gõ form | Đang gõ dở form liên hệ; admin đổi dữ liệu | Chữ đang gõ không mất | P1 | |
 | TC-WEB-406 | API khởi động lại | Tắt API 10 giây rồi bật | Web tự kết nối lại và tải dữ liệu một lần; không báo lỗi cho khách | P2 | |
 | TC-WEB-407 | Không cấu hình revalidate | Xoá `WEB_REVALIDATE_URL` ở API → đổi giá | Trang mở sẵn **không** đổi ngay; tối đa 5 phút sau tải lại thì thấy giá mới | P2 | |
+| TC-WEB-408 | Nhiều tab | Mở 8 tab web, ở tab thứ 9 vào thanh toán | Báo giá giỏ hàng vẫn chạy ngay; chỉ 1 kết nối `/events` tới API cho cả trình duyệt; admin đổi giá → mọi tab cập nhật | P1 | |
 
 ## 12. Khi API lỗi
 

@@ -14,7 +14,7 @@ function payload(formData: FormData) {
     excerpt: text(formData, "excerpt"),
     content: String(formData.get("content") ?? ""),
     coverImage: text(formData, "coverImage") || null,
-    category: text(formData, "category"),
+    type: text(formData, "type") === "recruitment" ? "recruitment" : "knowledge",
     isPublished: checked(formData, "isPublished"),
     publishedAt: publishedAt ? new Date(`${publishedAt}:00+07:00`).toISOString() : undefined,
   };

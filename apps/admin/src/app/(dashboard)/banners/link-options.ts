@@ -15,8 +15,9 @@ const PAGES: LinkOption[] = [
   { label: "Trang chủ", value: "/" },
   { label: "Tất cả sản phẩm", value: "/products" },
   { label: "Giới thiệu", value: "/about" },
-  { label: "Đặt hàng sỉ", value: "/wholesale" },
   { label: "Tin tức", value: "/news" },
+  { label: "Tin tức — Kiến thức", value: "/news?type=kien-thuc" },
+  { label: "Tin tức — Tuyển dụng", value: "/news?type=tuyen-dung" },
   { label: "Liên hệ", value: "/contact" },
   { label: "Tra cứu đơn hàng", value: "/order-lookup" },
 ];

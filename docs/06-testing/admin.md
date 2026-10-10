@@ -114,7 +114,7 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
-| TC-ADM-150 | Danh sách | Gửi 1 liên hệ + 1 báo giá sỉ từ web | Hai mục, mới nhất trước; nhãn loại (Liên hệ / Báo giá sỉ), nhãn trạng thái "Mới", tên, SĐT (`tel:`), email (`mailto:`), tên quán, "Nhu cầu: …", nội dung giữ xuống dòng, thời gian | P0 | |
+| TC-ADM-150 | Danh sách | Gửi 1 liên hệ từ web | Mục mới nhất ở đầu; nhãn "Liên hệ", trạng thái "Mới", tên, SĐT (`tel:`), email (`mailto:`), nội dung giữ xuống dòng, thời gian. Liên hệ báo giá sỉ cũ (seed) vẫn hiện đủ tên quán, nhu cầu | P0 | |
 | TC-ADM-151 | Lọc | Bấm từng chip trạng thái, từng chip loại, kết hợp | Lọc đúng | P1 | |
 | TC-ADM-152 | Đổi trạng thái | Bấm "Đánh dấu: Đang xử lý" rồi "Đánh dấu: Xong" | Nhãn đổi; chỉ hiện nút của **trạng thái khác** trạng thái hiện tại; số trên menu giảm khi rời "Mới" | P1 | |
 | TC-ADM-153 | Xoá — Cancel | Bấm "Xoá" → Cancel | Không xoá | P1 | |
@@ -127,7 +127,7 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
 | TC-ADM-170 | Chưa có danh mục | DB mới | Có nút "Tạo danh mục trước" → `/categories/new` | P2 | |
-| TC-ADM-171 | Nhãn | Xem P1, P2, P3 | P1: "Nổi bật", "Còn hàng". P2: "1 hết hàng". P3: "Nổi bật", "Bán sỉ", "Chưa có ảnh", "1 hết hàng", "1 sắp hết" | P1 | |
+| TC-ADM-171 | Nhãn | Xem P1, P2, P3 | P1: "Nổi bật", "Còn hàng". P2: "1 hết hàng". P3: "Nổi bật", "Chưa có ảnh", "1 hết hàng", "1 sắp hết". Không còn nhãn "Bán sỉ" | P1 | |
 | TC-ADM-172 | Lọc | Tên "xoài" + danh mục C1 + trạng thái (Đang bán / Đã ẩn / Tất cả) → "Lọc" | Đúng điều kiện; P4 chỉ hiện khi chọn Đã ẩn / Tất cả | P1 | |
 | TC-ADM-173 | Bật/tắt nhanh | Bấm trạng thái "Đang bán" của P1 | Đổi thành ẩn; web: P1 biến mất ngay. Bấm lại → hiện lại | P0 | |
 | TC-ADM-174 | Sửa | Bấm "Sửa" | Mở form có sẵn dữ liệu | P1 | |
@@ -144,7 +144,7 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-ADM-195 | Giữ dữ liệu khi lỗi | Ở TC-ADM-194, xem lại form | Các ô đã nhập, ảnh, quy cách **còn nguyên** — kiểm kỹ ([findings.md F-02](findings.md)) | P0 | |
 | TC-ADM-196 | Tên chỉ có ký hiệu | Tên "!!!", slug trống | Ghi nhận hành vi (slug rỗng?) — [findings.md F-09](findings.md) | P2 | |
 | TC-ADM-197 | Hạn sử dụng | 0, 3651, 30, để trống | 0 / 3651 bị chặn; 30 → web "30 ngày kể từ ngày sản xuất"; trống → không hiện dòng | P2 | |
-| TC-ADM-198 | Các ô chọn | Bỏ "Đang bán", chọn "Nổi bật", "Nhận đặt sỉ" | Web: không hiện / hiện ở nổi bật / hiện ở `/wholesale` tương ứng | P1 | |
+| TC-ADM-198 | Các ô chọn | Bỏ "Đang bán", chọn "Nổi bật" | Web: không hiện / hiện ở nổi bật; form không còn ô "Nhận đặt sỉ" | P1 | |
 | TC-ADM-199 | Thứ tự hiển thị | P1 = 2, P3 = 1 | Web sắp xếp mặc định P3 trước P1 | P2 | |
 | TC-ADM-200 | Huỷ | Bấm "Huỷ" | Về `/products`, không lưu | P2 | |
 | TC-ADM-201 | Danh mục bị xoá giữa chừng | Mở form, tab khác xoá danh mục đã chọn → Lưu | "Danh mục không tồn tại." | P2 | |
@@ -207,6 +207,11 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-ADM-296 | Không liên kết | Chọn "— Không có liên kết —" | Web không có nút | P2 | |
 | TC-ADM-297 | Ẩn / thứ tự / xoá | Bỏ "Hiển thị trên trang chủ"; đổi thứ tự; xoá | Web cập nhật tương ứng | P1 | |
 | TC-ADM-298 | Ảnh khác tỉ lệ | Ảnh dọc 800×1200 | Web cắt vừa khung, không méo (ghi nhận chất lượng hiển thị) | P2 | |
+| TC-ADM-299 | Lọc theo vị trí | Bấm tab "Trang chủ (trình chiếu)", "Đầu trang Sản phẩm", "Tất cả" | Bảng chỉ còn banner đúng vị trí; cột "Vị trí" có nhãn tương ứng; "+ Thêm banner" ở tab Sản phẩm mở form chọn sẵn vị trí Sản phẩm | P1 | |
+| TC-ADM-300 | Banner trang Sản phẩm | Tạo banner vị trí "Đầu trang Sản phẩm" có ảnh, tiêu đề, mô tả | Form ẩn ô "Liên kết" và "Chữ trên nút", khung xem ảnh tỉ lệ 4:1; web `/products`: ảnh nền, tiêu đề, mô tả mới (khi lọc danh mục vẫn hiện tên danh mục); trang chủ **không** có banner này | P0 | |
+| TC-ADM-301 | Nhiều banner trang Sản phẩm | Bật 2 banner vị trí Sản phẩm, thứ tự 1 và 2; rồi tắt banner thứ tự 1 | Web dùng banner thứ tự 1; tắt đi thì dùng banner thứ tự 2; tắt hết thì về ảnh mặc định, tiêu đề "Tất cả trái cây đông lạnh" | P1 | |
+| TC-ADM-303 | Banner trang Tin tức | Tạo banner vị trí "Đầu trang Tin tức" | Web `/news` dùng ảnh, tiêu đề, mô tả của banner (khi lọc loại bài thì tiêu đề theo loại); tắt hết thì về ảnh mặc định | P1 | |
+| TC-ADM-302 | Đổi vị trí banner có liên kết | Sửa banner trang chủ có liên kết → đổi sang "Đầu trang Sản phẩm" → Lưu | Liên kết và chữ trên nút bị xoá (banner trang Sản phẩm không có nút) | P2 | |
 
 ## 10. Bài viết `/posts` và chính sách `/policies`
 
@@ -216,7 +221,7 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-ADM-311 | Hẹn giờ | Ngày đăng = ngày mai | Nhãn "Hẹn giờ đăng"; web chưa thấy | P1 | |
 | TC-ADM-312 | Bản nháp | Bỏ "Hiển thị trên website" | Nhãn "Bản nháp"; web không thấy | P1 | |
 | TC-ADM-313 | Giờ Việt Nam | Đặt ngày đăng 08:00 hôm nay → mở lại form | Ô vẫn hiện 08:00 (không lệch 7 giờ); web hiện đúng ngày | P1 | |
-| TC-ADM-314 | Chuyên mục gợi ý | Gõ vào ô chuyên mục | Có gợi ý chuyên mục đã dùng; nhập mới được | P2 | |
+| TC-ADM-314 | Loại bài viết | Viết bài chọn "Tuyển dụng"; mở `/posts/new?type=recruitment` | Ô loại bắt buộc, mặc định Kiến thức (hoặc Tuyển dụng khi mở từ tab Tuyển dụng); danh sách có cột Loại và tab lọc kèm số bài; web hiện bài ở tab tương ứng | P1 | |
 | TC-ADM-315 | Thiếu tiêu đề / slug trùng | | Trình duyệt báo / "Đường dẫn (slug) này đã được dùng…" | P2 | |
 | TC-ADM-316 | Sửa, xoá bài | | Web cập nhật; bài xoá → 404 | P1 | |
 | TC-ADM-330 | Mẫu chính sách | DB chưa có chính sách đổi trả | Khung "Có nội dung soạn sẵn từ tài liệu cửa hàng:" kèm nút mẫu; bấm → form điền sẵn tiêu đề, slug, nội dung | P1 | |
@@ -241,7 +246,7 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
 | TC-ADM-370 | Đơn mới | Mở admin ở `/products`; khách đặt hàng | Góc màn hình: "Đơn hàng mới {mã}" + tên khách + tiền, có âm báo; số trên menu "Đơn hàng" +1 | P0 | |
-| TC-ADM-371 | Liên hệ mới | Khách gửi liên hệ / báo giá sỉ | Thông báo "Liên hệ mới" / "Báo giá sỉ mới"; số trên menu +1 | P0 | |
+| TC-ADM-371 | Liên hệ mới | Khách gửi liên hệ | Thông báo "Liên hệ mới"; số trên menu +1 | P0 | |
 | TC-ADM-372 | Tab ẩn | Chuyển admin sang tab khác; khách đặt 2 đơn | Tiêu đề tab admin thành "(2) …"; quay lại tab thì số tự xoá | P1 | |
 | TC-ADM-373 | Đóng thông báo | Bấm nút đóng; hoặc đợi | Thông báo biến mất; nhiều thông báo xếp chồng, tối đa vài cái | P2 | |
 | TC-ADM-374 | Trang đang xem tự làm mới | Admin mở `/orders`; khách đặt đơn | Đơn mới xuất hiện trong bảng không cần F5 | P0 | |
@@ -249,6 +254,7 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-ADM-376 | Âm báo bị trình duyệt chặn | Mở admin, chưa bấm gì trên trang, khách đặt đơn | Ghi nhận: âm có thể không kêu tới khi người dùng tương tác trang (chính sách autoplay) | P2 | |
 | TC-ADM-377 | Phiên bị thu hồi | STAFF1 đang mở admin; ADMIN khoá STAFF1 | Trong ≤ 60 giây, trang STAFF1 tự về `/login` | P0 | |
 | TC-ADM-378 | API khởi động lại | Tắt API rồi bật | Admin tự kết nối lại, tải lại dữ liệu | P2 | |
+| TC-ADM-379 | Nhiều tab | Mở 10 tab admin cùng trình duyệt, rồi mở thêm tab và lưu một bài viết | Mọi tab vẫn bấm được, lưu ngay; DevTools → Network chỉ có **1** kết nối `/api/events` đang mở; đơn mới → mọi tab hiện thông báo, chỉ **một** tiếng âm báo; đóng tab đầu → tab khác vẫn nhận thông báo | P0 | |
 
 ## 13. Tài khoản nhân viên `/users` (chỉ ADMIN)
 
@@ -273,3 +279,28 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-ADM-413 | Trùng mật khẩu cũ | Mới = cũ | "Mật khẩu mới phải khác mật khẩu hiện tại." | P2 | |
 | TC-ADM-414 | Quá ngắn | 7 ký tự | Trình duyệt báo tối thiểu 8 | P2 | |
 | TC-ADM-415 | Đổi thành công | Đăng nhập cùng tài khoản ở 2 trình duyệt; đổi ở trình duyệt A | A: "Đã đổi mật khẩu. Các thiết bị khác đã bị đăng xuất." và **vẫn đăng nhập**; B: thao tác kế tiếp về `/login` | P0 | |
+
+## 15. Trình soạn thảo nội dung
+
+Thử ở Bài viết; lặp nhanh ở Chính sách, Mô tả sản phẩm, Trang Giới thiệu.
+
+| ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
+|---|---|---|---|:-:|:-:|
+| TC-ADM-430 | Định dạng cơ bản | Gõ chữ; Ctrl+B, Ctrl+I, Ctrl+U; bấm Tiêu đề, Tiêu đề nhỏ, danh sách, trích dẫn | Nút đang áp dụng tô đen; lưu xong web hiện đúng định dạng | P0 | |
+| TC-ADM-431 | Ảnh từ nút | Bấm "Ảnh", chọn 2 ảnh | Nút báo "Đang tải 2 ảnh…"; 2 ảnh chèn tại con trỏ, mỗi ảnh có ô "Nhập chú thích ảnh…" | P0 | |
+| TC-ADM-432 | Dán / kéo-thả ảnh | Copy ảnh rồi Ctrl+V; kéo file ảnh từ máy thả vào giữa 2 đoạn | Ảnh được tải lên và chèn đúng chỗ | P1 | |
+| TC-ADM-433 | Chú thích ảnh | Bấm dưới ảnh, gõ chú thích; để trống ở ảnh khác | Web: chú thích căn giữa dưới ảnh; ảnh không chú thích thì không có dòng trống | P1 | |
+| TC-ADM-434 | Xoá / di chuyển ảnh | Rê chuột vào ảnh → "Xoá ảnh"; kéo ảnh sang vị trí khác | Xoá đúng ảnh; ảnh chuyển chỗ, chú thích đi theo | P1 | |
+| TC-ADM-435 | Ảnh sai | Ảnh 6 MB; file `.pdf` | Báo "…: ảnh vượt quá 5MB." / không nhận file không phải ảnh | P1 | |
+| TC-ADM-436 | Ô sản phẩm | Bấm "Sản phẩm" → bấm chọn 4 sản phẩm (hiện số 1–4) → "Chèn 4 sản phẩm" | Trình soạn thảo: 4 thẻ (ảnh, tên, giá) xếp một hàng; web: một hàng 4 thẻ (điện thoại hiện 2, tự lướt) có giá hiện tại, nút + thêm giỏ | P0 | |
+| TC-ADM-446 | Dán link sản phẩm | Ở dòng trống dán `http://localhost:3000/products/mit-thai-mui` (hoặc `/products/…`); ở dòng có chữ dán link | Dòng trống → thành ô sản phẩm; dòng có chữ → giữ là link chữ thường | P1 | |
+| TC-ADM-447 | Link sản phẩm gõ tay | Nút "Liên kết" → `products/dau-tay-cat-lat`, link nằm riêng một dòng | Lưu thành `/products/dau-tay-cat-lat` (không thành `https://products/…`); web hiện thành thẻ sản phẩm | P1 | |
+| TC-ADM-437 | Ô sản phẩm đã ẩn | Chèn ô P1, rồi tắt "Đang bán" P1 → mở lại bài | Ô báo "đã ẩn hoặc bị xoá — ô này sẽ không hiện trên web"; web không hiện ô đó, phần còn lại bình thường | P1 | |
+| TC-ADM-438 | Giá trong ô luôn mới | Đổi giá P1 sau khi đăng bài | Ô sản phẩm trên web hiện giá mới (không cần sửa bài) | P1 | |
+| TC-ADM-439 | Liên kết | Chọn chữ → "Liên kết" → `zalo.me/0396799579` → Enter; sửa lại → "Bỏ liên kết" | Web: link `https://zalo.me/…` mở tab mới; link `/products` mở cùng tab; bỏ liên kết thì còn chữ thường | P1 | |
+| TC-ADM-440 | Khung ghi chú | Bấm "Ghi chú", gõ; bấm "Cảnh báo" khi đang trong khung; bấm lại để bỏ | Khung đổi xanh ↔ đỏ, bấm lần nữa thì bỏ khung | P2 | |
+| TC-ADM-441 | Dán từ Word / web khác | Dán đoạn có màu chữ, cỡ chữ, bảng, ảnh | Giữ đậm/nghiêng/tiêu đề/danh sách; màu, cỡ chữ, font bị bỏ; không vỡ trình soạn thảo | P1 | |
+| TC-ADM-442 | Rời trang chưa lưu | Sửa nội dung rồi bấm menu khác / đóng tab | Trình duyệt hỏi xác nhận rời trang; bấm Lưu thì không hỏi | P2 | |
+| TC-ADM-443 | Nội dung cũ | Mở chính sách / bài viết tạo trước khi có trình soạn thảo | Nội dung giữ đúng đoạn và xuống dòng | P0 | |
+| TC-ADM-444 | Trang Giới thiệu | Menu "Trang Giới thiệu" → sửa tiêu đề, dòng giới thiệu, thêm ảnh + ô sản phẩm → "Lưu trang" | "Đã lưu…"; web `/about` cập nhật ngay; lần đầu mở có sẵn nội dung đang hiển thị | P0 | |
+| TC-ADM-445 | STAFF | Đăng nhập STAFF1 | Sửa được bài viết, chính sách, trang Giới thiệu | P2 | |

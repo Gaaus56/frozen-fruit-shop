@@ -71,7 +71,7 @@ Kiểm tra nhanh: `http://localhost:4000/health` trả OK; trang chủ web hiệ
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` | — | Chỉ dùng cho `npm run admin:create` |
 
 ### `apps/web/.env.local`
-`NEXT_PUBLIC_API_URL`, `API_URL` (tuỳ chọn), `REVALIDATE_SECRET` — xem [web.md](../03-apps/web.md#5-biến-môi-trường-appswebenvlocal).
+`NEXT_PUBLIC_API_URL`, `API_URL` (tuỳ chọn), `REVALIDATE_SECRET` — xem [web.md](../03-apps/web.md#6-biến-môi-trường-appswebenvlocal).
 
 ### `apps/admin/.env.local`
 `API_URL` — địa chỉ API cho server admin.

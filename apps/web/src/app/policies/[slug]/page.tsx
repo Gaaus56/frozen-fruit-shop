@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
+import { RichContent } from "@/components/ui/rich-content";
 import { getPolicy } from "@/lib/api";
 
 interface PolicyPageProps {
@@ -21,7 +22,7 @@ export default async function PolicyPage({ params }: PolicyPageProps) {
   return (
     <Container className="py-12">
       <h1 className="text-2xl uppercase text-foreground sm:text-3xl">{policy.title}</h1>
-      <div className="mt-6 max-w-3xl whitespace-pre-line leading-relaxed text-foreground/80">{policy.content}</div>
+      <RichContent html={policy.content} className="mt-6 max-w-3xl" />
     </Container>
   );
 }

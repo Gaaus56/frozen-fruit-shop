@@ -1,10 +1,12 @@
 "use client";
 
 import { useActionState } from "react";
-import type { Post } from "@frozen-fruit-shop/types";
+import { POST_TYPES, POST_TYPE_LABELS, type Post, type PostType } from "@frozen-fruit-shop/types";
 import { LinkButton, SubmitButton } from "@/components/ui/button";
 import { Checkbox, Field, FormAlert, Section, inputClass } from "@/components/ui/form";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { RichTextEditor } from "@/components/editor/rich-text-editor";
+import type { ProductOption } from "@/components/editor/extensions";
 import { savePostAction } from "./actions";
 
 /** ISO → giá trị cho <input type="datetime-local"> theo giờ Việt Nam. */
@@ -14,7 +16,15 @@ function toLocalInput(iso: string | undefined): string {
   return date.toISOString().slice(0, 16);
 }
 
-export function PostForm({ post, categories }: { post?: Post; categories: string[] }) {
+export function PostForm({
+  post,
+  defaultType = "knowledge",
+  products,
+}: {
+  post?: Post;
+  defaultType?: PostType;
+  products: ProductOption[];
+}) {
   const [state, formAction] = useActionState(savePostAction.bind(null, post?.id ?? null), undefined);
 
   return (
@@ -27,8 +37,8 @@ export function PostForm({ post, categories }: { post?: Post; categories: string
           <Field label="Tóm tắt" htmlFor="excerpt" hint="Hiện ở thẻ bài viết và khi chia sẻ lên mạng xã hội.">
             <textarea id="excerpt" name="excerpt" rows={2} maxLength={500} defaultValue={post?.excerpt} className={inputClass} />
           </Field>
-          <Field label="Nội dung bài viết" htmlFor="content" hint="Xuống dòng sẽ được giữ nguyên khi hiển thị.">
-            <textarea id="content" name="content" rows={16} maxLength={50000} defaultValue={post?.content} className={inputClass} />
+          <Field label="Nội dung bài viết" hint="Chèn ảnh (kèm chú thích) và ô sản phẩm ở bất cứ đâu trong bài. Kéo để đổi vị trí.">
+            <RichTextEditor name="content" defaultValue={post?.content} products={products} />
           </Field>
         </Section>
       </div>
@@ -39,11 +49,12 @@ export function PostForm({ post, categories }: { post?: Post; categories: string
           <Field label="Ngày đăng" htmlFor="publishedAt" hint="Đặt ngày trong tương lai để hẹn giờ đăng. Để trống = ngay bây giờ.">
             <input id="publishedAt" name="publishedAt" type="datetime-local" defaultValue={toLocalInput(post?.publishedAt)} className={inputClass} />
           </Field>
-          <Field label="Chuyên mục" htmlFor="category" hint="Ví dụ: Công thức, Mẹo bảo quản, Tin cửa hàng.">
-            <input id="category" name="category" list="post-categories" maxLength={60} defaultValue={post?.category} className={inputClass} />
-            <datalist id="post-categories">
-              {categories.map((category) => <option key={category} value={category} />)}
-            </datalist>
+          <Field label="Loại bài viết" htmlFor="type" required hint="Kiến thức: bảo quản, công thức, tin cửa hàng. Tuyển dụng: có thêm khối «Ứng tuyển» (Zalo, gọi, email) cuối bài.">
+            <select id="type" name="type" required defaultValue={post?.type ?? defaultType} className={inputClass}>
+              {POST_TYPES.map((type) => (
+                <option key={type} value={type}>{POST_TYPE_LABELS[type]}</option>
+              ))}
+            </select>
           </Field>
           <Field label="Đường dẫn (slug)" htmlFor="slug" hint="Để trống để tự tạo từ tiêu đề.">
             <input id="slug" name="slug" defaultValue={post?.slug} pattern="[a-z0-9]+(-[a-z0-9]+)*" className={inputClass} />

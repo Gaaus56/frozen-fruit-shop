@@ -51,17 +51,17 @@ export function SectionCard({
       <div className="mb-6 text-center">
         <h2 className="text-xl font-extrabold uppercase tracking-wide text-accent-700 sm:text-2xl">{title}</h2>
         <div className="mt-1 flex items-center justify-center gap-2.5" aria-hidden>
-          <span className="h-1 w-1 shrink-0 rotate-45 bg-accent-700/45" />
+          <span className="h-1 w-1 shrink-0 rotate-45 bg-leaf/60" />
           <span
             className="h-px w-14 sm:w-24"
-            style={{ background: "linear-gradient(to right, transparent, var(--color-accent-700) 92%)" }}
+            style={{ background: "linear-gradient(to right, transparent, var(--leaf) 92%)" }}
           />
-          <span className="h-2 w-2 shrink-0 rotate-45 bg-accent-700" />
+          <span className="h-2 w-2 shrink-0 rotate-45 bg-leaf" />
           <span
             className="h-px w-14 sm:w-24"
-            style={{ background: "linear-gradient(to left, transparent, var(--color-accent-700) 92%)" }}
+            style={{ background: "linear-gradient(to left, transparent, var(--leaf) 92%)" }}
           />
-          <span className="h-1 w-1 shrink-0 rotate-45 bg-accent-700/45" />
+          <span className="h-1 w-1 shrink-0 rotate-45 bg-leaf/60" />
         </div>
       </div>
 

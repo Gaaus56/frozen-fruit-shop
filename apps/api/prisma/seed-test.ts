@@ -118,7 +118,6 @@ interface ProductSeed {
   shelfLifeDays?: number;
   thawInstructions?: string;
   isFeatured?: boolean;
-  isWholesaleAvailable?: boolean;
   isActive?: boolean;
   sortOrder?: number;
   variants: VariantSeed[];
@@ -150,7 +149,7 @@ const PRODUCTS: ProductSeed[] = [
   {
     key: 'P3', slug: 'sau-rieng-ri6', name: 'Sầu riêng Ri6', category: 'C1',
     shortDescription: 'Múi sầu riêng Ri6 cơm vàng, hạt lép.', ...STORAGE,
-    isFeatured: true, isWholesaleAvailable: true, sortOrder: 3,
+    isFeatured: true, sortOrder: 3,
     variants: [
       { packageSize: '1kg', weightGrams: 1000, price: 250_000, stockStatus: 'low_stock', sku: 'SR-1K' },
       { packageSize: '2kg', weightGrams: 2000, price: 480_000, stockStatus: 'out_of_stock', sku: 'SR-2K' },
@@ -166,7 +165,7 @@ const PRODUCTS: ProductSeed[] = [
   },
   {
     key: 'P6', slug: 'thanh-long-ruot-do', name: 'Thanh long ruột đỏ cắt hạt lựu', category: 'C5', images: ['thanh-long.png'],
-    shortDescription: 'Thanh long ruột đỏ Bình Thuận, cắt hạt lựu.', ...STORAGE, isWholesaleAvailable: true, sortOrder: 6,
+    shortDescription: 'Thanh long ruột đỏ Bình Thuận, cắt hạt lựu.', ...STORAGE, sortOrder: 6,
     variants: [
       { packageSize: '500g', weightGrams: 500, price: 45_000 },
       { packageSize: '1kg', weightGrams: 1000, price: 85_000 },
@@ -457,7 +456,10 @@ async function seedContent() {
       { title: 'Trái cây đông lạnh chuẩn VietGAP', description: 'Cấp đông nhanh, giữ trọn vị ngọt tự nhiên.', image: img('banner-1.jpg'),
         linkUrl: '/products', ctaLabel: 'Mua ngay', sortOrder: 1 },
       { image: img('banner-2.jpg'), sortOrder: 2 },
-      { title: 'Banner đã tắt', image: img('banner-3.jpg'), linkUrl: '/wholesale', ctaLabel: 'Xem', sortOrder: 3, isActive: false },
+      { title: 'Banner đã tắt', image: img('banner-3.jpg'), linkUrl: '/news', ctaLabel: 'Xem', sortOrder: 3, isActive: false },
+      { placement: 'products', title: 'Trái cây đông lạnh Đà Nẵng 28', image: img('banner-san-pham.jpg'),
+        description: 'Cấp đông nhanh sau thu hoạch, đóng gói hút chân không — chọn loại và quy cách bạn cần.', sortOrder: 1 },
+      { placement: 'news', image: img('banner-3.jpg'), sortOrder: 1 },
     ],
   });
 
@@ -466,13 +468,25 @@ async function seedContent() {
   await prisma.post.createMany({
     data: [
       { slug: 'cach-ra-dong-trai-cay', title: 'Cách rã đông trái cây đúng cách', excerpt: 'Ba cách rã đông giữ trọn hương vị.',
-        content: content('Rã đông thế nào cho đúng'), coverImage: img('bai-viet-1.jpg'), category: 'Mẹo bảo quản', publishedAt: daysAgo(1) },
+        content: content('Rã đông thế nào cho đúng'), coverImage: img('bai-viet-1.jpg'), publishedAt: daysAgo(1) },
       { slug: 'sinh-to-xoai-dau', title: 'Sinh tố xoài dâu 5 phút', excerpt: 'Công thức sinh tố mát lạnh cho ngày hè.',
-        content: content('Làm sinh tố từ trái cây đông lạnh'), coverImage: img('bai-viet-2.jpg'), category: 'Công thức', publishedAt: daysAgo(10) },
+        content: content('Làm sinh tố từ trái cây đông lạnh'), coverImage: img('bai-viet-2.jpg'), publishedAt: daysAgo(10) },
       { slug: 'trai-cay-dong-lanh-co-mat-chat', title: 'Trái cây đông lạnh có mất chất?', excerpt: 'So sánh trái cây tươi và đông lạnh.',
-        content: content('Giá trị dinh dưỡng'), category: 'Kiến thức', publishedAt: daysAgo(30) },
+        content: content('Giá trị dinh dưỡng'), publishedAt: daysAgo(30) },
       { slug: 'bai-hen-gio', title: 'Bài viết hẹn giờ (ngày mai)', excerpt: 'Chưa được hiện trên web.', content: content('Bài hẹn giờ'),
-        category: 'Tin cửa hàng', publishedAt: new Date(now + DAY) },
+        publishedAt: new Date(now + DAY) },
+      { slug: 'tuyen-nhan-vien-ban-hang', type: 'recruitment', title: 'Tuyển 2 nhân viên bán hàng & đóng gói',
+        excerpt: 'Làm việc tại cửa hàng 49 Đặng Tất, ca sáng hoặc ca chiều, lương 6–8 triệu.',
+        content: `Mô tả công việc
+• Tư vấn khách tại cửa hàng và qua Zalo.
+• Đóng gói đơn hàng giữ lạnh (thùng xốp + đá gel).
+
+Yêu cầu
+• Trung thực, cẩn thận, ưu tiên ở Liên Chiểu.
+
+Quyền lợi
+• Lương 6–8 triệu + thưởng theo doanh số, nghỉ 4 ngày/tháng.`,
+        publishedAt: daysAgo(3) },
       { slug: 'bai-nhap', title: 'Bài viết nháp', excerpt: 'Đã tắt hiển thị.', content: content('Bài nháp'), isPublished: false, publishedAt: daysAgo(2) },
     ],
   });

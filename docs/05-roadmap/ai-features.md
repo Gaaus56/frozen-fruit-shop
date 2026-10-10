@@ -2,7 +2,7 @@
 
 Đề xuất các tính năng dùng mô hình ngôn ngữ lớn (LLM) cho trang quản trị và website khách hàng. **Chưa có quyết định triển khai** — khi chốt làm mục nào, chuyển mục đó vào [roadmap.md](roadmap.md) và ghi lý do vào [decisions.md](decisions.md).
 
-Các ý tưởng bám vào nỗi đau thật của cửa hàng: nhập nội dung tốn thời gian, phí ship phải gọi khách để tính, khách sỉ gửi nhu cầu bằng chữ tự do, khách hỏi đi hỏi lại cách bảo quản / rã đông.
+Các ý tưởng bám vào nỗi đau thật của cửa hàng: nhập nội dung tốn thời gian, phí ship phải gọi khách để tính, khách hỏi đi hỏi lại cách bảo quản / rã đông.
 
 ## 1. Tổng quan và thứ tự đề xuất
 
@@ -11,7 +11,7 @@ Xếp theo **giá trị ÷ rủi ro**. Phía admin làm trước vì luôn có n
 | # | Tính năng | Phía | Rủi ro | Bước |
 |---|---|---|:-:|:-:|
 | A1 | Viết hộ nội dung sản phẩm / bài viết | Admin | Thấp | **1** |
-| A2 | Phân loại liên hệ, soạn trả lời, đọc yêu cầu báo giá sỉ | Admin | Thấp | **2** |
+| A2 | Phân loại liên hệ, soạn trả lời | Admin | Thấp | **2** |
 | A5 | Báo cáo hằng ngày qua Telegram | Admin | Thấp | **2** |
 | A3 | Gợi ý phí ship từ địa chỉ | Admin | Vừa | **3** |
 | W1 | Trợ lý tư vấn trên web | Web | Vừa–Cao | **4** |
@@ -32,10 +32,9 @@ Xếp theo **giá trị ÷ rủi ro**. Phía admin làm trước vì luôn có n
 - **Giá trị:** giải quyết việc khó nhất khi ra mắt — nhập nội dung thật (roadmap 1.8, 3.9). Văn phong nhất quán giữa các sản phẩm.
 - **Kỹ thuật:** `POST /admin/ai/draft { kind: "product" | "post", notes, fields }` → trả JSON các trường. Kèm 2–3 mô tả sản phẩm có sẵn làm mẫu văn phong.
 
-### A2. Phân loại liên hệ và báo giá sỉ
-- **Phân loại:** khi có liên hệ mới, gắn nhãn chủ đề (*Khiếu nại*, *Hỏi giá*, *Hỏi giao hàng*, *Hợp tác sỉ*) và mức khẩn (*khiếu nại hàng rã đông* lên đầu); tóm tắt một dòng hiện trong danh sách `/inquiries`.
+### A2. Phân loại liên hệ
+- **Phân loại:** khi có liên hệ mới, gắn nhãn chủ đề (*Khiếu nại*, *Hỏi giá*, *Hỏi giao hàng*, *Ứng tuyển*) và mức khẩn (*khiếu nại hàng rã đông* lên đầu); tóm tắt một dòng hiện trong danh sách `/inquiries`.
 - **Soạn trả lời:** nút "Soạn trả lời" dựa trên chính sách đổi trả / giao hàng thật trong database; nhân viên chép sang Zalo / email.
-- **Đọc báo giá sỉ:** chữ tự do "xoài 30kg/tháng, dâu 20kg" → bảng *sản phẩm – quy cách – số lượng* khớp với catalog → tính thử tổng theo **giá lấy từ database** (không để AI tự tính tiền).
 - **Kỹ thuật:** chạy nền sau `InquiriesService.create()` (không làm chậm phản hồi cho khách); lưu kết quả vào cột mới `aiLabel`, `aiSummary` của `inquiries`. Dùng model nhỏ (Haiku 4.5).
 
 ### A3. Gợi ý phí ship

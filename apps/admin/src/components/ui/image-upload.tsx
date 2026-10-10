@@ -4,9 +4,10 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { uploadImageAction } from "@/lib/upload-action";
 import { buttonClass } from "./button";
 
-const ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
+export const ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
 
-async function uploadFile(file: File): Promise<string> {
+/** Tải một file ảnh lên API (qua Server Action), trả URL. Dùng chung cho ô ảnh và trình soạn thảo. */
+export async function uploadFile(file: File): Promise<string> {
   const data = new FormData();
   data.append("file", file);
   const result = await uploadImageAction(data);

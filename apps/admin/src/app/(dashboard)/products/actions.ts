@@ -25,7 +25,6 @@ function payload(formData: FormData) {
     shelfLifeDays: int(formData, "shelfLifeDays"),
     thawInstructions: text(formData, "thawInstructions"),
     isFeatured: checked(formData, "isFeatured"),
-    isWholesaleAvailable: checked(formData, "isWholesaleAvailable"),
     isActive: checked(formData, "isActive"),
     sortOrder: int(formData, "sortOrder") ?? 0,
     images: images.map((url) => ({ url })),

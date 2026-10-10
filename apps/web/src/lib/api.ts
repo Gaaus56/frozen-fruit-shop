@@ -6,10 +6,14 @@
 import {
   DEFAULT_SITE_SETTINGS,
   type Banner,
+  type BannerPlacement,
   type CacheTag,
   type Category,
+  type Page,
+  type PageSlug,
   type Policy,
   type Post,
+  type PostType,
   type Product,
   type ProductDetail,
   type SiteSettings,
@@ -73,7 +77,6 @@ export interface ProductFilters {
   category?: string;
   q?: string;
   featured?: boolean;
-  wholesale?: boolean;
   sort?: "default" | "newest" | "price_asc" | "price_desc";
   limit?: number;
 }
@@ -83,7 +86,6 @@ export function getProducts(filters: ProductFilters = {}): Promise<Product[]> {
     category: filters.category,
     q: filters.q,
     featured: filters.featured ? "true" : undefined,
-    wholesale: filters.wholesale ? "true" : undefined,
     sort: filters.sort,
     limit: filters.limit,
   })}`;
@@ -94,12 +96,12 @@ export function getProduct(slug: string): Promise<ProductDetail | null> {
   return orNull(apiGet<ProductDetail>(`/products/${encodeURIComponent(slug)}`, "catalog"), `sản phẩm ${slug}`);
 }
 
-export function getBanners(): Promise<Banner[]> {
-  return withFallback(apiGet<Banner[]>("/banners", "content"), [], "banner");
+export function getBanners(placement: BannerPlacement = "home"): Promise<Banner[]> {
+  return withFallback(apiGet<Banner[]>(`/banners?placement=${placement}`, "content"), [], "banner");
 }
 
-export function getPosts(limit?: number): Promise<Post[]> {
-  return withFallback(apiGet<Post[]>(`/posts${query({ limit })}`, "content"), [], "bài viết");
+export function getPosts(limit?: number, type?: PostType): Promise<Post[]> {
+  return withFallback(apiGet<Post[]>(`/posts${query({ limit, type })}`, "content"), [], "bài viết");
 }
 
 export function getPost(slug: string): Promise<Post | null> {
@@ -108,6 +110,11 @@ export function getPost(slug: string): Promise<Post | null> {
 
 export function getPolicies(): Promise<Policy[]> {
   return withFallback(apiGet<Policy[]>("/policies", "content"), [], "chính sách");
+}
+
+/** Trang nội dung admin sửa được (trang Giới thiệu). API luôn trả nội dung (mặc định nếu chưa lưu); null khi API lỗi. */
+export function getPage(slug: PageSlug): Promise<Page | null> {
+  return orNull(apiGet<Page>(`/pages/${slug}`, "content"), `trang ${slug}`);
 }
 
 export function getPolicy(slug: string): Promise<Policy | null> {

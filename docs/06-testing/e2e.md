@@ -9,7 +9,7 @@ Mỗi kịch bản đi qua nhiều app như người dùng thật. Chạy **toà
 | E2E-03 | Giá đổi khi khách đang thanh toán | P0 | |
 | E2E-04 | Hết hàng khi khách đang thanh toán | P0 | |
 | E2E-05 | Khách huỷ qua điện thoại | P1 | |
-| E2E-06 | Báo giá sỉ | P1 | |
+| E2E-06 | Đăng tin tuyển dụng | P1 | |
 | E2E-07 | Nhân viên nghỉ việc | P0 | |
 | E2E-08 | Ra mắt sản phẩm mới | P1 | |
 | E2E-09 | Ngừng bán cả danh mục | P1 | |
@@ -57,11 +57,11 @@ Mỗi kịch bản đi qua nhiều app như người dùng thật. Chạy **toà
 2. Khách gọi huỷ: STAFF1 bấm "Huỷ đơn" → Cancel (không đổi) → bấm lại → OK, ghi chú "Khách đổi ý".
 3. ✅ Khách tra cứu: "Đơn hàng đã bị huỷ."; admin: không còn nút xử lý; Tổng quan: không tính doanh thu, tăng "Đơn bị huỷ".
 
-### E2E-06 — Báo giá sỉ
-1. Khách mở P3 → "Gửi yêu cầu báo giá sỉ" → `/wholesale` thấy P3 trong danh sách nhận sỉ.
-2. Gửi form: tên, quán "Cafe Mộc", SĐT, nhu cầu "Sầu riêng 20kg/tháng".
-3. ✅ Admin: thông báo "Báo giá sỉ mới"; `/inquiries` lọc "Báo giá sỉ" thấy đủ thông tin; bấm SĐT gọi được.
-4. STAFF1 "Đánh dấu: Đang xử lý" → "Đánh dấu: Xong"; số trên menu giảm.
+### E2E-06 — Đăng tin tuyển dụng
+1. Admin → Bài viết → tab "Tuyển dụng" → "+ Viết bài" (ô loại đã chọn sẵn Tuyển dụng) → tiêu đề, nội dung, ngày đăng trống → Đăng.
+2. ✅ Web (điện thoại): tab dưới "Tin tức" → tab "Tuyển dụng" thấy bài mới; tab "Tất cả" bài có nhãn xanh "Tuyển dụng".
+3. Mở bài → khối "Ứng tuyển": bấm Zalo mở đúng số Zalo cửa hàng; bấm Gọi mở trình gọi.
+4. Admin đổi loại bài sang Kiến thức → web chuyển bài sang tab Kiến thức, không còn khối Ứng tuyển.
 
 ### E2E-07 — Nhân viên nghỉ việc
 1. STAFF2 đăng nhập trên 2 trình duyệt, đang mở `/orders`.

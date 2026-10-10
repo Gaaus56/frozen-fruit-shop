@@ -39,7 +39,7 @@
 
 | Việc | Lý do | Ưu tiên |
 |---|---|:-:|
-| OTP cho ADMIN | Mật khẩu chủ shop lộ = mất toàn quyền ([thiết kế](../03-apps/admin.md#4-kế-hoạch-xác-thực-otp-cho-admin)) | P1 |
+| OTP cho ADMIN | Mật khẩu chủ shop lộ = mất toàn quyền ([thiết kế](../03-apps/admin.md#5-kế-hoạch-xác-thực-otp-cho-admin)) | P1 |
 | Header bảo mật cho `apps/web` và `apps/admin` (HSTS, `X-Frame-Options`, CSP cơ bản) — thêm ở Caddyfile | Hiện chỉ API có header | P1 |
 | SSH chỉ dùng khoá, tắt đăng nhập mật khẩu; `fail2ban` | VPS mở cổng 22 ra Internet | P1 |
 | Dependabot / `npm audit` trong CI | Phát hiện thư viện có lỗ hổng | P2 |

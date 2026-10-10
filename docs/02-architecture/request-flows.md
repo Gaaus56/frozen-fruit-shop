@@ -170,8 +170,9 @@ Chi tiết vận hành:
 - Tab đang ẩn đợi khách quay lại mới tải. Trang thanh toán báo giá lại giỏ (sự kiện window `traicay28:data-changed`).
 - Mỗi 25 giây gửi `ping` để proxy không cắt kết nối. Kết nối admin được kiểm tra lại phiên mỗi 60 giây — tài khoản bị khoá / đổi mật khẩu thì luồng bị ngắt.
 - Rớt mạng / API khởi động lại: trình duyệt tự kết nối lại và tải lại dữ liệu một lần.
+- **Một kết nối cho mọi tab** (`lib/shared-event-source.ts` ở web và admin): các tab tranh một Web Lock, tab giữ lock mở EventSource duy nhất và chuyển sự kiện sang tab khác qua `BroadcastChannel`; đóng tab đó thì tab khác tự nhận. Lý do: trên HTTP/1.1 (máy dev) trình duyệt chỉ cho 6 kết nối tới một địa chỉ — mỗi tab một kết nối thì mở 6 tab là mọi request khác treo. Âm báo đơn mới chỉ phát ở tab giữ kết nối.
 - Luồng nằm trong bộ nhớ một tiến trình API — chạy nhiều instance cần Redis pub/sub.
 
-## 6. Liên hệ / báo giá sỉ
+## 6. Liên hệ
 
-Khách gửi form → trình duyệt `POST /inquiries {type: contact|wholesale, ...}` → rate limit 5 / 10 phút, honeypot (bot điền ô ẩn → API giả vờ thành công, không lưu) → lưu `inquiries` (status `new`) → SSE `inquiry.created` cho admin → nhân viên xử lý: `new → in_progress → done`.
+Khách gửi form → trình duyệt `POST /inquiries {type: "contact", ...}` → rate limit 5 / 10 phút, honeypot (bot điền ô ẩn → API giả vờ thành công, không lưu) → lưu `inquiries` (status `new`) → SSE `inquiry.created` cho admin → nhân viên xử lý: `new → in_progress → done`.

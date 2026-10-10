@@ -33,7 +33,7 @@ export default async function HomePage() {
             <CategoryGrid categories={categories.filter((category) => category.productCount > 0)} />
             <FeaturedProducts
               products={showcase}
-              title={featured.length > 0 ? "Sản phẩm bán chạy" : "Sản phẩm mới"}
+              title={featured.length > 0 ? "Trái cây đông lạnh" : "Trái cây đông lạnh"}
             />
             <BlogPreview posts={posts} />
           </Container>

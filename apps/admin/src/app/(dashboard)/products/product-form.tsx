@@ -5,6 +5,7 @@ import type { Category, Product } from "@frozen-fruit-shop/types";
 import { LinkButton, SubmitButton } from "@/components/ui/button";
 import { Checkbox, Field, FormAlert, Section, inputClass } from "@/components/ui/form";
 import { ImageListUpload } from "@/components/ui/image-upload";
+import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import { saveProductAction } from "./actions";
 import { VariantEditor } from "./variant-editor";
 
@@ -21,8 +22,8 @@ export function ProductForm({ product, categories }: { product?: Product; catego
           <Field label="Mô tả ngắn" htmlFor="shortDescription" hint="1–2 câu hiện ngay dưới tên sản phẩm.">
             <textarea id="shortDescription" name="shortDescription" rows={2} maxLength={500} defaultValue={product?.shortDescription} className={inputClass} />
           </Field>
-          <Field label="Mô tả chi tiết" htmlFor="description" hint="Xuống dòng sẽ được giữ nguyên khi hiển thị.">
-            <textarea id="description" name="description" rows={7} maxLength={20000} defaultValue={product?.description} className={inputClass} />
+          <Field label="Mô tả chi tiết" hint="Có thể in đậm, chia mục, chèn ảnh có chú thích.">
+            <RichTextEditor name="description" defaultValue={product?.description} placeholder="Nguồn gốc, quy trình, cách dùng… (dán hoặc kéo ảnh vào đây)" />
           </Field>
         </Section>
 
@@ -64,7 +65,6 @@ export function ProductForm({ product, categories }: { product?: Product; catego
           </Field>
           <Checkbox name="isActive" label="Đang bán trên website" defaultChecked={product?.isActive ?? true} />
           <Checkbox name="isFeatured" label="Sản phẩm nổi bật" hint="Hiện ở mục nổi bật trang chủ." defaultChecked={product?.isFeatured} />
-          <Checkbox name="isWholesaleAvailable" label="Nhận đặt sỉ" hint="Hiện ở trang Đặt hàng sỉ." defaultChecked={product?.isWholesaleAvailable} />
           <Field label="Thứ tự hiển thị" htmlFor="sortOrder" hint="Số nhỏ hiện trước.">
             <input id="sortOrder" name="sortOrder" type="number" defaultValue={product?.sortOrder ?? 0} className={inputClass} />
           </Field>

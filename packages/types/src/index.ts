@@ -90,7 +90,6 @@ export interface Product {
   description: string;
   storageInfo: ProductStorageInfo;
   isFeatured: boolean;
-  isWholesaleAvailable: boolean;
   isActive: boolean;
   sortOrder: number;
   variants: ProductVariant[];
@@ -104,6 +103,20 @@ export interface ProductDetail extends Product {
 
 // ───────────── Nội dung trang khách hàng ─────────────
 
+export const POST_TYPES = ["knowledge", "recruitment"] as const;
+export type PostType = (typeof POST_TYPES)[number];
+
+export const POST_TYPE_LABELS: Record<PostType, string> = {
+  knowledge: "Kiến thức",
+  recruitment: "Tuyển dụng",
+};
+
+/** Đường dẫn thân thiện trên web: /news?type=kien-thuc | tuyen-dung. */
+export const POST_TYPE_SLUGS: Record<PostType, string> = {
+  knowledge: "kien-thuc",
+  recruitment: "tuyen-dung",
+};
+
 export interface Post {
   id: string;
   slug: string;
@@ -111,13 +124,23 @@ export interface Post {
   excerpt: string;
   content: string;
   coverImage: string | null;
-  category: string;
+  type: PostType;
   isPublished: boolean;
   publishedAt: string;
 }
 
+export const BANNER_PLACEMENTS = ["home", "products", "news"] as const;
+export type BannerPlacement = (typeof BANNER_PLACEMENTS)[number];
+
+export const BANNER_PLACEMENT_LABELS: Record<BannerPlacement, string> = {
+  home: "Trang chủ (trình chiếu)",
+  products: "Đầu trang Sản phẩm",
+  news: "Đầu trang Tin tức",
+};
+
 export interface Banner {
   id: string;
+  placement: BannerPlacement;
   title: string;
   description: string;
   image: string;
@@ -389,3 +412,53 @@ export type AdminRealtimeEvent =
   | { type: "order.updated"; id: string; orderNumber: string; status: OrderStatus }
   | { type: "inquiry.created"; id: string; inquiryType: InquiryType; name: string }
   | { type: "inquiry.updated"; id: string };
+
+// ───────────── Nội dung có định dạng (bài viết, chính sách, mô tả sản phẩm, trang Giới thiệu) ─────────────
+
+/**
+ * Thuộc tính đánh dấu "ô sản phẩm" trong nội dung HTML: `<div data-product-slug="xoai-cat"></div>`.
+ * Web thay chỗ này bằng thẻ sản phẩm (ảnh, giá hiện tại, nút xem) lấy từ API.
+ */
+export const PRODUCT_EMBED_ATTR = "data-product-slug";
+
+/** Nội dung lưu trước khi có trình soạn thảo là chữ thường; nội dung mới là HTML (bắt đầu bằng thẻ). */
+export function isRichHtml(content: string): boolean {
+  return /^\s*</.test(content);
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/** Chữ thường → HTML: dòng trống tách đoạn, xuống dòng đơn giữ bằng <br>. Nội dung đã là HTML thì giữ nguyên. */
+export function plainTextToHtml(content: string): string {
+  if (!content.trim()) return "";
+  if (isRichHtml(content)) return content;
+  return content
+    .replace(/\r\n/g, "\n")
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => `<p>${escapeHtml(block).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+// ───────────── Trang nội dung cố định (admin sửa được) ─────────────
+
+export const PAGE_SLUGS = ["about"] as const;
+export type PageSlug = (typeof PAGE_SLUGS)[number];
+
+export const PAGE_LABELS: Record<PageSlug, string> = {
+  about: "Trang Giới thiệu",
+};
+
+export interface Page {
+  slug: PageSlug;
+  title: string;
+  /** Dòng giới thiệu ngắn dưới tiêu đề. */
+  description: string;
+  /** HTML đã được API lọc. */
+  content: string;
+  /** null = chưa từng lưu, đang dùng nội dung mặc định. */
+  updatedAt: string | null;
+}

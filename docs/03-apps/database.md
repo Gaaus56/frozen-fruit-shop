@@ -23,16 +23,17 @@ inquiries · posts · banners · policies · site_settings (1 dòng, id = 1)   �
 |---|---|---|
 | `users` | Tài khoản quản trị | `role` ADMIN/STAFF, `isActive`, `failedLoginCount` + `lockedUntil` (khoá sau 5 lần sai), `passwordChangedAt` (token cấp trước thời điểm này bị từ chối), `lastLoginAt` |
 | `categories` | Danh mục | `slug` duy nhất, `image`, `sortOrder`, `isActive` (ẩn danh mục = ẩn luôn sản phẩm của nó trên web) |
-| `products` | Sản phẩm | `categoryId`, mô tả ngắn/dài, `storageTemperature`, `shelfLifeDays`, `thawInstructions`, `isFeatured`, `isWholesaleAvailable`, `isActive`, `sortOrder` |
+| `products` | Sản phẩm | `categoryId`, mô tả ngắn/dài, `storageTemperature`, `shelfLifeDays`, `thawInstructions`, `isFeatured`, `isActive`, `sortOrder` |
 | `product_images` | Ảnh sản phẩm | `url` (đường dẫn tương đối `/uploads/...`), `sortOrder` (0 = ảnh chính) |
 | `product_variants` | Quy cách đóng gói | `packageSize` ("500g"), `weightGrams` (tính giá/kg), `price`, `compareAtPrice` (giá gốc khi giảm), `stockStatus` in_stock/low_stock/out_of_stock, `sku` duy nhất (tuỳ chọn), `isActive` |
 | `orders` | Đơn hàng | `orderNumber` duy nhất, thông tin khách, `paymentMethod` cod/bank_transfer, `paymentStatus` unpaid/paid/refunded, `status`, `subtotal`, `shippingFee`, `discount`, `total`, `internalNote` |
 | `order_items` | Dòng đơn | `productId`/`variantId` có thể NULL (sản phẩm đã xoá) + bản chụp `productName`, `packageSize`, `unitPrice`, `quantity`, `lineTotal` |
 | `order_status_logs` | Lịch sử đơn | `fromStatus` → `toStatus`, `note`, `changedById` |
-| `inquiries` | Liên hệ / báo giá sỉ | `type` contact/wholesale, `status` new/in_progress/done |
-| `posts` | Bài viết | `isPublished`, `publishedAt` (ngày tương lai = hẹn giờ đăng) |
-| `banners` | Banner trang chủ | `image`, `linkUrl`, `ctaLabel`, `sortOrder`, `isActive` |
+| `inquiries` | Liên hệ | `type` contact (`wholesale` chỉ còn ở dữ liệu cũ), `status` new/in_progress/done; `company`, `quantity` dùng cho liên hệ sỉ cũ |
+| `posts` | Bài viết | `type` knowledge/recruitment, `isPublished`, `publishedAt` (ngày tương lai = hẹn giờ đăng) |
+| `banners` | Banner trang chủ / đầu trang Sản phẩm / Tin tức | `placement` home/products/news, `image`, `linkUrl`, `ctaLabel` (chỉ dùng ở trang chủ), `sortOrder`, `isActive` |
 | `policies` | Trang chính sách | `slug`, `content`, `sortOrder`, `isActive` |
+| `pages` | Trang nội dung cố định | Khoá `slug` (`about`), `title`, `description`, `content` (HTML). Chưa có dòng → API trả nội dung mặc định |
 | `site_settings` | Thông tin cửa hàng | Một dòng `id = 1`. Chưa có dòng → API trả `DEFAULT_SITE_SETTINGS` (thông tin thật của cửa hàng trong `packages/types`) |
 
 ## 3. Quy tắc toàn vẹn dữ liệu
@@ -55,3 +56,8 @@ inquiries · posts · banners · policies · site_settings (1 dòng, id = 1)   �
 ## 5. Ảnh
 
 Ảnh không lưu trong database mà trên đĩa của API (`UPLOAD_DIR`, mặc định `apps/api/uploads/yyyy/mm/`). Database chỉ lưu đường dẫn tương đối `/uploads/...`; API ghép `PUBLIC_URL` khi trả ra. Nhờ vậy đổi tên miền không cần sửa dữ liệu. Khi sao lưu phải sao lưu **cả database lẫn thư mục ảnh**.
+
+
+## 6. Nội dung có định dạng
+
+`posts.content`, `policies.content`, `pages.content`, `products.description` lưu **HTML đã lọc** (xem [api.md §6](api.md#6-nội-dung-có-định-dạng-html)). Dữ liệu cũ dạng chữ thường vẫn hợp lệ — được chuyển sang HTML khi đọc. Ảnh trong bài cũng nằm ở thư mục `uploads/` nên được sao lưu cùng ảnh sản phẩm.

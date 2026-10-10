@@ -15,7 +15,6 @@ Thông tin doanh nghiệp gốc: [business-info.md](business-info.md).
 | Nhóm | Mô tả | Dùng app |
 |---|---|---|
 | Khách lẻ (B2C) | Hộ gia đình mua gói 250 g – 1 kg; đặt hàng **không cần tài khoản** | `apps/web` |
-| Khách sỉ / F&B (B2B) | Quán cà phê, nhà hàng, tiệm sinh tố; gửi **yêu cầu báo giá**, không đặt qua giỏ hàng | `apps/web` (`/wholesale`) |
 | Chủ cửa hàng (ADMIN) | Đúng 1 tài khoản; toàn quyền, xem doanh thu, quản lý nhân viên | `apps/admin` |
 | Nhân viên (STAFF) | Xử lý đơn, liên hệ, cập nhật sản phẩm & nội dung; không xem doanh thu | `apps/admin` |
 
@@ -44,6 +43,7 @@ Những ràng buộc này chi phối thiết kế dữ liệu và luồng đặt
 **Trong phạm vi hiện tại:** website khách hàng, trang quản trị, API, database, triển khai VPS — chi tiết ở [features.md](features.md).
 
 **Ngoài phạm vi (có chủ đích):**
+- Bán sỉ / báo giá sỉ cho quán, nhà hàng — đã bỏ khỏi website (2026-10); khách sỉ liên hệ trực tiếp qua hotline / Zalo.
 - Tài khoản khách hàng, wishlist, tích điểm — khách mua lẻ không muốn đăng ký; tra cứu đơn bằng *mã đơn + SĐT* là đủ.
 - Tự tính phí vận chuyển qua GHN/GHTK — đơn chủ yếu nội thành Đà Nẵng, shop tự giao.
 - Kế toán, kho nhiều chi nhánh.
@@ -57,6 +57,6 @@ Các hạng mục có thể làm sau nằm trong [roadmap.md](../05-roadmap/road
 | Quy cách (variant) | Một cách đóng gói của sản phẩm, ví dụ "Xoài cắt miếng – 500g" |
 | Bản chụp (snapshot) | Tên, quy cách, đơn giá lưu cứng vào dòng đơn lúc đặt; sửa / xoá sản phẩm sau đó không ảnh hưởng đơn cũ |
 | Báo giá (quote) | API tính lại giá giỏ hàng từ database trước khi hiển thị / đặt hàng |
-| Liên hệ (inquiry) | Tin nhắn từ form liên hệ hoặc yêu cầu báo giá sỉ |
+| Liên hệ (inquiry) | Tin nhắn từ form liên hệ (loại "báo giá sỉ" chỉ còn ở dữ liệu cũ) |
 | Revalidate | API báo web xoá cache để trang hiển thị dữ liệu mới ngay |
 | SSE | Server-Sent Events — kênh máy chủ đẩy sự kiện realtime xuống trình duyệt |

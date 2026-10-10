@@ -15,6 +15,7 @@ import { IsBoolean, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'cl
 import type { Policy as PolicyRow } from '@prisma/client';
 import type { Policy } from '@frozen-fruit-shop/types';
 import { Auth } from '../auth/auth.guard.js';
+import { sanitizeRichText, toRichTextOutput } from '../common/rich-text.js';
 import { slugify } from '../common/utils.js';
 import { IsSlug, Trim } from '../common/validators.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -32,9 +33,10 @@ export class CreatePolicyDto {
   @IsSlug()
   slug?: string;
 
+  /** HTML từ trình soạn thảo — được lọc lại trước khi lưu. */
   @IsOptional()
   @IsString()
-  @MaxLength(50_000)
+  @MaxLength(300_000)
   content?: string;
 
   @IsOptional()
@@ -53,7 +55,7 @@ function toPolicy(row: PolicyRow): Policy {
     id: row.id,
     slug: row.slug,
     title: row.title,
-    content: row.content,
+    content: toRichTextOutput(row.content),
     sortOrder: row.sortOrder,
     isActive: row.isActive,
   };
@@ -90,7 +92,7 @@ export class PoliciesService {
       data: {
         title: dto.title,
         slug: dto.slug || slugify(dto.title),
-        content: dto.content ?? '',
+        content: sanitizeRichText(dto.content),
         sortOrder: dto.sortOrder ?? 0,
         isActive: dto.isActive ?? true,
       },
@@ -101,7 +103,12 @@ export class PoliciesService {
 
   async update(id: string, dto: UpdatePolicyDto): Promise<Policy> {
     await this.findById(id);
-    const row = await this.prisma.policy.update({ where: { id }, data: { ...dto, slug: dto.slug || undefined } });
+    const row = await this.prisma.policy.update({ where: { id }, data: {
+        ...dto,
+        slug: dto.slug || undefined,
+        content: dto.content === undefined ? undefined : sanitizeRichText(dto.content),
+      },
+    });
     this.revalidate.notify('content');
     return toPolicy(row);
   }

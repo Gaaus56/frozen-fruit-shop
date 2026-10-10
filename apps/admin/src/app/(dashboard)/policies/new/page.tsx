@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/ui/page-header";
+import { getProductOptions } from "@/lib/product-options";
 import { PolicyForm } from "../policy-form";
 import { POLICY_TEMPLATES } from "../templates";
 
@@ -11,7 +12,7 @@ export default async function NewPolicyPage({ searchParams }: PageProps<"/polici
   return (
     <div>
       <PageHeader back={{ href: "/policies", label: "Chính sách" }} title="Thêm chính sách" />
-      <PolicyForm template={template} />
+      <PolicyForm template={template} products={await getProductOptions()} />
     </div>
   );
 }

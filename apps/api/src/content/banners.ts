@@ -9,11 +9,12 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { PartialType } from '@nestjs/mapped-types';
-import { IsBoolean, IsInt, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 import type { Banner as BannerRow } from '@prisma/client';
-import type { Banner } from '@frozen-fruit-shop/types';
+import { BANNER_PLACEMENTS, type Banner, type BannerPlacement } from '@frozen-fruit-shop/types';
 import { Auth } from '../auth/auth.guard.js';
 import { toPublicUrl, toStoredPath } from '../common/utils.js';
 import { IsImagePath, Trim } from '../common/validators.js';
@@ -23,6 +24,10 @@ import { RevalidateService } from '../revalidate/revalidate.service.js';
 export class CreateBannerDto {
   @IsImagePath()
   image!: string;
+
+  @IsOptional()
+  @IsIn(BANNER_PLACEMENTS, { message: 'Vị trí banner không hợp lệ' })
+  placement?: BannerPlacement;
 
   @IsOptional()
   @Trim()
@@ -59,9 +64,16 @@ export class CreateBannerDto {
 
 export class UpdateBannerDto extends PartialType(CreateBannerDto) {}
 
+export class BannerQuery {
+  @IsOptional()
+  @IsIn(BANNER_PLACEMENTS, { message: 'Vị trí banner không hợp lệ' })
+  placement?: BannerPlacement;
+}
+
 function toBanner(row: BannerRow): Banner {
   return {
     id: row.id,
+    placement: row.placement,
     title: row.title,
     description: row.description,
     image: toPublicUrl(row.image),
@@ -72,7 +84,7 @@ function toBanner(row: BannerRow): Banner {
   };
 }
 
-const orderBy = [{ sortOrder: 'asc' as const }, { createdAt: 'asc' as const }];
+const orderBy = [{ placement: 'asc' as const }, { sortOrder: 'asc' as const }, { createdAt: 'asc' as const }];
 
 @Injectable()
 export class BannersService {
@@ -81,8 +93,11 @@ export class BannersService {
     private readonly revalidate: RevalidateService,
   ) {}
 
-  async list(onlyActive: boolean): Promise<Banner[]> {
-    const rows = await this.prisma.banner.findMany({ where: onlyActive ? { isActive: true } : undefined, orderBy });
+  async list(onlyActive: boolean, placement?: BannerPlacement): Promise<Banner[]> {
+    const rows = await this.prisma.banner.findMany({
+      where: { placement, isActive: onlyActive ? true : undefined },
+      orderBy,
+    });
     return rows.map(toBanner);
   }
 
@@ -96,6 +111,7 @@ export class BannersService {
     const row = await this.prisma.banner.create({
       data: {
         image: toStoredPath(dto.image),
+        placement: dto.placement ?? 'home',
         title: dto.title ?? '',
         description: dto.description ?? '',
         linkUrl: dto.linkUrl || null,
@@ -134,9 +150,10 @@ export class BannersService {
 export class PublicBannersController {
   constructor(private readonly service: BannersService) {}
 
+  /** Mặc định trả banner trang chủ (giữ tương thích với web cũ); `?placement=products` cho trang Sản phẩm. */
   @Get()
-  list() {
-    return this.service.list(true);
+  list(@Query() query: BannerQuery) {
+    return this.service.list(true, query.placement ?? 'home');
   }
 }
 
@@ -146,8 +163,8 @@ export class AdminBannersController {
   constructor(private readonly service: BannersService) {}
 
   @Get()
-  list() {
-    return this.service.list(false);
+  list(@Query() query: BannerQuery) {
+    return this.service.list(false, query.placement);
   }
 
   @Get(':id')

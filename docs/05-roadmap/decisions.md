@@ -18,6 +18,9 @@ Ghi lại **vì sao** hệ thống được làm như hiện tại, để ngư�
 | 12 | Một ADMIN duy nhất + nhiều STAFF | Đang áp dụng |
 | 13 | Bỏ chế độ tối (dark mode) ở web | Đang áp dụng |
 | 14 | Seed dữ liệu kiểm thử riêng cho máy dev (bổ sung #11) | Đang áp dụng |
+| 15 | Bỏ tính năng bán sỉ khỏi website | Đang áp dụng |
+| 16 | Tin tức chia 2 loại cố định; tab Liên hệ trên điện thoại đổi thành Tin tức | Đang áp dụng |
+| 17 | Trình soạn thảo có giới hạn (Tiptap) thay vì dev viết bài / soạn thảo tự do | Đang áp dụng |
 
 ---
 
@@ -81,3 +84,18 @@ Ghi lại **vì sao** hệ thống được làm như hiện tại, để ngư�
 - **Bối cảnh:** test thủ công ([06-testing](../06-testing/README.md)) cần cùng một bộ dữ liệu đủ mọi tình huống (hết hàng, danh mục ẩn, đơn mọi trạng thái, 13 tháng doanh thu); nhập tay mỗi lần mất cả giờ.
 - **Quyết định:** `npm run db:seed:test` (`apps/api/prisma/seed-test.ts`) xoá sạch rồi nạp lại bộ dữ liệu cố định. Production vẫn **không** có seed (#11 giữ nguyên).
 - **Hệ quả:** chạy lại được bất cứ lúc nào; script tự từ chối khi `NODE_ENV=production` hoặc `DATABASE_URL` không phải máy cục bộ. Ảnh mẫu (~600 KB) nằm ở `prisma/seed-assets/`, không đóng vào image Docker.
+
+### 15. Bỏ tính năng bán sỉ
+- **Bối cảnh:** trang Đặt hàng sỉ / F&B, cờ "Nhận đặt sỉ" của sản phẩm và form báo giá sỉ không được dùng; khách sỉ vẫn liên hệ thẳng qua hotline / Zalo.
+- **Quyết định:** xoá trang `/wholesale`, mọi link tới nó, cờ `isWholesaleAvailable` (migration `20261008010000`); `POST /inquiries` chỉ nhận `contact`.
+- **Hệ quả:** liên hệ báo giá sỉ cũ vẫn giữ trong DB, xem / lọc / xoá được ở admin. Muốn làm lại tính năng sỉ phải thêm lại cột và trang.
+
+### 16. Tin tức 2 loại + điều hướng trên điện thoại
+- **Bối cảnh:** cần đăng tin tuyển dụng tách khỏi bài kiến thức; trên điện thoại trước đây không có đường vào trang Tin tức ngoài chân trang.
+- **Quyết định:** `posts.type` = knowledge / recruitment thay cho chuyên mục gõ tự do (bài cũ có chữ "tuyển dụng" tự chuyển). Trang `/news` dùng chung khung đầu trang với trang Sản phẩm (ảnh nền + chip lọc Tất cả / Kiến thức / Tuyển dụng, không dính khi cuộn). Thanh dưới điện thoại: tab **Liên hệ → Tin tức**, vì nút tròn giữa thanh đã làm việc liên hệ (gọi, Zalo, SMS, Messenger); trang `/contact` vào từ chân trang. Desktop: mục Tin tức có menu thả xuống 2 loại.
+- **Hệ quả:** thêm loại bài thứ ba phải sửa enum + migration (chủ ý giữ danh sách cố định cho gọn).
+
+### 17. Trình soạn thảo có giới hạn
+- **Bối cảnh:** bài viết, chính sách, trang Giới thiệu chỉ là chữ thường (trang Giới thiệu còn viết cứng trong code); không chèn được ảnh giữa bài, không in đậm. Để dev viết hộ thì chậm và tốn công cho nội dung đổi hằng tuần (tuyển dụng, mẹo, khuyến mãi).
+- **Quyết định:** admin tự soạn bằng Tiptap với bộ định dạng cố định (tiêu đề, đậm/nghiêng, danh sách, trích dẫn, khung ghi chú xanh/đỏ, liên kết, ảnh có chú thích, ô sản phẩm). **Không** có chọn màu / cỡ chữ / font. Lưu HTML, API lọc theo danh sách cho phép (`sanitize-html`).
+- **Hệ quả:** mọi bài cùng một kiểu, đúng thương hiệu; muốn thêm kiểu định dạng mới phải sửa cả trình soạn thảo, bộ lọc API và CSS web. Ô sản phẩm chỉ lưu slug → giá trên web luôn mới.

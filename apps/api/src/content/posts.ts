@@ -13,10 +13,11 @@ import {
 } from '@nestjs/common';
 import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsDateString, IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsBoolean, IsDateString, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 import type { Post as PostRow } from '@prisma/client';
-import type { Post } from '@frozen-fruit-shop/types';
+import { POST_TYPES, type Post, type PostType } from '@frozen-fruit-shop/types';
 import { Auth } from '../auth/auth.guard.js';
+import { sanitizeRichText, toRichTextOutput } from '../common/rich-text.js';
 import { iso, slugify, toPublicUrl, toStoredPath } from '../common/utils.js';
 import { IsImagePath, IsSlug, Trim } from '../common/validators.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -40,9 +41,10 @@ export class CreatePostDto {
   @MaxLength(500)
   excerpt?: string;
 
+  /** HTML từ trình soạn thảo — được lọc lại trước khi lưu (sanitizeRichText). */
   @IsOptional()
   @IsString()
-  @MaxLength(50_000)
+  @MaxLength(300_000)
   content?: string;
 
   @IsOptional()
@@ -50,10 +52,8 @@ export class CreatePostDto {
   coverImage?: string | null;
 
   @IsOptional()
-  @Trim()
-  @IsString()
-  @MaxLength(60)
-  category?: string;
+  @IsIn(POST_TYPES, { message: 'Loại bài viết không hợp lệ' })
+  type?: PostType;
 
   @IsOptional()
   @IsBoolean()
@@ -68,6 +68,10 @@ export class UpdatePostDto extends PartialType(CreatePostDto) {}
 
 export class PublicPostQuery {
   @IsOptional()
+  @IsIn(POST_TYPES, { message: 'Loại bài viết không hợp lệ' })
+  type?: PostType;
+
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
@@ -81,9 +85,9 @@ function toPost(row: PostRow): Post {
     slug: row.slug,
     title: row.title,
     excerpt: row.excerpt,
-    content: row.content,
+    content: toRichTextOutput(row.content),
     coverImage: toPublicUrl(row.coverImage),
-    category: row.category,
+    type: row.type,
     isPublished: row.isPublished,
     publishedAt: iso(row.publishedAt),
   };
@@ -97,9 +101,9 @@ export class PostsService {
   ) {}
 
   /** Bài đã bật hiển thị và đã tới ngày đăng (hẹn giờ đăng bằng cách đặt ngày trong tương lai). */
-  async listPublic(limit?: number): Promise<Post[]> {
+  async listPublic(limit?: number, type?: PostType): Promise<Post[]> {
     const rows = await this.prisma.post.findMany({
-      where: { isPublished: true, publishedAt: { lte: new Date() } },
+      where: { type, isPublished: true, publishedAt: { lte: new Date() } },
       orderBy: { publishedAt: 'desc' },
       take: limit,
     });
@@ -131,9 +135,9 @@ export class PostsService {
         title: dto.title,
         slug: dto.slug || slugify(dto.title),
         excerpt: dto.excerpt ?? '',
-        content: dto.content ?? '',
+        content: sanitizeRichText(dto.content),
         coverImage: toStoredPath(dto.coverImage),
-        category: dto.category ?? '',
+        type: dto.type ?? 'knowledge',
         isPublished: dto.isPublished ?? true,
         publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : new Date(),
       },
@@ -148,6 +152,7 @@ export class PostsService {
       where: { id },
       data: {
         ...dto,
+        content: dto.content === undefined ? undefined : sanitizeRichText(dto.content),
         slug: dto.slug || undefined,
         coverImage: dto.coverImage === undefined ? undefined : toStoredPath(dto.coverImage),
         publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : undefined,
@@ -170,7 +175,7 @@ export class PublicPostsController {
 
   @Get()
   list(@Query() query: PublicPostQuery) {
-    return this.service.listPublic(query.limit);
+    return this.service.listPublic(query.limit, query.type);
   }
 
   @Get(':slug')

@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { formatPhone, type Category, type SiteSettings } from "@frozen-fruit-shop/types";
+import {
+  POST_TYPES,
+  POST_TYPE_LABELS,
+  POST_TYPE_SLUGS,
+  formatPhone,
+  type Category,
+  type SiteSettings,
+} from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
 import { LogoBadge } from "./logo-badge";
@@ -12,10 +19,12 @@ const NAV_LINKS = [
   { href: "/", label: "Trang chủ" },
   { href: "/products", label: "Sản phẩm" },
   { href: "/about", label: "Giới thiệu" },
-  { href: "/wholesale", label: "Đặt hàng sỉ" },
   { href: "/news", label: "Tin tức" },
   { href: "/contact", label: "Liên hệ" },
 ];
+
+/** Menu con của mục Tin tức: hai loại bài viết. */
+const NEWS_LINKS = POST_TYPES.map((type) => ({ href: `/news?type=${POST_TYPE_SLUGS[type]}`, label: POST_TYPE_LABELS[type] }));
 
 const FEATURES = [
   {
@@ -198,7 +207,13 @@ export function Header({ settings, categories }: HeaderProps) {
           <nav className="hidden items-center gap-8 lg:flex">
             {NAV_LINKS.map((link) => {
               const active = isActive(link.href);
-              const hasDropdown = link.href === "/products";
+              const dropdown =
+                link.href === "/products"
+                  ? categories.map((category) => ({ href: `/products?category=${category.slug}`, label: category.name }))
+                  : link.href === "/news"
+                    ? NEWS_LINKS
+                    : [];
+              const hasDropdown = dropdown.length > 0;
               return (
                 <div
                   key={link.href}
@@ -227,21 +242,21 @@ export function Header({ settings, categories }: HeaderProps) {
                   </Link>
 
                   {hasDropdown ? (
-                    <div className={`invisible absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 ${
-                        isDropdownSuppressed
-                          ? ""
-                          : "group-has-[:focus-visible]/nav:visible group-has-[:focus-visible]/nav:opacity-100 group-hover/nav:visible group-hover/nav:opacity-100"
-                      }`}>
-                      <ul className="border-t-2 border-accent-700 bg-background py-2 shadow-2xl ring-1 ring-divider" role="menu">
-                        {categories.map((category) => (
-                          <li key={category.id} role="none">
+                    // Hiệu ứng cuộn xuống / cuộn lên: xem .nav-dropdown trong globals.css.
+                    <div
+                      className="nav-dropdown absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-4"
+                      data-suppressed={isDropdownSuppressed || undefined}
+                    >
+                      <ul className="nav-dropdown-panel border-t-2 border-accent-700 bg-background py-2 shadow-2xl ring-1 ring-divider" role="menu">
+                        {dropdown.map((item) => (
+                          <li key={item.href} role="none">
                             <Link
                               role="menuitem"
-                              href={`/products?category=${category.slug}`}
+                              href={item.href}
                               onClick={() => setIsDropdownSuppressed(true)}
                               className="block border-b border-divider px-5 py-3 text-sm font-semibold normal-case text-foreground/75 last:border-b-0 hover:bg-surface hover:text-accent-700"
                             >
-                              {category.name}
+                              {item.label}
                             </Link>
                           </li>
                         ))}
@@ -325,7 +340,8 @@ export function Header({ settings, categories }: HeaderProps) {
         {/* Chỗ trống cho nút liên hệ nổi (FloatingContact) nằm giữa thanh. */}
         <span aria-hidden className="w-14 shrink-0" />
         <TabLink href="/about" label="Giới thiệu" active={isActive("/about")} icon={<InfoIcon />} />
-        <TabLink href="/contact" label="Liên hệ" active={isActive("/contact")} icon={<ContactIcon />} />
+        {/* Liên hệ đã có nút tròn ở giữa (gọi / Zalo / SMS / Messenger); trang /contact vào từ chân trang. */}
+        <TabLink href="/news" label="Tin tức" active={isActive("/news")} icon={<NewsIcon />} />
       </nav>
     </>
   );
@@ -412,10 +428,12 @@ function InfoIcon() {
   );
 }
 
-function ContactIcon() {
+function NewsIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.6-.8L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z" />
+      <path d="M4 5a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v14a1 1 0 0 0 1 1H6a2 2 0 0 1-2-2V5z" />
+      <path d="M17 8h2a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2" />
+      <path d="M8 8h5M8 12h5M8 16h3" />
     </svg>
   );
 }

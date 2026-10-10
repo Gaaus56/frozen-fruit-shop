@@ -44,16 +44,17 @@ Bộ đếm nằm trong bộ nhớ tiến trình (đủ cho một máy chủ). A
 | GET | `/health` | Kiểm tra sống |
 | GET | `/settings` | Thông tin cửa hàng |
 | GET | `/categories` | Danh mục đang hiển thị (kèm số sản phẩm) |
-| GET | `/products` | Sản phẩm đang bán. Lọc: `category` (slug), `q`, `featured=true`, `wholesale=true`, `sort` (default/newest/price_asc/price_desc), `limit` |
+| GET | `/products` | Sản phẩm đang bán. Lọc: `category` (slug), `q`, `featured=true`, `sort` (default/newest/price_asc/price_desc), `limit` |
 | GET | `/products/:slug` | Chi tiết + `relatedProducts` |
-| GET | `/posts` | Bài đã đăng (`limit`) |
+| GET | `/posts` | Bài đã đăng (`limit`, `type` = knowledge / recruitment) |
 | GET | `/posts/:slug` | Chi tiết bài |
-| GET | `/banners` | Banner đang bật |
+| GET | `/pages/:slug` | Trang nội dung (`about`). Chưa lưu → nội dung mặc định, `updatedAt: null` |
+| GET | `/banners` | Banner đang bật. `?placement=home` (mặc định), `products` hoặc `news` |
 | GET | `/policies` · `/policies/:slug` | Chính sách đang bật |
 | POST | `/orders/quote` | `{ items: [{ variantId, quantity }] }` → giá hiện tại từng dòng, dòng không khả dụng, tạm tính |
 | POST | `/orders` | Tạo đơn: `items`, `customerName`, `customerPhone`, `customerEmail?`, `shippingAddress`, `customerNote?`, `paymentMethod` (cod/bank_transfer), `website` (honeypot). Trả `{ orderNumber, total }` |
 | GET | `/orders/lookup?orderNumber=&phone=` | Tra cứu đơn (phải khớp cả hai) |
-| POST | `/inquiries` | Liên hệ / báo giá sỉ: `type` (contact/wholesale), `name`, `phone`, `email`, `company`, `quantity`, `message`, `website` |
+| POST | `/inquiries` | Liên hệ: `type` (chỉ `contact`), `name`, `phone`, `email`, `message`, `website` |
 | GET | `/events` | Luồng SSE: `{ type: "changed", tags }` khi dữ liệu hiển thị trên web thay đổi (xem [request-flows.md](../02-architecture/request-flows.md#5-cập-nhật-realtime)) |
 
 Phí vận chuyển của đơn mới là 0 — cửa hàng gọi khách xác nhận rồi nhập phí ở trang quản trị.
@@ -80,28 +81,37 @@ Tất cả cần đăng nhập. Cột **Quyền**: *Tất cả* = ADMIN và STAF
 | GET · POST | `/admin/products` | Tất cả | Lọc `q`, `categoryId`, `status` (active/inactive/all) · tạo |
 | GET · PATCH · DELETE | `/admin/products/:id` | Tất cả | PATCH nhận `images: [{ url }]` (thay toàn bộ, theo thứ tự) và `variants` (có `id` = sửa, không có = thêm, thiếu = xoá) |
 | CRUD | `/admin/posts`, `/admin/banners`, `/admin/policies` | Tất cả | Tương tự |
+| GET · PUT | `/admin/pages/:slug` | Tất cả | Trang Giới thiệu `{ title, description, content }` |
 | POST | `/admin/uploads` | Tất cả | `multipart/form-data`, trường `file`; JPG/PNG/WEBP/GIF ≤ 5 MB → `{ url }` |
 
 Mọi thao tác ghi dữ liệu hiển thị trên web gọi `RevalidateService.notify(tag)` → web làm mới cache ngay, rồi phát sự kiện realtime cho trình duyệt đang mở.
 
 `GET /admin/events` (Tất cả) — luồng SSE cho trang quản trị: `changed`, `order.created`, `order.updated`, `inquiry.created`, `inquiry.updated`. Kiểu sự kiện: `AdminRealtimeEvent` trong `packages/types`.
 
-## 6. Cấu trúc mã
+## 6. Nội dung có định dạng (HTML)
+
+`content` của bài viết / chính sách / trang, `description` của sản phẩm là **HTML** do trình soạn thảo admin tạo. API **không tin** HTML gửi lên: `common/rich-text.ts` (`sanitize-html`) chỉ giữ
+
+`p h2 h3 strong em u s br hr ul ol li blockquote` · `a[href]` (http(s), mailto, tel, "/…"; link ngoài thêm `target=_blank rel=noopener`) · `figure > img[src,alt] + figcaption` (ảnh `/uploads/…` hoặc http(s)) · `aside[data-tone=green|red]` · `div[data-product-slug]` (ô sản phẩm).
+
+Mọi thứ khác (`script`, `style`, `on*`, `javascript:`, class, màu…) bị bỏ. Ảnh của API lưu dạng tương đối `/uploads/…`, trả ra kèm `PUBLIC_URL` — đổi tên miền không hỏng ảnh trong bài. Nội dung cũ dạng chữ thường được chuyển sang `<p>` khi đọc / lưu.
+
+## 7. Cấu trúc mã
 
 ```
 src/
 ├── main.ts                 # khởi tạo: trust proxy, header bảo mật, CORS, /uploads tĩnh, ValidationPipe, filter lỗi Prisma
 ├── app.module.ts           # ghép module + GET /health
 ├── config/env.ts           # đọc & kiểm tra biến môi trường (dùng process.loadEnvFile, không cần dotenv)
-├── common/                 # tiện ích (slugify, URL ảnh, chuẩn hoá SĐT), validator, phân trang, rate-limit guard, filter lỗi Prisma
+├── common/                 # rich-text.ts (lọc HTML), tiện ích (slugify, URL ảnh, chuẩn hoá SĐT), validator, phân trang, rate-limit guard, filter lỗi Prisma
 ├── prisma/                 # PrismaService
 ├── auth/                   # đăng nhập, /auth/me, đổi mật khẩu, guard + decorator @Auth
 ├── users/                  # quản lý tài khoản nhân viên (ADMIN)
 ├── categories/             # danh mục (public + admin)
 ├── products/               # sản phẩm, ảnh, quy cách
 ├── orders/                 # báo giá, đặt hàng, tra cứu, quản lý đơn
-├── inquiries/              # liên hệ / báo giá sỉ
-├── content/                # posts, banners, policies, settings
+├── inquiries/              # liên hệ
+├── content/                # posts, banners, policies, pages (trang Giới thiệu), settings
 ├── uploads/                # tải ảnh
 ├── stats/                  # số liệu Tổng quan (ADMIN)
 ├── realtime/               # luồng sự kiện SSE: GET /events, GET /admin/events

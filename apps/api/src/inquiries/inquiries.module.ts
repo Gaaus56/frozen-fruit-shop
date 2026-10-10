@@ -25,12 +25,13 @@ import { VN_PHONE } from '../orders/orders.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RealtimeService } from '../realtime/realtime.module.js';
 
+/** "wholesale": liên hệ báo giá sỉ cũ (tính năng sỉ đã bỏ) — vẫn lọc / xem được trong admin. */
 const TYPES = ['contact', 'wholesale'] as const;
 const STATUSES = ['new', 'in_progress', 'done'] as const;
 
 export class CreateInquiryDto {
-  @IsIn(TYPES)
-  type!: (typeof TYPES)[number];
+  @IsIn(['contact'], { message: 'Loại liên hệ không hợp lệ' })
+  type!: 'contact';
 
   @Trim()
   @IsString()
@@ -50,18 +51,6 @@ export class CreateInquiryDto {
   @IsEmail({}, { message: 'Email không hợp lệ' })
   @MaxLength(120)
   email?: string;
-
-  @IsOptional()
-  @Trim()
-  @IsString()
-  @MaxLength(150)
-  company?: string;
-
-  @IsOptional()
-  @Trim()
-  @IsString()
-  @MaxLength(100)
-  quantity?: string;
 
   @IsOptional()
   @Trim()
@@ -117,7 +106,7 @@ export class InquiriesService {
     if (!dto.phone && !dto.email) {
       throw new BadRequestException('Vui lòng để lại số điện thoại hoặc email để cửa hàng liên hệ lại.');
     }
-    if (dto.type === 'contact' && !dto.message) {
+    if (!dto.message) {
       throw new BadRequestException('Vui lòng nhập nội dung cần hỗ trợ.');
     }
 
@@ -127,8 +116,6 @@ export class InquiriesService {
         name: dto.name,
         phone: dto.phone ?? '',
         email: dto.email ?? '',
-        company: dto.company ?? '',
-        quantity: dto.quantity ?? '',
         message: dto.message ?? '',
       },
     });

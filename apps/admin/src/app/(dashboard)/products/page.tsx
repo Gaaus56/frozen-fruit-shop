@@ -91,7 +91,6 @@ export default async function ProductsPage({ searchParams }: PageProps<"/product
                     <Link href={`/products/${product.id}`} className="font-bold hover:text-accent-700">{product.name}</Link>
                     <span className="mt-0.5 flex flex-wrap gap-1">
                       {product.isFeatured ? <Badge tone="red">Nổi bật</Badge> : null}
-                      {product.isWholesaleAvailable ? <Badge tone="blue">Bán sỉ</Badge> : null}
                       {product.images.length === 0 ? <Badge tone="amber">Chưa có ảnh</Badge> : null}
                     </span>
                   </span>

@@ -13,7 +13,7 @@ Next.js 16 + Tailwind CSS 4, cổng 3002. Cùng tông màu với web khách (đ�
 |---|:-:|:-:|
 | Tổng quan bán hàng (doanh thu, biểu đồ, sản phẩm bán chạy...) | ✅ | ❌ |
 | Đơn hàng: xem, xác nhận, cập nhật trạng thái/thanh toán/phí ship/giảm giá, ghi chú nội bộ, in | ✅ | ✅ |
-| Liên hệ & báo giá sỉ: xem, đổi trạng thái, xoá | ✅ | ✅ |
+| Liên hệ: xem, đổi trạng thái, xoá | ✅ | ✅ |
 | Sản phẩm, danh mục, ảnh | ✅ | ✅ |
 | Banner, bài viết, chính sách | ✅ | ✅ |
 | Thông tin cửa hàng (hotline, địa chỉ, chuyển khoản...) | ✅ | ❌ |
@@ -36,12 +36,13 @@ Quy tắc phiên đăng nhập:
 | `/` (ADMIN) | Chọn khoảng 7 / 30 / 90 / 365 ngày. Doanh thu, số đơn, giá trị TB/đơn, tỷ lệ huỷ (so với kỳ trước); biểu đồ doanh thu theo ngày/tháng; sản phẩm bán chạy; doanh thu theo danh mục; đơn theo trạng thái; theo phương thức thanh toán; đơn gần đây; kho (quy cách sắp hết/hết hàng). Doanh thu không tính đơn huỷ, tính theo giờ Việt Nam |
 | `/orders` | Lọc theo trạng thái, tìm theo mã đơn/tên/SĐT, phân trang |
 | `/orders/[id]` | Chi tiết đơn, chuyển trạng thái hợp lệ, trạng thái thanh toán, phí vận chuyển, giảm giá, ghi chú nội bộ, lịch sử thay đổi (ai, lúc nào), in phiếu |
-| `/inquiries` | Liên hệ và yêu cầu báo giá sỉ; trạng thái Mới / Đang xử lý / Xong |
+| `/inquiries` | Liên hệ từ website; trạng thái Mới / Đang xử lý / Xong. Bộ lọc loại vẫn có "Báo giá sỉ" để xem dữ liệu cũ |
 | `/products` | Lọc theo tên, danh mục, trạng thái; bật/tắt bán nhanh; cảnh báo hết hàng, chưa có ảnh |
-| `/products/new`, `/products/[id]` | Tên, mô tả, **nhiều ảnh** (kéo thứ tự, ảnh đầu là ảnh chính, tối đa 12), **quy cách đóng gói** (quy cách, khối lượng, giá bán, giá gốc, tồn kho, SKU, đang bán; hiện giá/kg), bảo quản & rã đông, danh mục, nổi bật, nhận sỉ, thứ tự, slug |
+| `/products/new`, `/products/[id]` | Tên, mô tả, **nhiều ảnh** (kéo thứ tự, ảnh đầu là ảnh chính, tối đa 12), **quy cách đóng gói** (quy cách, khối lượng, giá bán, giá gốc, tồn kho, SKU, đang bán; hiện giá/kg), bảo quản & rã đông, danh mục, nổi bật, thứ tự, slug |
 | `/categories` | Danh mục kèm ảnh, mô tả, thứ tự, ẩn/hiện. Không xoá được danh mục còn sản phẩm |
-| `/banners` | Banner trang chủ (ảnh 21:8, tiêu đề, mô tả, liên kết, chữ trên nút, thứ tự) |
-| `/posts` | Bài viết: ảnh bìa, chuyên mục, tóm tắt, nội dung, bản nháp / hẹn giờ đăng |
+| `/banners` | Lọc theo vị trí. **Trang chủ**: ảnh trình chiếu 21:8, tiêu đề, mô tả, liên kết, chữ trên nút, thứ tự. **Đầu trang Sản phẩm** / **Đầu trang Tin tức**: ảnh nền + tiêu đề / mô tả thay cho chữ mặc định (dùng banner đang bật có thứ tự nhỏ nhất; không có thì dùng ảnh mặc định) |
+| `/pages/about` | **Trang Giới thiệu**: tiêu đề, dòng giới thiệu, nội dung bằng trình soạn thảo. Chưa lưu lần nào thì mở ra là nội dung đang hiển thị |
+| `/posts` | Bài viết: lọc theo loại (Tất cả / Kiến thức / Tuyển dụng, kèm số bài); **loại bài** bắt buộc, ảnh bìa, tóm tắt, nội dung, bản nháp / hẹn giờ đăng |
 | `/policies` | Trang chính sách. Có **mẫu soạn sẵn** "Chính sách bảo hành & đổi trả" lấy từ tài liệu cửa hàng |
 | `/settings` (ADMIN) | Tên cửa hàng, hotline, giờ nghe máy, Zalo, email, Facebook, địa chỉ, link bản đồ, thông tin chuyển khoản, MST, dòng chữ chạy (có công tắc bật/tắt) |
 | `/users` (ADMIN) | Danh sách tài khoản, tạo nhân viên, đặt lại mật khẩu, khoá/mở khoá, xoá |
@@ -49,7 +50,27 @@ Quy tắc phiên đăng nhập:
 
 Mọi thay đổi nội dung được API báo sang web để làm mới ngay (không phải chờ 5 phút).
 
-## 3. Kỹ thuật
+## 3. Trình soạn thảo nội dung
+
+Dùng cho **bài viết, chính sách, mô tả chi tiết sản phẩm, trang Giới thiệu** (`components/editor/`, thư viện Tiptap 3).
+
+| Nút | Tác dụng |
+|---|---|
+| Văn bản · Tiêu đề · Tiêu đề nhỏ | Chia mục (h2 / h3) |
+| **B** *I* <u>U</u> ~~S~~ | Đậm, nghiêng, gạch chân, gạch ngang (Ctrl+B / I / U) |
+| Danh sách · 1. Danh sách · Trích dẫn | |
+| Ghi chú (xanh) · Cảnh báo (đỏ) | Khung nổi bật theo màu thương hiệu |
+| Liên kết | Thanh nhập link ngay dưới thanh công cụ; `zalo.me/…` (có tên miền) → `https://…`, `products/…` → `/products/…`; link ngoài tự mở tab mới |
+| Ảnh | Chọn nhiều ảnh, **hoặc dán / kéo-thả ảnh vào bài**. Mỗi ảnh có ô chú thích ngay dưới, nút "Xoá ảnh" khi rê chuột, kéo để đổi vị trí |
+| Sản phẩm | Ô tìm (có dấu / không dấu) → bấm để chọn **một hoặc nhiều** sản phẩm (số thứ tự hiện trên thẻ) → "Chèn N sản phẩm". Các ô liền nhau xếp thành hàng thẻ (ảnh, tên, giá) ngay trong trình soạn thảo; trên web là một hàng thẻ sản phẩm (giá hiện tại, nút thêm giỏ) tự lướt khi nhiều sản phẩm. **Dán link trang sản phẩm vào dòng trống** cũng tự thành ô sản phẩm. Không có ở mô tả sản phẩm |
+| ― · ↶ ↷ | Đường kẻ, hoàn tác, làm lại |
+
+- Cố ý **không** có chọn màu / cỡ chữ / font: kiểu chữ do giao diện web quyết định (decisions #17).
+- Chèn ảnh / ô sản phẩm vào dòng trống thì thay luôn dòng đó; luôn có dòng trống phía sau để gõ tiếp.
+- Cuối khung: số chữ · ảnh · ô sản phẩm. Rời trang khi chưa lưu → trình duyệt hỏi lại.
+- Nội dung cũ dạng chữ thường mở ra vẫn giữ đoạn / xuống dòng; lưu lại sẽ thành HTML.
+
+## 4. Kỹ thuật
 
 - **Không có API route riêng**: trang là Server Component gọi `api<T>()` (`src/lib/api.ts`, chỉ chạy phía server) kèm token từ cookie; thao tác ghi là **Server Action** (`actions.ts` cạnh mỗi trang) bọc bởi `runAction()` để trả lỗi hiển thị trên form.
 - API trả 401 → chuyển tới `/logout?expired=1` (route xoá cookie rồi về `/login`), tránh vòng lặp chuyển hướng.
@@ -60,7 +81,7 @@ Mọi thay đổi nội dung được API báo sang web để làm mới ngay (k
 
 Biến môi trường (`apps/admin/.env.local`): `API_URL` — địa chỉ API mà server admin gọi (mặc định `http://localhost:4000`).
 
-## 4. Kế hoạch xác thực OTP cho ADMIN
+## 5. Kế hoạch xác thực OTP cho ADMIN
 
 Hiện ADMIN đăng nhập bằng email + mật khẩu. Thiết kế đã chừa chỗ để thêm OTP mà không đổi luồng của nhân viên:
 

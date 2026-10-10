@@ -44,7 +44,7 @@ export default async function InquiriesPage({ searchParams }: PageProps<"/inquir
 
   return (
     <div>
-      <PageHeader title="Liên hệ & báo giá" description="Tin nhắn từ form Liên hệ và yêu cầu báo giá sỉ trên website." />
+      <PageHeader title="Liên hệ & báo giá" description="Tin nhắn từ form Liên hệ trên website. (Yêu cầu báo giá sỉ cũ vẫn xem được ở bộ lọc loại.)" />
 
       <div className="mb-4 flex flex-wrap gap-2">
         <Link href={filterHref({ status: undefined })} className={chip(!status)}>Mọi trạng thái</Link>

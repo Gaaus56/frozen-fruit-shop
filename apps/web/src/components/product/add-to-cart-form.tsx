@@ -51,7 +51,7 @@ export function AddToCartForm({ product }: { product: Product }) {
               onClick={() => setSelectedVariantId(variant.id)}
               disabled={variant.stockStatus === "out_of_stock"}
               aria-pressed={variant.id === selectedVariantId}
-              className={`border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+              className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                 variant.id === selectedVariantId
                   ? "border-accent-600 bg-accent-600 text-white"
                   : "border-divider text-foreground/85 hover:border-accent-500"
@@ -71,14 +71,28 @@ export function AddToCartForm({ product }: { product: Product }) {
         ) : null}
       </div>
 
-      {selectedVariant.stockStatus === "low_stock" ? (
-        <p className="text-sm font-medium text-amber-700">Sắp hết hàng — chỉ còn số lượng giới hạn</p>
+      {selectedVariant.stockStatus === "in_stock" ? (
+        <p className="flex items-center gap-2 text-sm font-medium text-leaf">
+          <span className="h-2 w-2 rounded-full bg-leaf" aria-hidden />
+          Còn hàng
+        </p>
       ) : null}
-      {isOutOfStock ? <p className="text-sm font-medium text-red-600">Quy cách này hiện đã hết hàng</p> : null}
+      {selectedVariant.stockStatus === "low_stock" ? (
+        <p className="flex items-center gap-2 text-sm font-medium text-amber-700">
+          <span className="h-2 w-2 rounded-full bg-amber-500" aria-hidden />
+          Sắp hết hàng — chỉ còn số lượng giới hạn
+        </p>
+      ) : null}
+      {isOutOfStock ? (
+        <p className="flex items-center gap-2 text-sm font-medium text-red-600">
+          <span className="h-2 w-2 rounded-full bg-red-500" aria-hidden />
+          Quy cách này hiện đã hết hàng
+        </p>
+      ) : null}
 
       <div className="flex items-center gap-3">
         <p className="text-sm font-semibold text-foreground">Số lượng</p>
-        <div className="flex items-center border border-divider">
+        <div className="flex items-center overflow-hidden rounded-lg border border-divider">
           <button
             type="button"
             className="px-3 py-1.5 text-lg text-foreground/70 disabled:opacity-40"
@@ -102,10 +116,10 @@ export function AddToCartForm({ product }: { product: Product }) {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button variant="secondary" className="sm:flex-1" onClick={handleAddToCart} disabled={isOutOfStock}>
+        <Button variant="secondary" className="rounded-lg sm:flex-1" onClick={handleAddToCart} disabled={isOutOfStock}>
           {justAdded ? "Đã thêm vào giỏ ✓" : "Thêm vào giỏ hàng"}
         </Button>
-        <Button className="sm:flex-1" onClick={handleBuyNow} disabled={isOutOfStock}>
+        <Button className="rounded-lg sm:flex-1" onClick={handleBuyNow} disabled={isOutOfStock}>
           Mua ngay
         </Button>
       </div>

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import type { PublicRealtimeEvent } from "@frozen-fruit-shop/types";
 import { API_URL } from "@/lib/api-client";
+import { subscribeSharedEventSource } from "@/lib/shared-event-source";
 
 /** Sự kiện trên window: dữ liệu cửa hàng vừa đổi — component cần kiểm tra lại (ví dụ báo giá giỏ hàng) lắng nghe. */
 export const DATA_CHANGED_EVENT = "traicay28:data-changed";
@@ -18,10 +19,8 @@ export function LiveUpdates() {
   const router = useRouter();
 
   useEffect(() => {
-    const source = new EventSource(`${API_URL}/events`);
     let timer: ReturnType<typeof setTimeout> | undefined;
     let pendingWhileHidden = false;
-    let hasConnected = false;
 
     const refresh = () => {
       if (document.hidden) {
@@ -36,19 +35,22 @@ export function LiveUpdates() {
       timer = setTimeout(refresh, 300 + Math.random() * 1500);
     };
 
-    source.onopen = () => {
-      // Kết nối lại sau khi rớt mạng / API khởi động lại: có thể đã lỡ sự kiện nên tải lại một lần.
-      if (hasConnected) scheduleRefresh();
-      hasConnected = true;
-    };
-    source.onmessage = (message: MessageEvent<string>) => {
-      try {
-        const event = JSON.parse(message.data) as PublicRealtimeEvent;
-        if (event.type === "changed") scheduleRefresh();
-      } catch {
-        // Bỏ qua dữ liệu không đọc được.
-      }
-    };
+    // Một kết nối cho mọi tab của khách (xem lib/shared-event-source.ts): mở nhiều tab không chiếm hết
+    // kết nối tới API (trình duyệt giới hạn 6 trên HTTP/1.1) làm treo báo giá / đặt hàng.
+    const events = subscribeSharedEventSource(`${API_URL}/events`, {
+      // Kết nối lại sau khi rớt mạng / API khởi động lại / tab khác nhận giữ kết nối: có thể đã lỡ sự kiện.
+      onOpen: (missedEvents) => {
+        if (missedEvents) scheduleRefresh();
+      },
+      onMessage: (data) => {
+        try {
+          const event = JSON.parse(data) as PublicRealtimeEvent;
+          if (event.type === "changed") scheduleRefresh();
+        } catch {
+          // Bỏ qua dữ liệu không đọc được.
+        }
+      },
+    });
 
     const onVisibilityChange = () => {
       if (!document.hidden && pendingWhileHidden) {
@@ -59,7 +61,7 @@ export function LiveUpdates() {
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
-      source.close();
+      events.stop();
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };

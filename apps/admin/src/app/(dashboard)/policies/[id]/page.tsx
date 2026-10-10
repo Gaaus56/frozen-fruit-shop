@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Policy } from "@frozen-fruit-shop/types";
 import { PageHeader } from "@/components/ui/page-header";
 import { ApiError, api } from "@/lib/api";
+import { getProductOptions } from "@/lib/product-options";
 import { PolicyForm } from "../policy-form";
 
 export const metadata = { title: "Sửa chính sách" };
@@ -16,7 +17,7 @@ export default async function EditPolicyPage({ params }: PageProps<"/policies/[i
   return (
     <div>
       <PageHeader back={{ href: "/policies", label: "Chính sách" }} title={`Sửa: ${policy.title}`} />
-      <PolicyForm policy={policy} />
+      <PolicyForm policy={policy} products={await getProductOptions()} />
     </div>
   );
 }

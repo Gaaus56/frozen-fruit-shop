@@ -28,8 +28,8 @@ Trạng thái: ✅ xong · 🟡 một phần · ⬜ chưa làm (đã lên kế h
 ### Nội dung & liên hệ
 | Tính năng | Trạng thái | Ghi chú |
 |---|:-:|---|
-| Giới thiệu, Liên hệ (bản đồ + form), Đặt hàng sỉ (form báo giá) | ✅ | |
-| Tin tức (bài đã đăng, hẹn giờ đăng) | ✅ | |
+| Giới thiệu, Liên hệ (bản đồ + form) | ✅ | Trang đặt hàng sỉ đã bỏ (2026-10) |
+| Tin tức chia 2 loại **Kiến thức** / **Tuyển dụng** (tab lọc, hẹn giờ đăng); bài tuyển dụng có khối Ứng tuyển (Zalo, gọi, email) | ✅ | |
 | Trang chính sách (đổi trả, vận chuyển…) | ✅ | Liệt kê ở chân trang |
 | Nút liên hệ nổi: gọi, Zalo, Facebook | ✅ | |
 | Tự cập nhật khi admin sửa dữ liệu (không mất giỏ hàng) | ✅ | SSE |
@@ -46,14 +46,16 @@ Trạng thái: ✅ xong · 🟡 một phần · ⬜ chưa làm (đã lên kế h
 | Phân quyền ADMIN (1) / STAFF (nhiều) | ✅ | Kiểm tra ở API |
 | Tổng quan: doanh thu, số đơn, biểu đồ, bán chạy, theo danh mục, tồn kho thấp | ✅ | Chỉ ADMIN |
 | Đơn hàng: lọc, tìm, đổi trạng thái hợp lệ, thanh toán, phí ship, giảm giá, ghi chú, lịch sử, in phiếu | ✅ | |
-| Liên hệ & báo giá sỉ: trạng thái Mới / Đang xử lý / Xong | ✅ | |
+| Liên hệ: trạng thái Mới / Đang xử lý / Xong | ✅ | Liên hệ báo giá sỉ cũ vẫn xem được |
 | Sản phẩm: nhiều ảnh (kéo thứ tự), nhiều quy cách, bật/tắt nhanh | ✅ | |
 | Danh mục, banner, bài viết, chính sách (có mẫu soạn sẵn) | ✅ | |
+| Trình soạn thảo: tiêu đề, đậm/nghiêng, danh sách, trích dẫn, khung ghi chú, liên kết, **ảnh có chú thích ở bất cứ đâu** (dán / kéo-thả), **ô sản phẩm** | ✅ | Bài viết, chính sách, mô tả sản phẩm, trang Giới thiệu |
+| Trang Giới thiệu sửa được | ✅ | |
 | Thông tin cửa hàng (hotline, chuyển khoản, MST, dòng chữ chạy + bật/tắt…) | ✅ | Chỉ ADMIN |
 | Tài khoản nhân viên: tạo, khoá, đặt lại mật khẩu, xoá | ✅ | Chỉ ADMIN |
 | Thông báo realtime đơn / liên hệ mới (toast + âm báo + số trên tab) | ✅ | |
 | Tải ảnh trực tiếp (kiểm tra định dạng thật, ≤ 5 MB) | ✅ | |
-| OTP khi ADMIN đăng nhập | ⬜ | Đã thiết kế — [admin.md §4](../03-apps/admin.md#4-kế-hoạch-xác-thực-otp-cho-admin) |
+| OTP khi ADMIN đăng nhập | ⬜ | Đã thiết kế — [admin.md §5](../03-apps/admin.md#5-kế-hoạch-xác-thực-otp-cho-admin) |
 | Tự nén / resize ảnh khi tải lên | ⬜ | Hiện `next/image` resize lúc hiển thị |
 | Xuất đơn hàng ra Excel | ⬜ | |
 | Nhật ký thao tác của nhân viên (ngoài lịch sử đơn) | ⬜ | |

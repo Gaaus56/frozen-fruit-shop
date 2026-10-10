@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { INQUIRY_TYPE_LABELS, type AdminRealtimeEvent } from "@frozen-fruit-shop/types";
 import { formatCurrency } from "@/lib/format";
+import { subscribeSharedEventSource } from "@/lib/shared-event-source";
 
 interface Toast {
   key: string;
@@ -67,50 +68,40 @@ export function LiveUpdates() {
   const [unseen, setUnseen] = useState(0);
 
   useEffect(() => {
-    let source: EventSource | null = null;
     let refreshTimer: ReturnType<typeof setTimeout> | undefined;
-    let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
-    let hasConnected = false;
-    let stopped = false;
-
     const scheduleRefresh = () => {
       clearTimeout(refreshTimer);
       refreshTimer = setTimeout(() => router.refresh(), 300);
     };
 
-    const connect = () => {
-      source = new EventSource("/api/events");
-      source.onopen = () => {
-        // Kết nối lại sau khi rớt: có thể đã lỡ sự kiện nên tải lại một lần.
-        if (hasConnected) scheduleRefresh();
-        hasConnected = true;
-      };
-      source.onmessage = (message: MessageEvent<string>) => {
-        let event: AdminRealtimeEvent;
-        try {
-          event = JSON.parse(message.data) as AdminRealtimeEvent;
-        } catch {
-          return;
-        }
-        scheduleRefresh();
-        const toast = toToast(event);
-        if (!toast) return;
-        setToasts((current) => [toast, ...current.filter((item) => item.key !== toast.key)].slice(0, MAX_TOASTS));
-        if (document.hidden) setUnseen((count) => count + 1);
-        playChime();
-      };
-      source.onerror = () => {
-        // Lỗi mạng: EventSource tự kết nối lại. Máy chủ trả lỗi (401 hết phiên, 502 API tắt) → kết nối bị đóng
-        // hẳn: tải lại trang (hết phiên thì tự chuyển về đăng nhập) rồi thử kết nối lại sau ít giây.
-        if (source?.readyState !== EventSource.CLOSED || stopped) return;
-        source.close();
-        reconnectTimer = setTimeout(() => {
-          router.refresh();
-          connect();
-        }, RECONNECT_MS);
-      };
-    };
-    connect();
+    // Một kết nối cho mọi tab admin (xem lib/shared-event-source.ts) — tránh hết chỗ kết nối khi mở nhiều tab.
+    const events = subscribeSharedEventSource(
+      "/api/events",
+      {
+        onOpen: (missedEvents) => {
+          // Kết nối lại sau khi rớt / tab khác vừa nhận giữ kết nối: có thể đã lỡ sự kiện nên tải lại một lần.
+          if (missedEvents) scheduleRefresh();
+        },
+        onMessage: (data) => {
+          let event: AdminRealtimeEvent;
+          try {
+            event = JSON.parse(data) as AdminRealtimeEvent;
+          } catch {
+            return;
+          }
+          scheduleRefresh();
+          const toast = toToast(event);
+          if (!toast) return;
+          setToasts((current) => [toast, ...current.filter((item) => item.key !== toast.key)].slice(0, MAX_TOASTS));
+          if (document.hidden) setUnseen((count) => count + 1);
+          // Mở nhiều tab thì chỉ tab giữ kết nối kêu, tránh âm báo chồng lên nhau.
+          if (events.isLeader()) playChime();
+        },
+        // Máy chủ đóng hẳn kết nối (401 hết phiên, 502 API tắt): tải lại trang — hết phiên thì tự về đăng nhập.
+        onClosed: () => router.refresh(),
+      },
+      RECONNECT_MS,
+    );
 
     const onVisibilityChange = () => {
       if (!document.hidden) setUnseen(0);
@@ -118,10 +109,8 @@ export function LiveUpdates() {
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
-      stopped = true;
-      source?.close();
+      events.stop();
       clearTimeout(refreshTimer);
-      clearTimeout(reconnectTimer);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [router]);

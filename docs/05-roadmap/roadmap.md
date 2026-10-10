@@ -20,7 +20,7 @@ flowchart LR
 Đã hoàn thành. Hệ thống chạy đầy đủ trên máy dev:
 
 - Monorepo `apps/web`, `apps/admin`, `apps/api`, `packages/types`.
-- Website khách: xem sản phẩm, giỏ hàng, đặt hàng COD / chuyển khoản, tra cứu đơn, liên hệ, báo giá sỉ, tin tức, chính sách.
+- Website khách: xem sản phẩm, giỏ hàng, đặt hàng COD / chuyển khoản, tra cứu đơn, liên hệ, tin tức (kiến thức / tuyển dụng), chính sách.
 - Trang quản trị: tổng quan doanh thu, đơn hàng, liên hệ, sản phẩm nhiều ảnh / nhiều quy cách, nội dung, cài đặt, tài khoản nhân viên.
 - API: phân quyền ADMIN/STAFF, rate limit, upload ảnh an toàn, realtime SSE, làm mới cache web tức thì.
 - Docker Compose production + Caddy, CI lint + build.
@@ -59,7 +59,7 @@ Chi tiết: [features.md](../01-product/features.md).
 | # | Việc | Ưu tiên | Ghi chú |
 |---|---|:-:|---|
 | 2.1 | **Báo đơn mới qua Telegram bot / email** cho chủ shop | P1 | Realtime hiện chỉ hiện khi đang mở admin; ngoài giờ sẽ lỡ đơn. Gọi từ `OrdersService.create()` sau khi lưu đơn, không chặn phản hồi cho khách |
-| 2.2 | OTP cho ADMIN | P1 | Thiết kế sẵn ở [admin.md §4](../03-apps/admin.md#4-kế-hoạch-xác-thực-otp-cho-admin) |
+| 2.2 | OTP cho ADMIN | P1 | Thiết kế sẵn ở [admin.md §5](../03-apps/admin.md#5-kế-hoạch-xác-thực-otp-cho-admin) |
 | 2.3 | Sentry cho web, admin, API | P1 | |
 | 2.4 | Test e2e API cho luồng tiền: báo giá, tạo đơn, chuyển trạng thái, tổng tiền, phân quyền; chạy trong CI với Postgres service | P1 | |
 | 2.5 | Lint + type-check `apps/api` trong CI | P1 | |
@@ -99,7 +99,7 @@ Chi tiết: [features.md](../01-product/features.md).
 | Ảnh / trang tải chậm với khách ngoài Đà Nẵng, băng thông VPS cao | Cloudflare proxy trước Caddy; chuyển ảnh sang R2/S3 + CDN |
 | VPS quá tải (CPU > 70 % thường xuyên) | Nâng cấp VPS trước; chỉ khi không đủ mới tách DB managed và chạy nhiều instance API (cần Redis cho rate limit + SSE) |
 | Khách quay lại mua nhiều lần, hỏi lịch sử đơn | Tài khoản khách bằng SĐT + OTP, lịch sử đơn, địa chỉ đã lưu |
-| Nhiều khách sỉ cố định | Bảng giá sỉ theo khách, đặt hàng sỉ qua giỏ |
+| Nhiều khách sỉ cố định | Cân nhắc làm lại tính năng sỉ (đã bỏ 2026-10 — xem decisions #15): bảng giá theo khách, đặt sỉ qua giỏ |
 | Mở chi nhánh | Tồn kho theo kho, đơn gắn chi nhánh |
 
 ---

@@ -32,8 +32,9 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
   {
     title: "Nội dung web",
     items: [
-      { href: "/banners", label: "Banner trang chủ" },
+      { href: "/banners", label: "Banner" },
       { href: "/posts", label: "Bài viết" },
+      { href: "/pages/about", label: "Trang Giới thiệu" },
       { href: "/policies", label: "Chính sách" },
       { href: "/settings", label: "Thông tin cửa hàng", adminOnly: true },
     ],

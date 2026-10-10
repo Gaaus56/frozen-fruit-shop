@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import type { Product, ProductDetail } from '@frozen-fruit-shop/types';
+import { sanitizeRichText, toRichTextOutput } from '../common/rich-text.js';
 import { iso, slugify, toPublicUrl, toStoredPath } from '../common/utils.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RevalidateService } from '../revalidate/revalidate.service.js';
@@ -36,14 +37,13 @@ function toProduct(row: ProductRow, onlyActiveVariants = false): Product {
     category: row.category,
     images: row.images.map((image) => ({ id: image.id, url: toPublicUrl(image.url), alt: image.alt || row.name })),
     shortDescription: row.shortDescription,
-    description: row.description,
+    description: toRichTextOutput(row.description),
     storageInfo: {
       temperature: row.storageTemperature,
       shelfLifeDays: row.shelfLifeDays,
       thawInstructions: row.thawInstructions,
     },
     isFeatured: row.isFeatured,
-    isWholesaleAvailable: row.isWholesaleAvailable,
     isActive: row.isActive,
     sortOrder: row.sortOrder,
     variants: variants.map((variant) => ({
@@ -95,7 +95,6 @@ export class ProductsService {
           publicWhere,
           query.category ? { category: { slug: query.category } } : {},
           query.featured === 'true' ? { isFeatured: true } : {},
-          query.wholesale === 'true' ? { isWholesaleAvailable: true } : {},
           searchWhere(query.q) ?? {},
         ],
       },
@@ -157,12 +156,11 @@ export class ProductsService {
         slug: dto.slug || slugify(dto.name),
         categoryId: dto.categoryId,
         shortDescription: dto.shortDescription ?? '',
-        description: dto.description ?? '',
+        description: sanitizeRichText(dto.description),
         storageTemperature: dto.storageTemperature ?? '',
         shelfLifeDays: dto.shelfLifeDays ?? null,
         thawInstructions: dto.thawInstructions ?? '',
         isFeatured: dto.isFeatured ?? false,
-        isWholesaleAvailable: dto.isWholesaleAvailable ?? false,
         isActive: dto.isActive ?? true,
         sortOrder: dto.sortOrder ?? 0,
         images: {
@@ -194,12 +192,11 @@ export class ProductsService {
           slug: dto.slug || undefined,
           categoryId: dto.categoryId,
           shortDescription: dto.shortDescription,
-          description: dto.description,
+          description: dto.description === undefined ? undefined : sanitizeRichText(dto.description),
           storageTemperature: dto.storageTemperature,
           shelfLifeDays: dto.shelfLifeDays,
           thawInstructions: dto.thawInstructions,
           isFeatured: dto.isFeatured,
-          isWholesaleAvailable: dto.isWholesaleAvailable,
           isActive: dto.isActive,
           sortOrder: dto.sortOrder,
         },

@@ -48,11 +48,12 @@ Mẹo: thêm `-w ' %{http_code}\n'` vào lệnh `curl` để in mã HTTP; `-i` �
 | TC-API-020 | Cài đặt | `GET /settings` | 200; DB chưa có cài đặt → trả thông tin mặc định | P1 | |
 | TC-API-021 | Danh mục | `GET /categories` | Chỉ danh mục đang hiện; `productCount` chỉ đếm sản phẩm đang bán; không có C3 | P0 | |
 | TC-API-022 | Sản phẩm | `GET /products` | Chỉ sản phẩm đang bán thuộc danh mục đang hiện (không P4, P5); quy cách ẩn không xuất hiện; ảnh là URL đầy đủ `http://localhost:4000/uploads/…` | P0 | |
-| TC-API-023 | Lọc | `?category=<slug C1>`, `?featured=true`, `?wholesale=true`, `?q=xoai`, `?limit=1` | Đúng điều kiện | P1 | |
+| TC-API-023 | Lọc | `?category=<slug C1>`, `?featured=true`, `?q=xoai`, `?limit=1` | Đúng điều kiện | P1 | |
 | TC-API-024 | Sắp xếp | `?sort=price_asc` / `price_desc` / `newest` | Đúng thứ tự (giá = quy cách rẻ nhất) | P1 | |
 | TC-API-025 | Tham số sai | `?sort=abc`, `?limit=0`, `?limit=101`, `?featured=yes`, `?q=<101 ký tự>` | 400 | P2 | |
 | TC-API-026 | Chi tiết | `GET /products/<slug P1>` | Có `relatedProducts` (cùng danh mục, không gồm chính nó) | P1 | |
 | TC-API-027 | Chi tiết ẩn | `GET /products/<slug P4>`, `/products/<slug P5>`, `/products/khongco` | 404 "Không tìm thấy sản phẩm." | P0 | |
+| TC-API-033 | Lọc bài theo loại | `GET /posts?type=recruitment`, `?type=knowledge`, `?type=abc` | Đúng loại; `abc` → 400 "Loại bài viết không hợp lệ" | P1 | |
 | TC-API-028 | Bài viết | `GET /posts`, `/posts?limit=51`, `/posts/<slug N2 hẹn giờ>`, `/posts/<slug N3 nháp>` | Chỉ bài đã đăng & tới giờ; limit 51 → 400; N2, N3 → 404 | P1 | |
 | TC-API-029 | Banner, chính sách | `GET /banners`, `/policies`, `/policies/<slug POL2>` | Chỉ mục đang bật; POL2 → 404 | P1 | |
 | TC-API-030 | Ảnh tĩnh | `curl -i $API/uploads/<đường dẫn ảnh>` | 200, `Cache-Control` dài hạn (max-age=31536000, immutable) | P2 | |
@@ -120,7 +121,7 @@ curl -s -X POST $API/orders -H "$J" -d "$ORDER" | jq
 | ID | Kịch bản | Body | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
 | TC-API-110 | Liên hệ hợp lệ | `{"type":"contact","name":"Lan","phone":"0905123456","message":"Hỏi giá","website":""}` | 201 `{"ok":true}`; DB có inquiry `status=new` | P0 | |
-| TC-API-111 | Sỉ không nội dung | `type: wholesale`, có `phone`, không `message` | 201 | P1 | |
+| TC-API-111 | Loại sỉ bị từ chối | `type: "wholesale"` | 400 "Loại liên hệ không hợp lệ" (tính năng sỉ đã bỏ) | P1 | |
 | TC-API-112 | Liên hệ không nội dung | `type: contact`, không `message` | 400 "Vui lòng nhập nội dung cần hỗ trợ." | P1 | |
 | TC-API-113 | Không SĐT & email | | 400 "Vui lòng để lại số điện thoại hoặc email để cửa hàng liên hệ lại." | P1 | |
 | TC-API-114 | Loại sai | `type: "spam"` | 400 | P2 | |
@@ -253,3 +254,18 @@ curl -s -X POST $API/admin/uploads -H "$A" -F "file=@anh.jpg" | jq
 | TC-API-291 | Sai khoá | `-H 'x-revalidate-secret: sai'` | 401 | P0 | |
 | TC-API-292 | Đúng khoá | Khoá đúng, `{"tags":["catalog","hack"]}` | 200 `{"revalidated":true,"tags":["catalog"]}` (tag lạ bị bỏ) | P1 | |
 | TC-API-293 | Web chưa cài khoá | Xoá `REVALIDATE_SECRET` ở web | Mọi request 401 (không mở cửa khi thiếu cấu hình) | P1 | |
+
+## 14. Lọc HTML nội dung
+
+Gửi `PATCH /admin/posts/<id>` với `content` là các chuỗi dưới, rồi `GET /posts/<slug>`.
+
+| ID | Gửi | `content` trả về | Ưu tiên | KQ |
+|---|---|---|:-:|:-:|
+| TC-API-300 | `<p onclick="x()">Hi<script>alert(1)</script></p>` | `<p>Hi</p>` | P0 | |
+| TC-API-301 | `<img src=x onerror=alert(1)>`, `<a href="javascript:alert(1)">a</a>` | Không còn `onerror`, `javascript:`; ảnh không phải `/uploads/` hay http(s) bị bỏ | P0 | |
+| TC-API-302 | `<span style="color:red">c</span>`, `<div class="x">y</div>` | Chỉ còn chữ, không `style` / `class` | P1 | |
+| TC-API-303 | `<figure><img src="http://localhost:4000/uploads/a.jpg"><figcaption>c</figcaption></figure>` | DB lưu `src="/uploads/a.jpg"`; trả ra lại URL đầy đủ theo `PUBLIC_URL` | P1 | |
+| TC-API-304 | `<div data-product-slug="xoai-cat-cat-mieng"></div>`, `<div data-product-slug="Bad Slug"></div>` | Giữ ô đầu, bỏ ô slug sai | P1 | |
+| TC-API-305 | `<aside data-tone="green">` / `"blue"` | Giữ green, bỏ blue | P2 | |
+| TC-API-306 | `<a href="https://zalo.me/1">` | Thêm `target="_blank" rel="noopener noreferrer"` | P2 | |
+| TC-API-307 | `GET /pages/about` khi chưa lưu; `PUT /admin/pages/about` không token; `GET /pages/khongco` | Nội dung mặc định, `updatedAt: null`; 401; 404 | P1 | |

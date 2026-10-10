@@ -95,9 +95,10 @@ export class CreateProductDto {
   @MaxLength(500)
   shortDescription?: string;
 
+  /** HTML từ trình soạn thảo — được lọc lại trước khi lưu. */
   @IsOptional()
   @IsString()
-  @MaxLength(20_000)
+  @MaxLength(200_000)
   description?: string;
 
   @IsOptional()
@@ -121,10 +122,6 @@ export class CreateProductDto {
   @IsOptional()
   @IsBoolean()
   isFeatured?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  isWholesaleAvailable?: boolean;
 
   @IsOptional()
   @IsBoolean()
@@ -163,10 +160,6 @@ export class PublicProductQuery {
   @IsOptional()
   @IsIn(['true', 'false'])
   featured?: 'true' | 'false';
-
-  @IsOptional()
-  @IsIn(['true', 'false'])
-  wholesale?: 'true' | 'false';
 
   @IsOptional()
   @IsIn(['default', 'newest', 'price_asc', 'price_desc'])

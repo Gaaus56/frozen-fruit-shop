@@ -69,7 +69,6 @@ model Product {
   shelfLifeDays        Int?
   thawInstructions     String  @default("")
   isFeatured           Boolean @default(false)
-  isWholesaleAvailable Boolean @default(false)
   isActive             Boolean @default(true)
   sortOrder            Int     @default(0)
 
@@ -248,6 +247,12 @@ model Inquiry {
 
 // ───────────────────────────── Nội dung trang khách hàng ─────────────────────────────
 
+/// Loại bài viết: kiến thức (bảo quản, công thức...) hoặc tin tuyển dụng.
+enum PostType {
+  knowledge
+  recruitment
+}
+
 model Post {
   id          String   @id @default(cuid())
   slug        String   @unique
@@ -255,19 +260,27 @@ model Post {
   excerpt     String   @default("")
   content     String   @default("")
   coverImage  String?
-  category    String   @default("")
+  type        PostType @default(knowledge)
   isPublished Boolean  @default(true)
   publishedAt DateTime @default(now())
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([isPublished, publishedAt])
+  @@index([type, isPublished, publishedAt])
   @@map("posts")
 }
 
+/// Nơi hiển thị banner: trình chiếu trang chủ, hoặc ảnh nền đầu trang Sản phẩm / Tin tức.
+enum BannerPlacement {
+  home
+  products
+  news
+}
+
 model Banner {
-  id          String  @id @default(cuid())
+  id          String          @id @default(cuid())
+  placement   BannerPlacement @default(home)
   title       String  @default("")
   description String  @default("")
   image       String
@@ -320,4 +333,15 @@ model SiteSetting {
   updatedAt       DateTime @updatedAt
 
   @@map("site_settings")
+}
+
+/// Trang nội dung cố định do admin sửa (hiện có: "about" — trang Giới thiệu). Chưa có dòng → API trả nội dung mặc định.
+model Page {
+  slug        String   @id
+  title       String
+  description String   @default("")
+  content     String   @default("")
+  updatedAt   DateTime @updatedAt
+
+  @@map("pages")
 }

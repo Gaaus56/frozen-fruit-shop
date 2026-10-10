@@ -11,7 +11,7 @@ Mức độ: **Cao** ảnh hưởng dữ liệu / trải nghiệm chính · **V�
 | F-03 | Vừa | `/cart` không báo giá lại; tài liệu nói có | TC-WEB-221 | Mở |
 | F-04 | Thấp | Bấm − ở số lượng 1 xoá dòng ngay, không hỏi | TC-WEB-215 | Mở |
 | F-05 | Vừa | Quy cách bị xoá → dòng tự biến khỏi giỏ, khách không được báo | TC-WEB-246 | Mở |
-| F-06 | Thấp | Gợi ý "Chữ trên nút — để trống sẽ không hiện nút" sai với web | TC-WEB-107 | Mở |
+| F-06 | Thấp | Gợi ý "Chữ trên nút — để trống sẽ không hiện nút" sai với web | TC-WEB-107 | ✅ Đã sửa gợi ý thành «Để trống sẽ hiện «Xem ngay»» |
 | F-07 | Thấp | "Ghi chú cho lần cập nhật" bị bỏ khi không đổi trạng thái | TC-ADM-128 | Mở |
 | F-08 | Thấp | STAFF mở `/login` khi đã đăng nhập bị đưa tới thông báo "không truy cập được" | TC-ADM-016 | Mở |
 | F-09 | Thấp | Tên chỉ gồm ký hiệu sinh slug rỗng; tìm kiếm ký hiệu ra toàn bộ sản phẩm | TC-ADM-196, TC-WEB-031 | Mở |
