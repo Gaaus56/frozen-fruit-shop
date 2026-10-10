@@ -9,7 +9,7 @@ export function CommentList({ comments, storeName }: { comments: PublicComment[]
         {comments.length > 0 ? `${comments.length} bình luận` : "Bình luận"}
       </h2>
       {comments.length === 0 ? (
-        <p className="mt-2 text-sm text-foreground/60">Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ cảm nhận!</p>
+        <p className="mt-2 text-sm text-foreground/65">Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ cảm nhận!</p>
       ) : (
         <ul className="mt-5 space-y-5">
           {comments.map((comment) => (
@@ -23,7 +23,7 @@ export function CommentList({ comments, storeName }: { comments: PublicComment[]
               <div className="min-w-0 flex-1">
                 <p className="text-sm">
                   <span className="font-bold text-foreground">{comment.name}</span>
-                  <span className="text-foreground/50"> · {formatDate(comment.createdAt)}</span>
+                  <span className="text-foreground/65"> · {formatDate(comment.createdAt)}</span>
                 </p>
                 <p className="mt-1 whitespace-pre-line break-words text-foreground/80">{comment.content}</p>
                 {comment.reply ? (

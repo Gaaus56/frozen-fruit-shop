@@ -67,7 +67,7 @@ export function AddToCartForm({ product }: { product: Product }) {
       <div className="flex flex-wrap items-baseline gap-3">
         <Price price={selectedVariant.price} compareAtPrice={selectedVariant.compareAtPrice} size="lg" />
         {selectedVariant.pricePerKg ? (
-          <span className="text-sm text-foreground/55">({formatCurrency(selectedVariant.pricePerKg)}/kg)</span>
+          <span className="text-sm text-foreground/65">({formatCurrency(selectedVariant.pricePerKg)}/kg)</span>
         ) : null}
       </div>
 

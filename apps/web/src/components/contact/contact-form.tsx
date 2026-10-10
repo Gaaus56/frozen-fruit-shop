@@ -48,7 +48,7 @@ export function ContactForm() {
           <input id="email" name="email" type="email" autoComplete="email" className={inputClass} />
         </Field>
       </div>
-      <p className="-mt-2 text-xs text-foreground/55">Vui lòng để lại số điện thoại hoặc email để cửa hàng liên hệ lại.</p>
+      <p className="-mt-2 text-xs text-foreground/65">Vui lòng để lại số điện thoại hoặc email để cửa hàng liên hệ lại.</p>
       <Field label="Nội dung" htmlFor="message" required>
         <textarea id="message" name="message" rows={4} required maxLength={3000} className={inputClass} />
       </Field>

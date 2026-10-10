@@ -52,10 +52,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   return (
     <Container className="py-12">
-      <nav className="mb-6 text-sm text-foreground/55" aria-label="Breadcrumb">
-        <Link href="/products" className="hover:text-accent-600">Sản phẩm</Link>
+      <nav className="mb-6 text-sm text-foreground/65" aria-label="Breadcrumb">
+        <Link href="/products" className="inline-block py-1.5 hover:text-accent-600">Sản phẩm</Link>
         {" / "}
-        <Link href={`/products?category=${product.category.slug}`} className="hover:text-accent-600">
+        <Link href={`/products?category=${product.category.slug}`} className="inline-block py-1.5 hover:text-accent-600">
           {product.category.name}
         </Link>
         {" / "}
@@ -84,7 +84,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   </span>
                   <span className="min-w-0">
                     <span className="block text-xs font-bold text-foreground">{item.title}</span>
-                    <span className="block text-xs leading-snug text-foreground/60">{item.text}</span>
+                    <span className="block text-xs leading-snug text-foreground/65">{item.text}</span>
                   </span>
                 </>
               );
@@ -105,7 +105,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             <dl className="mt-6 flex flex-col rounded-xl bg-card px-4 text-sm ring-1 ring-divider/70">
               {specs.map((spec) => (
                 <div key={spec.label} className="flex items-start justify-between gap-6 border-b border-divider py-2.5 last:border-b-0">
-                  <dt className="shrink-0 text-foreground/60">{spec.label}</dt>
+                  <dt className="shrink-0 text-foreground/65">{spec.label}</dt>
                   <dd className="text-right font-semibold text-foreground">{spec.value}</dd>
                 </div>
               ))}

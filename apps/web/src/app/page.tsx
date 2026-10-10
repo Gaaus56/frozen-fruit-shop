@@ -26,7 +26,7 @@ export default async function HomePage() {
   return (
     <>
       <BannerSlider banners={banners} />
-      <div className="bg-accent-600/[0.06]">
+      <div>
         <Hero />
         <section className="pb-10 pt-2 sm:pb-16 sm:pt-4">
           <Container className="flex flex-col gap-3 sm:gap-4">

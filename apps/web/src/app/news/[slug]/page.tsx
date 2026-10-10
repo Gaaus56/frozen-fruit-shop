@@ -40,12 +40,12 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   return (
     <Container className="py-8 sm:py-12">
       {/* Khung bo góc giống các khối ở trang chủ (SectionCard), căn giữa trang. */}
-      <article className="mx-auto max-w-4xl rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm sm:px-10 sm:py-10">
+      <article className="mx-auto max-w-4xl rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm [overflow-wrap:anywhere] sm:px-10 sm:py-10">
         <p className="text-xs font-bold uppercase tracking-wide text-accent-600">
           <Link href={typeHref} className="hover:underline">{POST_TYPE_LABELS[post.type]}</Link>
         </p>
         <h1 className="mt-2 text-2xl uppercase text-foreground sm:text-3xl">{post.title}</h1>
-        <p className="mt-2 text-sm text-foreground/55">
+        <p className="mt-2 text-sm text-foreground/65">
           <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
         </p>
 

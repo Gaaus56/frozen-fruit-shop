@@ -85,17 +85,22 @@ export function BannerSlider({ banners }: { banners: Banner[] }) {
                   onClick={() => setIndex(i)}
                   aria-label={`Chuyển tới banner ${i + 1}`}
                   aria-current={i === index}
-                  className={`relative h-1.5 overflow-hidden bg-white/60 transition-all duration-500 hover:bg-white ${
-                    i === index ? "w-10" : "w-4"
-                  }`}
+                  // Vùng bấm cao 24px, thanh hiển thị vẫn mảnh 6px.
+                  className="group/dot flex h-6 items-center"
                 >
-                  {i === index ? (
-                    <span
-                      key={index}
-                      className="banner-progress absolute inset-y-0 left-0 bg-accent-600"
-                      onAnimationEnd={() => go(index + 1)}
-                    />
-                  ) : null}
+                  <span
+                    className={`relative block h-1.5 overflow-hidden bg-white/60 transition-all duration-500 group-hover/dot:bg-white ${
+                      i === index ? "w-10" : "w-6"
+                    }`}
+                  >
+                    {i === index ? (
+                      <span
+                        key={index}
+                        className="banner-progress absolute inset-y-0 left-0 bg-accent-600"
+                        onAnimationEnd={() => go(index + 1)}
+                      />
+                    ) : null}
+                  </span>
                 </button>
               ))}
             </div>

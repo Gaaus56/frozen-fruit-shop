@@ -86,11 +86,15 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         ) : null}
       </PageHero>
 
-      <section className="bg-accent-600/[0.06] pb-12 pt-6 sm:pt-8">
+      <section className="pb-12 pt-6 sm:pt-8" aria-labelledby="product-list-heading">
         <Container>
+          {/* Tiêu đề cho trình đọc màn hình: giữ đúng thứ tự h1 → h2 → h3 (tên sản phẩm trong thẻ). */}
+          <h2 id="product-list-heading" className="sr-only">
+            Danh sách sản phẩm
+          </h2>
           <div className="mb-6">
             <div className="grid grid-cols-2 gap-1 text-sm sm:flex sm:flex-wrap sm:items-center" aria-label="Sắp xếp">
-              <span className="col-span-2 mr-1 text-foreground/55 sm:col-span-1">Sắp xếp:</span>
+              <span className="col-span-2 mr-1 text-foreground/65 sm:col-span-1">Sắp xếp:</span>
               {SORTS.map((item) => (
                 <Link
                   key={item.value}

@@ -507,7 +507,7 @@ function Stats({ editor }: { editor: Editor }) {
       <span>
         {stats.words} chữ · {stats.images} ảnh · {stats.products} ô sản phẩm
       </span>
-      <span>Mẹo: chọn chữ rồi bấm nút để định dạng · kéo ảnh / ô sản phẩm để đổi vị trí</span>
+      <span>Enter: đoạn mới · Shift+Enter: xuống dòng trong cùng đoạn · kéo ảnh / ô sản phẩm để đổi vị trí</span>
     </div>
   );
 }

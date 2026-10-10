@@ -48,7 +48,7 @@ export function TableOfContents({ headings }: { headings: Heading[] }) {
           aria-expanded={open}
           aria-controls="toc-list"
           title={open ? "Thu gọn mục lục" : "Mở mục lục"}
-          className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-foreground/60 ring-1 ring-divider transition-colors hover:text-leaf hover:ring-leaf/50"
+          className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-foreground/65 ring-1 ring-divider transition-colors hover:text-leaf hover:ring-leaf/50"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
             <path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01" />

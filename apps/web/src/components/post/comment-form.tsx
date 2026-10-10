@@ -69,7 +69,7 @@ export function CommentForm({ postSlug }: { postSlug: string }) {
       ) : (
         <form onSubmit={handleSubmit} className="relative mt-2 flex flex-col gap-4">
           <HoneypotField />
-          <p className="text-sm text-foreground/60">
+          <p className="text-sm text-foreground/65">
             Email của bạn sẽ không được hiển thị công khai. Các trường bắt buộc được đánh dấu <span className="text-accent-600">*</span>
           </p>
           <Field label="Bình luận" htmlFor="content" required>

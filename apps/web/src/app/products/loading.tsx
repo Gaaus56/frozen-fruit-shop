@@ -17,7 +17,7 @@ export default function ProductsLoading() {
           </div>
         </Container>
       </section>
-      <section className="bg-accent-600/[0.06] pb-12 pt-6 sm:pt-8">
+      <section className="pb-12 pt-6 sm:pt-8">
         <Container>
           <span className="mb-6 block h-7 w-80 max-w-full animate-pulse rounded-full bg-surface" />
           <ProductGridSkeleton />

@@ -107,7 +107,7 @@ export function CheckoutForm({ bankTransferInfo, hotline }: { bankTransferInfo: 
               `Cửa hàng sẽ gửi thông tin chuyển khoản khi gọi xác nhận đơn. Nội dung chuyển khoản: ${placed.orderNumber}.`}
           </div>
         ) : null}
-        <p className="text-sm text-foreground/60">
+        <p className="text-sm text-foreground/65">
           Lưu lại mã đơn để{" "}
           <Link href="/order-lookup" className="font-bold text-accent-700 hover:underline">
             tra cứu tình trạng đơn hàng
@@ -120,7 +120,7 @@ export function CheckoutForm({ bankTransferInfo, hotline }: { bankTransferInfo: 
   }
 
   if (!isHydrated) {
-    return <Container className="py-20 text-center text-foreground/60">Đang tải giỏ hàng...</Container>;
+    return <Container className="py-20 text-center text-foreground/65">Đang tải giỏ hàng...</Container>;
   }
 
   if (items.length === 0) {
@@ -177,11 +177,11 @@ export function CheckoutForm({ bankTransferInfo, hotline }: { bankTransferInfo: 
                     value={option.value}
                     checked={paymentMethod === option.value}
                     onChange={() => setPaymentMethod(option.value)}
-                    className="mt-1 accent-[#ec3013]"
+                    className="mt-1 accent-[#cf2a10]"
                   />
                   <span>
                     <span className="block text-sm font-bold text-foreground">{option.label}</span>
-                    <span className="block text-xs text-foreground/60">{option.description}</span>
+                    <span className="block text-xs text-foreground/65">{option.description}</span>
                   </span>
                 </label>
               ))}
@@ -193,7 +193,7 @@ export function CheckoutForm({ bankTransferInfo, hotline }: { bankTransferInfo: 
           <h2 className="font-bold text-foreground">Đơn hàng của bạn</h2>
 
           {quoteError ? <div className="mt-4"><FormMessage tone="error">{quoteError}</FormMessage></div> : null}
-          {!quote && !quoteError ? <p className="mt-4 text-sm text-foreground/60">Đang kiểm tra giá và tình trạng hàng...</p> : null}
+          {!quote && !quoteError ? <p className="mt-4 text-sm text-foreground/65">Đang kiểm tra giá và tình trạng hàng...</p> : null}
 
           {quote ? (
             <>
@@ -205,7 +205,7 @@ export function CheckoutForm({ bankTransferInfo, hotline }: { bankTransferInfo: 
                     </div>
                     <div className="min-w-0 flex-1 text-sm">
                       <p className="font-semibold text-foreground">{line.productName}</p>
-                      <p className="text-foreground/55">
+                      <p className="text-foreground/65">
                         {line.packageSize} × {line.quantity}
                       </p>
                       {line.issue ? <p className="font-semibold text-red-600">{line.issue}</p> : null}
@@ -248,7 +248,7 @@ export function CheckoutForm({ bankTransferInfo, hotline }: { bankTransferInfo: 
           <Button type="submit" className="mt-6 w-full" disabled={!canSubmit}>
             {isSubmitting ? "Đang đặt hàng..." : "Đặt hàng"}
           </Button>
-          <p className="mt-3 text-center text-xs text-foreground/55">
+          <p className="mt-3 text-center text-xs text-foreground/65">
             Bằng việc đặt hàng, bạn đồng ý với các chính sách mua hàng của cửa hàng.
           </p>
         </div>

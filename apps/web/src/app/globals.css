@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f3f2f2;
+  --background: #eef4f7;
   --surface: #eae9e9;
   --card: #ffffff;
   --foreground: #201e1d;
@@ -29,7 +29,9 @@
   --color-accent-300: #ffc4b8;
   --color-accent-400: #ff9783;
   --color-accent-500: #ff563c;
-  --color-accent-600: #ec3013;
+  /* Đỏ chính cho nút, giá, nhãn: đậm hơn đỏ logo (#ec3013) một chút để chữ trắng trên nút / chữ đỏ trên nền
+     sáng đạt tương phản WCAG AA 4,5:1 (trắng/#cf2a10 = 5,26:1; #cf2a10/#f3f2f2 = 4,71:1). Logo giữ màu gốc. */
+  --color-accent-600: #cf2a10;
   --color-accent-700: #ae1800;
   --color-accent-800: #7c1405;
   --color-accent-900: #4d170e;
@@ -237,6 +239,8 @@ h4 {
 .rich-content-flow {
   color: color-mix(in srgb, var(--foreground) 85%, transparent);
   line-height: 1.75;
+  /* Chuỗi dài không dấu cách (link, "1233333…") xuống dòng thay vì tràn khung. */
+  overflow-wrap: anywhere;
 }
 .rich-content-flow > * + * { margin-top: 0.9em; }
 .rich-content-flow h2 {

@@ -22,6 +22,7 @@ Ghi lại **vì sao** hệ thống được làm như hiện tại, để ngư�
 | 16 | Tin tức chia 2 loại cố định; tab Liên hệ trên điện thoại đổi thành Tin tức | Đang áp dụng |
 | 17 | Trình soạn thảo có giới hạn (Tiptap) thay vì dev viết bài / soạn thảo tự do | Đang áp dụng |
 | 18 | Bình luận bài viết phải duyệt, không có ô "Trang web" | Đang áp dụng |
+| 19 | Một nền xám ấm cho mọi trang; màu chữ đạt WCAG AA | Đang áp dụng |
 
 ---
 
@@ -105,3 +106,8 @@ Ghi lại **vì sao** hệ thống được làm như hiện tại, để ngư�
 - **Bối cảnh:** web bán hàng nhỏ, bình luận mở tự do sẽ bị spam quảng cáo / link bẩn làm xấu bài và hại SEO.
 - **Quyết định:** bình luận mới luôn ở trạng thái **chờ duyệt**; admin Duyệt / Ẩn / Trả lời ở mục "Bình luận" (trả lời = duyệt). Không có ô "Trang web" (chủ yếu để rải link). API thêm: giới hạn 5 / 10 phút / IP, honeypot, từ chối nội dung chứa ≥ 2 link. Email người bình luận không bao giờ trả ra web.
 - **Hệ quả:** khách không thấy bình luận ngay (form báo rõ "đang chờ duyệt"); cửa hàng cần vào duyệt — menu có số đếm + thông báo realtime để không bỏ sót.
+
+### 19. Một nền cho mọi trang, màu đạt WCAG AA
+- **Bối cảnh:** kiểm tra UI (axe-core, 13 trang × máy tính / điện thoại) thấy nền không đồng nhất (hồng ở trang chủ / Sản phẩm / Tin tức, xám ở các trang khác), ~60 chỗ chữ không đủ tương phản, 6 trang thiếu `h1`, vài nút nhỏ hơn 24px.
+- **Quyết định:** nền xám ấm `#f3f2f2` cho mọi trang, nội dung trong thẻ trắng; đỏ chính `#cf2a10` (logo vẫn `#ec3013`); chữ xám tối thiểu 65%; mỗi trang đúng một `h1`; vùng bấm ≥ 24px. Chi tiết màu: `design/color.md`.
+- **Hệ quả:** 0 vi phạm axe (WCAG 2 A/AA + best practice) ở thời điểm kiểm tra. Khi thêm giao diện mới, chạy lại kiểm tra (xem `docs/06-testing/README.md` §6).

@@ -16,7 +16,7 @@ export function Price({
       <span className={`font-extrabold text-price ${size === "lg" ? "text-2xl" : "text-lg"}`}>{formatCurrency(price)}</span>
       {discount > 0 ? (
         <>
-          <span className="text-sm text-foreground/45 line-through">{formatCurrency(compareAtPrice!)}</span>
+          <span className="text-sm text-foreground/65 line-through">{formatCurrency(compareAtPrice!)}</span>
           <span className="bg-accent-100 px-1.5 py-0.5 text-[11px] font-extrabold text-accent-700">-{discount}%</span>
         </>
       ) : null}

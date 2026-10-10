@@ -53,8 +53,11 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
         </FilterChips>
       </PageHero>
 
-      <section className="bg-accent-600/[0.06] pb-12 pt-8">
+      <section className="pb-12 pt-8" aria-labelledby="post-list-heading">
         <Container>
+          <h2 id="post-list-heading" className="sr-only">
+            Danh sách bài viết
+          </h2>
           {posts.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (

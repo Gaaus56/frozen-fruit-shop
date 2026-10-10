@@ -26,7 +26,7 @@ export function PageHero({
       <Image src={image} alt="" fill priority sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/20" aria-hidden />
       <Container className="relative py-12">
-        <SectionHeading eyebrow={eyebrow} title={title} tone="light" description={description} />
+        <SectionHeading as="h1" eyebrow={eyebrow} title={title} tone="light" description={description} />
         {children ? <div className="mt-6">{children}</div> : null}
       </Container>
     </section>

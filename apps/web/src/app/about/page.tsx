@@ -19,11 +19,17 @@ export default async function AboutPage() {
   return (
     <Container className="py-12">
       <SectionHeading
+        as="h1"
         eyebrow="Giới thiệu"
         title={page?.title || `Về ${settings.storeName}`}
         description={page?.description || undefined}
       />
-      {page?.content ? <RichContent html={page.content} className="mt-8 max-w-3xl" /> : null}
+      {/* Khung trắng bo góc giống các khối ở trang chủ (SectionCard). */}
+      {page?.content ? (
+        <div className="mt-8 rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm sm:px-10 sm:py-10">
+          <RichContent html={page.content} className="max-w-3xl" />
+        </div>
+      ) : null}
     </Container>
   );
 }

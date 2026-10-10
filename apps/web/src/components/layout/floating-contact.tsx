@@ -114,7 +114,7 @@ export function FloatingContact({ settings }: { settings: SiteSettings }) {
           khi đóng thì `inert` để không bấm / Tab vào được. Khung ngoài pointer-events-none để phần
           trống không chặn cú bấm vào thanh điều hướng phía sau. */}
       <ul
-        className="contact-menu pointer-events-auto w-56 bg-background p-2 shadow-2xl ring-1 ring-divider"
+        className="contact-menu pointer-events-auto w-56 bg-card p-2 shadow-2xl ring-1 ring-divider"
         role="menu"
         data-open={isOpen}
         inert={!isOpen}

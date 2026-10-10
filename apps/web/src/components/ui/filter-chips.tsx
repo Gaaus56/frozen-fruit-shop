@@ -33,7 +33,7 @@ export function ClearFilterChip({ href, label, children }: { href: string; label
       className="inline-flex items-center gap-2 rounded-full border border-white bg-white px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-white/85"
     >
       <span className="max-w-48 truncate">{children}</span>
-      <span aria-hidden className="text-base leading-none text-foreground/50">×</span>
+      <span aria-hidden className="text-base leading-none text-foreground/65">×</span>
     </Link>
   );
 }

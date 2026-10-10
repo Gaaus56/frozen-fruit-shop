@@ -33,7 +33,7 @@ export function CategoryGrid({ categories }: { categories: Category[] }) {
       </div>
       <div className="flex flex-col items-center gap-0.5">
         <span className="text-sm font-bold text-foreground group-hover:text-accent-700">{category.name}</span>
-        <span className="text-xs text-foreground/55">{category.productCount} sản phẩm</span>
+        <span className="text-xs text-foreground/65">{category.productCount} sản phẩm</span>
       </div>
     </Link>
   );

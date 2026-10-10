@@ -137,3 +137,9 @@ Mức độ: P0 / P1 / P2
 | Ngày | Người test | Commit | Web (đạt/tổng) | Admin | API | E2E | Ghi chú |
 |---|---|---|---|---|---|---|---|
 | | | | | | | | |
+
+## 6. Kiểm tra giao diện tự động (axe-core)
+
+Trước mỗi lần phát hành giao diện, chạy [axe DevTools](https://www.deque.com/axe/devtools/) (tiện ích Chrome) hoặc axe-core qua Playwright trên các trang chính, ở **1440 px** và **375 px**, với bộ quy tắc `wcag2a`, `wcag2aa`, `best-practice`. Đợi các khối chạy xong hiệu ứng hiện dần rồi mới đo (đang mờ dần sẽ báo sai tương phản).
+
+Tiêu chí đạt: 0 vi phạm; không cuộn ngang; mỗi trang đúng một `h1`; vùng bấm ≥ 24 px trên điện thoại; không lỗi console (trừ mã 404 của trang không tồn tại); không link nội bộ hỏng. Kết quả lần gần nhất (2026-10-10): 13 trang × 2 kích thước — 0 vi phạm, 41 link nội bộ không link nào hỏng.

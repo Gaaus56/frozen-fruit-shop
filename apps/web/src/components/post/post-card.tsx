@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { POST_TYPE_LABELS, type Post } from "@frozen-fruit-shop/types";
 import { ProductImage } from "@/components/product/product-image";
-import { formatDate } from "@/lib/format";
 
 /** `showType`: hiện nhãn Kiến thức / Tuyển dụng — tắt khi danh sách đã lọc theo một loại. */
 export function PostCard({ post, showType = true }: { post: Post; showType?: boolean }) {
   return (
-    <Link href={`/news/${post.slug}`} className="group">
+    <Link href={`/news/${post.slug}`} className="group min-w-0 [overflow-wrap:anywhere]">
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface ring-1 ring-divider/70">
         <ProductImage
           src={post.coverImage}
@@ -20,11 +19,7 @@ export function PostCard({ post, showType = true }: { post: Post; showType?: boo
           </span>
         ) : null}
       </div>
-      <p className="mt-4 text-[11px] font-bold uppercase tracking-wide text-accent-600">
-        {showType ? `${POST_TYPE_LABELS[post.type]} · ` : ""}
-        {formatDate(post.publishedAt)}
-      </p>
-      <h3 className="mt-1.5 line-clamp-2 text-[15px] font-bold text-foreground group-hover:text-accent-700">
+      <h3 className="mt-4 line-clamp-2 text-[15px] font-bold text-foreground group-hover:text-accent-700">
         {post.title}
       </h3>
       {post.excerpt ? <p className="mt-1.5 line-clamp-2 text-sm text-foreground/70">{post.excerpt}</p> : null}

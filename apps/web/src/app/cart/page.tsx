@@ -11,7 +11,7 @@ export default function CartPage() {
   const { items, updateQuantity, removeItem, subtotal, isHydrated } = useCart();
 
   if (!isHydrated) {
-    return <Container className="py-20 text-center text-foreground/60">Đang tải giỏ hàng...</Container>;
+    return <Container className="py-20 text-center text-foreground/65">Đang tải giỏ hàng...</Container>;
   }
 
   if (items.length === 0) {
@@ -44,7 +44,7 @@ export default function CartPage() {
                 <Link href={`/products/${item.productSlug}`} className="font-semibold text-foreground hover:text-accent-600">
                   {item.productName}
                 </Link>
-                <p className="text-sm text-foreground/55">Quy cách: {item.packageSize}</p>
+                <p className="text-sm text-foreground/65">Quy cách: {item.packageSize}</p>
                 <p className="mt-1 font-bold text-price">{formatCurrency(item.unitPrice)}</p>
               </div>
 
@@ -71,7 +71,7 @@ export default function CartPage() {
               <button
                 type="button"
                 onClick={() => removeItem(item.variantId)}
-                className="text-sm font-medium text-foreground/40 hover:text-red-600"
+                className="-m-2 p-2 text-sm font-medium text-foreground/65 hover:text-red-600"
                 aria-label={`Xóa ${item.productName} khỏi giỏ hàng`}
               >
                 Xóa

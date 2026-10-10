@@ -23,7 +23,7 @@ export function Field({
         {required ? <span className="text-accent-600"> *</span> : null}
       </label>
       {children}
-      {hint ? <p className="mt-1 text-xs text-foreground/55">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-xs text-foreground/65">{hint}</p> : null}
     </div>
   );
 }

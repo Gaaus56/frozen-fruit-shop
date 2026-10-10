@@ -108,7 +108,7 @@ export function Header({ settings, categories }: HeaderProps) {
   return (
     <>
       {settings.marqueeEnabled ? (
-        <div className="overflow-hidden bg-accent-700 text-white">
+        <aside aria-label="Thông báo của cửa hàng" className="overflow-hidden bg-accent-700 text-white">
           <div className="marquee py-2 text-[13px] font-semibold">
             <span className="marquee-track">
               {settings.marqueeText ||
@@ -121,10 +121,10 @@ export function Header({ settings, categories }: HeaderProps) {
                   .join(" — ")}
             </span>
           </div>
-        </div>
+        </aside>
       ) : null}
 
-      <div className="relative h-0 bg-background lg:h-auto">
+      <div role="region" aria-label="Cam kết của cửa hàng" className="relative h-0 bg-card lg:h-auto">
         <Container className="hidden h-16 items-center gap-6 lg:flex lg:pl-52">
           <ul className="hidden flex-1 items-center lg:flex">
             {FEATURES.map((feature, index) => (
@@ -166,8 +166,8 @@ export function Header({ settings, categories }: HeaderProps) {
       </div>
 
       <header
-        className={`sticky top-0 z-40 border-b border-divider backdrop-blur transition-shadow duration-300 ${
-          isScrolled ? "bg-background shadow-lg shadow-black/15" : "bg-background/95"
+        className={`sticky top-0 z-40 border-b border-divider bg-card transition-shadow duration-300 ${
+          isScrolled ? "shadow-lg shadow-black/15" : ""
         }`}
       >
         <Container
@@ -247,7 +247,7 @@ export function Header({ settings, categories }: HeaderProps) {
                       className="nav-dropdown absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-4"
                       data-suppressed={isDropdownSuppressed || undefined}
                     >
-                      <ul className="nav-dropdown-panel border-t-2 border-accent-700 bg-background py-2 shadow-2xl ring-1 ring-divider" role="menu">
+                      <ul className="nav-dropdown-panel border-t-2 border-accent-700 bg-card py-2 shadow-2xl ring-1 ring-divider" role="menu">
                         {dropdown.map((item) => (
                           <li key={item.href} role="none">
                             <Link
@@ -290,7 +290,7 @@ export function Header({ settings, categories }: HeaderProps) {
               <form
                 id="header-search"
                 onSubmit={submitSearch}
-                className={`absolute right-[3.75rem] top-full z-50 mt-2 flex w-[min(18rem,calc(100%-10.25rem))] items-center sm:right-[4.25rem] sm:w-72 lg:right-0 lg:mt-3 border-t-2 border-accent-700 bg-background shadow-2xl ring-1 ring-divider transition-all duration-200 ${
+                className={`absolute right-[3.75rem] top-full z-50 mt-2 flex w-[min(18rem,calc(100%-10.25rem))] items-center sm:right-[4.25rem] sm:w-72 lg:right-0 lg:mt-3 border-t-2 border-accent-700 bg-card shadow-2xl ring-1 ring-divider transition-all duration-200 ${
                   isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0"
                 }`}
               >
@@ -333,7 +333,7 @@ export function Header({ settings, categories }: HeaderProps) {
 
       <nav
         aria-label="Điều hướng chính"
-        className="fixed inset-x-3 bottom-3 z-50 flex items-center justify-between rounded-full border border-divider bg-background/95 p-1.5 shadow-xl shadow-black/15 backdrop-blur lg:hidden"
+        className="fixed inset-x-3 bottom-3 z-50 flex items-center justify-between rounded-full border border-divider bg-card/95 p-1.5 shadow-xl shadow-black/15 backdrop-blur lg:hidden"
       >
         <TabLink href="/" label="Trang chủ" active={isActive("/")} icon={<HomeIcon />} />
         <TabLink href="/products" label="Sản phẩm" active={isActive("/products")} icon={<GridIcon />} />
