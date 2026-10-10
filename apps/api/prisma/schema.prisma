@@ -264,6 +264,8 @@ model Post {
   isPublished Boolean  @default(true)
   publishedAt DateTime @default(now())
 
+  comments Comment[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -344,4 +346,31 @@ model Page {
   updatedAt   DateTime @updatedAt
 
   @@map("pages")
+}
+
+// ───────────────────────────── Bình luận bài viết ─────────────────────────────
+
+enum CommentStatus {
+  pending  // chờ duyệt — chưa hiện trên web
+  approved // đang hiện
+  hidden   // admin ẩn (spam, không phù hợp)
+}
+
+model Comment {
+  id        String        @id @default(cuid())
+  postId    String
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  content   String
+  status    CommentStatus @default(pending)
+  /// Câu trả lời của cửa hàng, hiện ngay dưới bình luận.
+  reply     String        @default("")
+  repliedAt DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([postId, status, createdAt])
+  @@index([status, createdAt])
+  @@map("comments")
 }

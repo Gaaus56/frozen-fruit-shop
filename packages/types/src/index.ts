@@ -411,7 +411,9 @@ export type AdminRealtimeEvent =
   | { type: "order.created"; id: string; orderNumber: string; customerName: string; total: number }
   | { type: "order.updated"; id: string; orderNumber: string; status: OrderStatus }
   | { type: "inquiry.created"; id: string; inquiryType: InquiryType; name: string }
-  | { type: "inquiry.updated"; id: string };
+  | { type: "inquiry.updated"; id: string }
+  | { type: "comment.created"; id: string; postTitle: string; name: string }
+  | { type: "comment.updated"; id: string };
 
 // ───────────── Nội dung có định dạng (bài viết, chính sách, mô tả sản phẩm, trang Giới thiệu) ─────────────
 
@@ -461,4 +463,41 @@ export interface Page {
   content: string;
   /** null = chưa từng lưu, đang dùng nội dung mặc định. */
   updatedAt: string | null;
+}
+
+// ───────────── Bình luận bài viết ─────────────
+
+/** pending: chờ duyệt (mặc định, chưa hiện trên web) · approved: đang hiện · hidden: admin ẩn / spam. */
+export const COMMENT_STATUSES = ["pending", "approved", "hidden"] as const;
+export type CommentStatus = (typeof COMMENT_STATUSES)[number];
+
+export const COMMENT_STATUS_LABELS: Record<CommentStatus, string> = {
+  pending: "Chờ duyệt",
+  approved: "Đang hiện",
+  hidden: "Đã ẩn",
+};
+
+/** Bình luận hiện trên web — không có email (email chỉ admin thấy). */
+export interface PublicComment {
+  id: string;
+  name: string;
+  content: string;
+  /** Câu trả lời của cửa hàng ("" = chưa trả lời). */
+  reply: string;
+  createdAt: string;
+  repliedAt: string | null;
+}
+
+export interface Comment extends PublicComment {
+  email: string;
+  status: CommentStatus;
+  post: { id: string; slug: string; title: string };
+}
+
+export interface CreateCommentInput {
+  name: string;
+  email: string;
+  content: string;
+  /** Ô ẩn chống bot. */
+  website: string;
 }

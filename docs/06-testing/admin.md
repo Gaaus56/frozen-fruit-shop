@@ -304,3 +304,13 @@ Thử ở Bài viết; lặp nhanh ở Chính sách, Mô tả sản phẩm, Tran
 | TC-ADM-443 | Nội dung cũ | Mở chính sách / bài viết tạo trước khi có trình soạn thảo | Nội dung giữ đúng đoạn và xuống dòng | P0 | |
 | TC-ADM-444 | Trang Giới thiệu | Menu "Trang Giới thiệu" → sửa tiêu đề, dòng giới thiệu, thêm ảnh + ô sản phẩm → "Lưu trang" | "Đã lưu…"; web `/about` cập nhật ngay; lần đầu mở có sẵn nội dung đang hiển thị | P0 | |
 | TC-ADM-445 | STAFF | Đăng nhập STAFF1 | Sửa được bài viết, chính sách, trang Giới thiệu | P2 | |
+
+## 16. Bình luận
+
+| ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
+|---|---|---|---|:-:|:-:|
+| TC-ADM-460 | Thông báo | Khách gửi bình luận khi admin đang mở | Thông báo "Bình luận mới chờ duyệt" + tên + tên bài; menu "Bình luận" +1 | P1 | |
+| TC-ADM-461 | Danh sách | Mở "Bình luận" | Mặc định tab "Chờ duyệt (N)"; mỗi mục: tên, email (bấm gửi mail), trạng thái, thời gian, tên bài (bấm mở bài), nội dung | P1 | |
+| TC-ADM-462 | Duyệt / ẩn / hiện lại | Bấm Duyệt; ở tab Đang hiện bấm Ẩn; ở tab Đã ẩn bấm Hiện lại | Trạng thái đổi, web cập nhật ngay; số trên menu giảm khi rời "Chờ duyệt" | P0 | |
+| TC-ADM-463 | Trả lời | Bấm "Trả lời" ở bình luận chờ duyệt → gõ → "Gửi trả lời"; sửa lại; xoá trắng rồi lưu | Bình luận tự duyệt, web hiện câu trả lời; sửa thì cập nhật; xoá trắng thì mất câu trả lời | P0 | |
+| TC-ADM-464 | Xoá | Xoá bình luận → OK; xoá bài viết có bình luận | Bình luận biến mất; xoá bài thì bình luận của bài cũng bị xoá | P2 | |

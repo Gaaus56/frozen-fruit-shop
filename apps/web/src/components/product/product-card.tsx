@@ -46,7 +46,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group flex flex-col overflow-hidden rounded-xl bg-card shadow-sm ring-1 ring-divider/70 transition duration-300 hover:-translate-y-1 hover:bg-accent-100 hover:shadow-lg hover:shadow-accent-900/10 hover:ring-accent-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      className="group flex flex-col overflow-hidden rounded-xl bg-card shadow-sm ring-1 ring-divider/70 transition duration-300 hover:-translate-y-1 hover:bg-accent-100 hover:shadow-lg hover:shadow-accent-900/10 hover:ring-2 hover:ring-accent-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       <div className="relative aspect-square w-full overflow-hidden">
         <ProductImage

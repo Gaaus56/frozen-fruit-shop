@@ -1,4 +1,4 @@
-import type { Inquiry, Order, Paginated } from "@frozen-fruit-shop/types";
+import type { Comment, Inquiry, Order, Paginated } from "@frozen-fruit-shop/types";
 import { LiveUpdates } from "@/components/layout/live-updates";
 import { Sidebar } from "@/components/layout/sidebar";
 import { api } from "@/lib/api";
@@ -7,13 +7,14 @@ import { getCurrentUser } from "@/lib/auth";
 async function loadCounts() {
   // Số việc cần xử lý hiển thị cạnh menu; lỗi ở đây không được làm hỏng cả trang.
   try {
-    const [orders, inquiries] = await Promise.all([
+    const [orders, inquiries, comments] = await Promise.all([
       api<Paginated<Order>>("/admin/orders?status=pending&pageSize=1"),
       api<Paginated<Inquiry>>("/admin/inquiries?status=new&pageSize=1"),
+      api<Paginated<Comment>>("/admin/comments?status=pending&pageSize=1"),
     ]);
-    return { orders: orders.total, inquiries: inquiries.total };
+    return { orders: orders.total, inquiries: inquiries.total, comments: comments.total };
   } catch {
-    return { orders: 0, inquiries: 0 };
+    return { orders: 0, inquiries: 0, comments: 0 };
   }
 }
 

@@ -2,6 +2,7 @@ import { Controller, Get, Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { ContentModule } from './content/content.module.js';
+import { CommentsModule } from './comments/comments.module.js';
 import { InquiriesModule } from './inquiries/inquiries.module.js';
 import { OrdersModule } from './orders/orders.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -37,6 +38,7 @@ class HealthController {
     ContentModule,
     OrdersModule,
     InquiriesModule,
+    CommentsModule,
     UploadsModule,
     StatsModule,
   ],

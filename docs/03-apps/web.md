@@ -14,6 +14,8 @@ Next.js 16 App Router + Tailwind CSS 4. Chạy ở cổng 3000. Giao diện đ�
 | `/order-lookup` | Tra cứu đơn bằng mã đơn + số điện thoại; hiển thị trạng thái đơn, trạng thái thanh toán, sản phẩm và chi tiết tiền |
 | `/contact` | Thông tin liên hệ, bản đồ, form liên hệ |
 | `/about` | Giới thiệu cửa hàng — nội dung admin sửa ở "Trang Giới thiệu" (`GET /pages/about`) |
+| `/news/[slug]` | Bài nằm trong khung trắng bo góc (giống khối trang chủ) căn giữa; nhãn loại → tiêu đề → ngày đăng (xám); không có breadcrumb |
+| `/news/[slug]` — phần cuối bài | **Mục lục** ("Nội dung:", tự lấy từ Tiêu đề / Tiêu đề nhỏ khi bài có ≥ 2 tiêu đề; đánh số 1 / 1.1; bấm cuộn mượt tới mục; thu gọn được) · **Xem thêm** (5 bài mới nhất cùng loại, thiếu thì lấy loại khác) · **Bình luận** đã duyệt + câu trả lời của cửa hàng · form **Để lại một bình luận** (tên, email không công khai, nội dung, "lưu tên và email" trên trình duyệt) |
 | `/news`, `/news/[slug]` | Bài viết (chỉ bài đã bật và đã tới ngày đăng). Đầu trang có ảnh nền (banner vị trí "Đầu trang Tin tức") và chip lọc Tất cả / Kiến thức / Tuyển dụng (`?type=kien-thuc` / `tuyen-dung`) — cùng khung `PageHero` + `FilterChips` với trang Sản phẩm; bài tuyển dụng có khối Ứng tuyển (Zalo, gọi, email) |
 | `/policies/[slug]` | Trang chính sách (liệt kê ở chân trang) |
 | `/api/revalidate` | Route nội bộ cho API báo xoá cache (cần khoá bí mật) |

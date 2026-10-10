@@ -41,6 +41,7 @@ Quy tắc phiên đăng nhập:
 | `/products/new`, `/products/[id]` | Tên, mô tả, **nhiều ảnh** (kéo thứ tự, ảnh đầu là ảnh chính, tối đa 12), **quy cách đóng gói** (quy cách, khối lượng, giá bán, giá gốc, tồn kho, SKU, đang bán; hiện giá/kg), bảo quản & rã đông, danh mục, nổi bật, thứ tự, slug |
 | `/categories` | Danh mục kèm ảnh, mô tả, thứ tự, ẩn/hiện. Không xoá được danh mục còn sản phẩm |
 | `/banners` | Lọc theo vị trí. **Trang chủ**: ảnh trình chiếu 21:8, tiêu đề, mô tả, liên kết, chữ trên nút, thứ tự. **Đầu trang Sản phẩm** / **Đầu trang Tin tức**: ảnh nền + tiêu đề / mô tả thay cho chữ mặc định (dùng banner đang bật có thứ tự nhỏ nhất; không có thì dùng ảnh mặc định) |
+| `/comments` | **Bình luận** của khách: tab Chờ duyệt (mặc định, kèm số) / Đang hiện / Đã ẩn / Tất cả; Duyệt, Ẩn (spam), Hiện lại, Xoá; **Trả lời** ngay tại chỗ (trả lời bình luận đang chờ = duyệt luôn). Menu có số bình luận chờ duyệt; bình luận mới → thông báo realtime |
 | `/pages/about` | **Trang Giới thiệu**: tiêu đề, dòng giới thiệu, nội dung bằng trình soạn thảo. Chưa lưu lần nào thì mở ra là nội dung đang hiển thị |
 | `/posts` | Bài viết: lọc theo loại (Tất cả / Kiến thức / Tuyển dụng, kèm số bài); **loại bài** bắt buộc, ảnh bìa, tóm tắt, nội dung, bản nháp / hẹn giờ đăng |
 | `/policies` | Trang chính sách. Có **mẫu soạn sẵn** "Chính sách bảo hành & đổi trả" lấy từ tài liệu cửa hàng |

@@ -2,6 +2,7 @@
 // Trình duyệt gọi thẳng API (không qua server web) để API giới hạn tần suất theo đúng IP khách.
 import type {
   CartLineInput,
+  CreateCommentInput,
   CreateOrderResponse,
   InquiryType,
   OrderLookupResult,
@@ -81,4 +82,9 @@ export interface InquiryInput {
 
 export function sendInquiry(input: InquiryInput): Promise<{ ok: true }> {
   return request<{ ok: true }>("/inquiries", { method: "POST", body: JSON.stringify(input) });
+}
+
+/** Gửi bình luận — luôn chờ admin duyệt mới hiện trên web. */
+export function sendComment(postSlug: string, input: CreateCommentInput): Promise<{ ok: true }> {
+  return request<{ ok: true }>(`/posts/${encodeURIComponent(postSlug)}/comments`, { method: "POST", body: JSON.stringify(input) });
 }

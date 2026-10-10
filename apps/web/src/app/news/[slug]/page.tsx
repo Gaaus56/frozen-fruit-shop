@@ -3,9 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
 import { RichContent } from "@/components/ui/rich-content";
+import { CommentForm } from "@/components/post/comment-form";
+import { CommentList } from "@/components/post/comment-list";
+import { RelatedPosts } from "@/components/post/related-posts";
+import { TableOfContents } from "@/components/post/table-of-contents";
 import { ProductImage } from "@/components/product/product-image";
 import { POST_TYPE_LABELS, POST_TYPE_SLUGS, formatPhone } from "@frozen-fruit-shop/types";
-import { getPost, getSettings } from "@/lib/api";
+import { getComments, getPost, getSettings } from "@/lib/api";
+import { extractHeadings } from "@/lib/rich-headings";
 import { formatDate } from "@/lib/format";
 
 interface BlogDetailPageProps {
@@ -26,28 +31,23 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug } = await params;
-  const [post, settings] = await Promise.all([getPost(slug), getSettings()]);
+  const [post, settings, comments] = await Promise.all([getPost(slug), getSettings(), getComments(slug)]);
   if (!post) notFound();
+  const headings = extractHeadings(post.content);
   const typeHref = `/news?type=${POST_TYPE_SLUGS[post.type]}`;
   const zalo = (settings.zaloPhone || settings.phone).replace(/\D/g, "");
 
   return (
-    <Container className="py-12">
-      <nav className="mb-6 text-sm text-foreground/55" aria-label="Breadcrumb">
-        <Link href="/news" className="hover:text-accent-600">Tin tức</Link>
-        {" / "}
-        <Link href={typeHref} className="hover:text-accent-600">{POST_TYPE_LABELS[post.type]}</Link>
-        {" / "}
-        <span className="text-foreground/85">{post.title}</span>
-      </nav>
-
-      <article className="max-w-3xl">
+    <Container className="py-8 sm:py-12">
+      {/* Khung bo góc giống các khối ở trang chủ (SectionCard), căn giữa trang. */}
+      <article className="mx-auto max-w-4xl rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm sm:px-10 sm:py-10">
         <p className="text-xs font-bold uppercase tracking-wide text-accent-600">
           <Link href={typeHref} className="hover:underline">{POST_TYPE_LABELS[post.type]}</Link>
-          {" · "}
-          {formatDate(post.publishedAt)}
         </p>
         <h1 className="mt-2 text-2xl uppercase text-foreground sm:text-3xl">{post.title}</h1>
+        <p className="mt-2 text-sm text-foreground/55">
+          <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+        </p>
 
         {post.coverImage ? (
           <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-xl bg-surface">
@@ -56,6 +56,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         ) : null}
 
         {post.excerpt ? <p className="mt-8 text-lg font-semibold text-foreground/80">{post.excerpt}</p> : null}
+        {/* Mục lục chỉ khi bài có từ 2 tiêu đề trở lên. */}
+        {headings.length >= 2 ? <TableOfContents headings={headings} /> : null}
         <RichContent html={post.content} className="mt-6" />
 
         {post.type === "recruitment" ? (
@@ -79,6 +81,10 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             </div>
           </section>
         ) : null}
+
+        <RelatedPosts post={post} />
+        <CommentList comments={comments} storeName={settings.storeName} />
+        <CommentForm postSlug={post.slug} />
       </article>
     </Container>
   );

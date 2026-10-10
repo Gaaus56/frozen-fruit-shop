@@ -10,7 +10,7 @@ interface NavItem {
   href: string;
   label: string;
   adminOnly?: boolean;
-  badgeKey?: "orders" | "inquiries";
+  badgeKey?: "orders" | "inquiries" | "comments";
 }
 
 const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
@@ -34,6 +34,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
     items: [
       { href: "/banners", label: "Banner" },
       { href: "/posts", label: "Bài viết" },
+      { href: "/comments", label: "Bình luận", badgeKey: "comments" },
       { href: "/pages/about", label: "Trang Giới thiệu" },
       { href: "/policies", label: "Chính sách" },
       { href: "/settings", label: "Thông tin cửa hàng", adminOnly: true },
@@ -48,7 +49,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
   },
 ];
 
-export function Sidebar({ user, counts }: { user: AuthUser; counts: { orders: number; inquiries: number } }) {
+export function Sidebar({ user, counts }: { user: AuthUser; counts: { orders: number; inquiries: number; comments: number } }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 

@@ -253,6 +253,9 @@ h4 {
   color: var(--foreground);
 }
 .rich-content-flow > :first-child { margin-top: 0; }
+/* Mục lục bấm nhảy tới tiêu đề: chừa chỗ cho header dính ở đầu trang. */
+.rich-content-flow h2,
+.rich-content-flow h3 { scroll-margin-top: 5.5rem; }
 .rich-content-flow strong { font-weight: 700; color: var(--foreground); }
 .rich-content-flow a { color: var(--color-accent-700); text-decoration: underline; text-underline-offset: 2px; }
 .rich-content-flow a:hover { color: var(--color-accent-600); }
@@ -272,6 +275,7 @@ h4 {
 .rich-content-flow aside[data-tone="green"] { background: color-mix(in srgb, var(--leaf) 8%, white); border-color: var(--leaf); }
 .rich-content-flow aside[data-tone="red"] { background: var(--color-accent-50); border-color: var(--color-accent-600); }
 .rich-content-flow figure { margin-top: 1.75em; margin-bottom: 1.75em; }
+.rich-content-flow p > img { display: block; max-width: 100%; height: auto; margin-inline: auto; border-radius: 0.75rem; }
 .rich-content-flow figure img {
   display: block;
   max-width: 100%;

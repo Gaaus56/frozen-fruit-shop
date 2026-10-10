@@ -207,6 +207,7 @@ const CUSTOMERS = [
 
 async function wipe() {
   await prisma.$transaction([
+    prisma.comment.deleteMany(),
     prisma.orderStatusLog.deleteMany(),
     prisma.orderItem.deleteMany(),
     prisma.order.deleteMany(),
@@ -488,6 +489,17 @@ Quyền lợi
 • Lương 6–8 triệu + thưởng theo doanh số, nghỉ 4 ngày/tháng.`,
         publishedAt: daysAgo(3) },
       { slug: 'bai-nhap', title: 'Bài viết nháp', excerpt: 'Đã tắt hiển thị.', content: content('Bài nháp'), isPublished: false, publishedAt: daysAgo(2) },
+    ],
+  });
+
+  const n1 = await prisma.post.findUniqueOrThrow({ where: { slug: 'cach-ra-dong-trai-cay' } });
+  await prisma.comment.createMany({
+    data: [
+      { postId: n1.id, name: 'Chị Lan', email: 'lan@test.vn', content: 'Làm theo cách ngăn mát thấy ngon hơn hẳn, cảm ơn shop!', status: 'approved', createdAt: daysAgo(0, 9) },
+      { postId: n1.id, name: 'Anh Minh', email: 'minh@test.vn', content: 'Rã đông bằng lò vi sóng được không shop?', status: 'approved',
+        reply: 'Được bạn nhé, dùng chế độ rã đông 2–3 phút và đảo đều.', repliedAt: daysAgo(0, 11), createdAt: daysAgo(0, 10) },
+      { postId: n1.id, name: 'Khách mới', email: 'moi@test.vn', content: 'Bình luận đang chờ duyệt (chưa hiện trên web).', createdAt: daysAgo(0, 12) },
+      { postId: n1.id, name: 'Spam', email: 'spam@test.vn', content: 'Bình luận đã bị ẩn.', status: 'hidden', createdAt: daysAgo(1) },
     ],
   });
 

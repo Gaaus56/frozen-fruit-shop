@@ -34,6 +34,13 @@ function toToast(event: AdminRealtimeEvent): Toast | null {
         detail: event.name,
         href: event.inquiryType === "wholesale" ? "/inquiries?type=wholesale" : "/inquiries",
       };
+    case "comment.created":
+      return {
+        key: `comment-${event.id}`,
+        title: "Bình luận mới chờ duyệt",
+        detail: `${event.name} · ${event.postTitle}`,
+        href: "/comments",
+      };
     default:
       return null;
   }

@@ -33,6 +33,7 @@ Trạng thái: ✅ xong · 🟡 một phần · ⬜ chưa làm (đã lên kế h
 | Trang chính sách (đổi trả, vận chuyển…) | ✅ | Liệt kê ở chân trang |
 | Nút liên hệ nổi: gọi, Zalo, Facebook | ✅ | |
 | Tự cập nhật khi admin sửa dữ liệu (không mất giỏ hàng) | ✅ | SSE |
+| Bài viết: mục lục tự động, "Xem thêm" bài liên quan, bình luận (chờ duyệt) + trả lời của cửa hàng | ✅ | |
 | Tiêu đề, mô tả, ảnh chia sẻ (Open Graph) riêng từng trang | ✅ | |
 | `sitemap.xml`, `robots.txt` | ⬜ | Cần cho Google Search Console |
 | Dữ liệu có cấu trúc (JSON-LD Product, Article, LocalBusiness) | ⬜ | |

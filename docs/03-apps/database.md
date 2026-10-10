@@ -33,6 +33,7 @@ inquiries · posts · banners · policies · site_settings (1 dòng, id = 1)   �
 | `posts` | Bài viết | `type` knowledge/recruitment, `isPublished`, `publishedAt` (ngày tương lai = hẹn giờ đăng) |
 | `banners` | Banner trang chủ / đầu trang Sản phẩm / Tin tức | `placement` home/products/news, `image`, `linkUrl`, `ctaLabel` (chỉ dùng ở trang chủ), `sortOrder`, `isActive` |
 | `policies` | Trang chính sách | `slug`, `content`, `sortOrder`, `isActive` |
+| `comments` | Bình luận bài viết | `postId` (xoá bài → xoá bình luận), `name`, `email` (không công khai), `content`, `status` pending/approved/hidden, `reply` + `repliedAt` |
 | `pages` | Trang nội dung cố định | Khoá `slug` (`about`), `title`, `description`, `content` (HTML). Chưa có dòng → API trả nội dung mặc định |
 | `site_settings` | Thông tin cửa hàng | Một dòng `id = 1`. Chưa có dòng → API trả `DEFAULT_SITE_SETTINGS` (thông tin thật của cửa hàng trong `packages/types`) |
 

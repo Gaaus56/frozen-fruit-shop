@@ -48,6 +48,7 @@ Bộ đếm nằm trong bộ nhớ tiến trình (đủ cho một máy chủ). A
 | GET | `/products/:slug` | Chi tiết + `relatedProducts` |
 | GET | `/posts` | Bài đã đăng (`limit`, `type` = knowledge / recruitment) |
 | GET | `/posts/:slug` | Chi tiết bài |
+| GET · POST | `/posts/:slug/comments` | Bình luận đã duyệt (không có email) · gửi bình luận `{ name, email, content, website }` — luôn **chờ duyệt**; giới hạn 5 / 10 phút / IP, honeypot, từ chối nội dung có ≥ 2 link |
 | GET | `/pages/:slug` | Trang nội dung (`about`). Chưa lưu → nội dung mặc định, `updatedAt: null` |
 | GET | `/banners` | Banner đang bật. `?placement=home` (mặc định), `products` hoặc `news` |
 | GET | `/policies` · `/policies/:slug` | Chính sách đang bật |
@@ -81,6 +82,7 @@ Tất cả cần đăng nhập. Cột **Quyền**: *Tất cả* = ADMIN và STAF
 | GET · POST | `/admin/products` | Tất cả | Lọc `q`, `categoryId`, `status` (active/inactive/all) · tạo |
 | GET · PATCH · DELETE | `/admin/products/:id` | Tất cả | PATCH nhận `images: [{ url }]` (thay toàn bộ, theo thứ tự) và `variants` (có `id` = sửa, không có = thêm, thiếu = xoá) |
 | CRUD | `/admin/posts`, `/admin/banners`, `/admin/policies` | Tất cả | Tương tự |
+| GET · PATCH · DELETE | `/admin/comments`, `/admin/comments/:id` | Tất cả | Lọc `status` (pending/approved/hidden); PATCH `{ status?, reply? }` — có trả lời mà đang chờ thì tự duyệt |
 | GET · PUT | `/admin/pages/:slug` | Tất cả | Trang Giới thiệu `{ title, description, content }` |
 | POST | `/admin/uploads` | Tất cả | `multipart/form-data`, trường `file`; JPG/PNG/WEBP/GIF ≤ 5 MB → `{ url }` |
 

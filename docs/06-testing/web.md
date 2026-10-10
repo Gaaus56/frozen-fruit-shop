@@ -300,17 +300,23 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-WEB-378 | Tab loại bài | Bấm "Kiến thức", "Tuyển dụng", "Tất cả" | URL `?type=kien-thuc` / `?type=tuyen-dung` / không có `type`; tiêu đề trang đổi theo; khi đã lọc thì thẻ không lặp nhãn loại | P1 | |
 | TC-WEB-379 | Đầu trang Tin tức | Mở `/news` ở 375 px và 1440 px | Cùng kiểu với trang Sản phẩm: ảnh nền + lớp tối, tiêu đề trắng, chip bo tròn (đỏ = đang chọn); chip **không** dính khi cuộn; không bị logo che | P2 | |
 | TC-WEB-380 | Chưa có tin tuyển dụng | Tắt mọi bài tuyển dụng → mở tab Tuyển dụng | "Hiện cửa hàng chưa có vị trí tuyển dụng…" kèm link Zalo | P2 | |
-| TC-WEB-381 | Bài tuyển dụng | Mở một bài tuyển dụng | Breadcrumb "Tin tức / Tuyển dụng / {tiêu đề}"; cuối bài có khối "Ứng tuyển": Nhắn Zalo (tab mới), Gọi (`tel:`), Gửi email (`mailto:` có sẵn tiêu đề "Ứng tuyển: …"; ẩn nếu chưa cài email) | P1 | |
+| TC-WEB-381 | Bài tuyển dụng | Mở một bài tuyển dụng | Nhãn "Tuyển dụng" trên tiêu đề; cuối bài có khối "Ứng tuyển": Nhắn Zalo (tab mới), Gọi (`tel:`), Gửi email (`mailto:` có sẵn tiêu đề "Ứng tuyển: …"; ẩn nếu chưa cài email) | P1 | |
 | TC-WEB-382 | `type` sai | Mở `/news?type=abc` | Coi như "Tất cả", không lỗi | P2 | |
 | TC-WEB-371 | Chưa có bài | Tắt mọi bài | "Chưa có bài viết nào. Vui lòng quay lại sau." | P2 | |
 | TC-WEB-372 | Hẹn giờ đăng | Đặt N2 đăng sau 2 phút → đợi → tải lại | Trước giờ: không thấy, `/news/{slug N2}` 404. Sau giờ (≤ 5 phút do cache): thấy | P1 | |
-| TC-WEB-373 | Chi tiết bài | Bấm N1 | Breadcrumb "Tin tức / Kiến thức / {tiêu đề}"; loại (bấm được) · ngày; ảnh bìa; tóm tắt in đậm; nội dung giữ xuống dòng | P1 | |
+| TC-WEB-373 | Chi tiết bài | Bấm N1 | Bài nằm trong khung trắng bo góc căn giữa trang; **không** có đường dẫn nhỏ (breadcrumb); nhãn loại (bấm được) trên tiêu đề; ngày đăng chữ thường màu xám ngay dưới tiêu đề; ảnh bìa; tóm tắt in đậm; ảnh trong bài căn giữa | P1 | |
 | TC-WEB-374 | Bài ẩn / không tồn tại | Mở slug N3, slug sai | 404, tiêu đề tab "Không tìm thấy bài viết" | P1 | |
 | TC-WEB-375 | Chính sách | Mở POL1 từ chân trang | Tiêu đề + nội dung giữ xuống dòng | P1 | |
 | TC-WEB-376 | Chính sách ẩn | Mở `/policies/{slug POL2}` | 404 | P1 | |
 | TC-WEB-377 | Giới thiệu | Mở `/about` | Tiêu đề, dòng giới thiệu, nội dung theo "Trang Giới thiệu" của admin; ảnh không vỡ, link hoạt động | P1 | |
 | TC-WEB-383 | Nội dung có định dạng | Mở bài có tiêu đề, đậm, danh sách, trích dẫn, khung ghi chú, ảnh có chú thích, ô sản phẩm (375 px và 1440 px) | Hiển thị đúng kiểu; ảnh nhỏ không bị kéo giãn mờ, ảnh lớn co vừa khung; ô sản phẩm không gạch chân, bấm vào mở trang sản phẩm; không cuộn ngang | P0 | |
 | TC-WEB-384 | Hàng sản phẩm tự lướt | Bài có 6 ô sản phẩm liền nhau và một hàng 2 ô; xem ở 1440 px và 375 px, đợi 6 giây | Mỗi hàng nằm trên **một dòng**; hàng 6 ô tự lướt sang 1 thẻ mỗi ~5 giây, chạy vòng không thấy giật lùi; vuốt tay được, chạm / giữ chuột thì dừng; hàng 2 ô đứng yên; thẻ cao bằng nhau; bật "Giảm chuyển động" thì không tự lướt | P1 | |
+| TC-WEB-385 | Mục lục | Bài có ≥ 2 Tiêu đề / Tiêu đề nhỏ | Khung "Nội dung:" sau tóm tắt, đánh số 1, 1.1…; bấm mục → cuộn mượt, tiêu đề không bị header che, URL có `#muc-N`; nút bên phải thu gọn / mở; bài < 2 tiêu đề không có mục lục | P1 | |
+| TC-WEB-386 | Xem thêm | Cuối bài | "Xem thêm:" tối đa 5 link bài khác (cùng loại trước), không có chính bài đang xem | P2 | |
+| TC-WEB-387 | Gửi bình luận | Điền nội dung, tên, email → "Gửi bình luận" | Báo "đang chờ cửa hàng duyệt"; bình luận **chưa** hiện; admin có thông báo + số trên menu | P0 | |
+| TC-WEB-388 | Kiểm tra form bình luận | Bỏ trống / tên 1 ký tự / email sai / nội dung 2 link / gửi 6 lần trong 10 phút / điền ô ẩn `website` | Trình duyệt chặn ô bắt buộc; "Email không hợp lệ"; "Bình luận chứa quá nhiều đường link."; lần 6: "Bạn thao tác quá nhanh…"; bot: báo thành công nhưng không lưu | P1 | |
+| TC-WEB-389 | Lưu tên, email | Tích "Lưu tên và email…", gửi, tải lại trang | Tên và email điền sẵn; bỏ tích rồi gửi → lần sau không điền sẵn | P2 | |
+| TC-WEB-390 | Hiện bình luận | Admin duyệt 1 bình luận, trả lời 1 bình luận | "2 bình luận", cũ trước mới sau; câu trả lời trong khung xanh "{tên cửa hàng} trả lời"; email người bình luận **không** xuất hiện ở đâu trên web | P0 | |
 
 ---
 

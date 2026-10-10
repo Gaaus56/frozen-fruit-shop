@@ -21,6 +21,7 @@ Ghi lại **vì sao** hệ thống được làm như hiện tại, để ngư�
 | 15 | Bỏ tính năng bán sỉ khỏi website | Đang áp dụng |
 | 16 | Tin tức chia 2 loại cố định; tab Liên hệ trên điện thoại đổi thành Tin tức | Đang áp dụng |
 | 17 | Trình soạn thảo có giới hạn (Tiptap) thay vì dev viết bài / soạn thảo tự do | Đang áp dụng |
+| 18 | Bình luận bài viết phải duyệt, không có ô "Trang web" | Đang áp dụng |
 
 ---
 
@@ -99,3 +100,8 @@ Ghi lại **vì sao** hệ thống được làm như hiện tại, để ngư�
 - **Bối cảnh:** bài viết, chính sách, trang Giới thiệu chỉ là chữ thường (trang Giới thiệu còn viết cứng trong code); không chèn được ảnh giữa bài, không in đậm. Để dev viết hộ thì chậm và tốn công cho nội dung đổi hằng tuần (tuyển dụng, mẹo, khuyến mãi).
 - **Quyết định:** admin tự soạn bằng Tiptap với bộ định dạng cố định (tiêu đề, đậm/nghiêng, danh sách, trích dẫn, khung ghi chú xanh/đỏ, liên kết, ảnh có chú thích, ô sản phẩm). **Không** có chọn màu / cỡ chữ / font. Lưu HTML, API lọc theo danh sách cho phép (`sanitize-html`).
 - **Hệ quả:** mọi bài cùng một kiểu, đúng thương hiệu; muốn thêm kiểu định dạng mới phải sửa cả trình soạn thảo, bộ lọc API và CSS web. Ô sản phẩm chỉ lưu slug → giá trên web luôn mới.
+
+### 18. Bình luận phải duyệt
+- **Bối cảnh:** web bán hàng nhỏ, bình luận mở tự do sẽ bị spam quảng cáo / link bẩn làm xấu bài và hại SEO.
+- **Quyết định:** bình luận mới luôn ở trạng thái **chờ duyệt**; admin Duyệt / Ẩn / Trả lời ở mục "Bình luận" (trả lời = duyệt). Không có ô "Trang web" (chủ yếu để rải link). API thêm: giới hạn 5 / 10 phút / IP, honeypot, từ chối nội dung chứa ≥ 2 link. Email người bình luận không bao giờ trả ra web.
+- **Hệ quả:** khách không thấy bình luận ngay (form báo rõ "đang chờ duyệt"); cửa hàng cần vào duyệt — menu có số đếm + thông báo realtime để không bỏ sót.

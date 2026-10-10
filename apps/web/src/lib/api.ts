@@ -15,6 +15,7 @@ import {
   type Post,
   type PostType,
   type Product,
+  type PublicComment,
   type ProductDetail,
   type SiteSettings,
 } from "@frozen-fruit-shop/types";
@@ -102,6 +103,11 @@ export function getBanners(placement: BannerPlacement = "home"): Promise<Banner[
 
 export function getPosts(limit?: number, type?: PostType): Promise<Post[]> {
   return withFallback(apiGet<Post[]>(`/posts${query({ limit, type })}`, "content"), [], "bài viết");
+}
+
+/** Bình luận đã duyệt của bài (tag content: admin duyệt / trả lời → web làm mới ngay). */
+export function getComments(slug: string): Promise<PublicComment[]> {
+  return withFallback(apiGet<PublicComment[]>(`/posts/${encodeURIComponent(slug)}/comments`, "content"), [], `bình luận ${slug}`);
 }
 
 export function getPost(slug: string): Promise<Post | null> {

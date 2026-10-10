@@ -1,8 +1,9 @@
 import type { Product } from "@frozen-fruit-shop/types";
-import { PRODUCT_EMBED_ATTR, plainTextToHtml } from "@frozen-fruit-shop/types";
+import { PRODUCT_EMBED_ATTR } from "@frozen-fruit-shop/types";
 import { ProductCard } from "@/components/product/product-card";
 import { AutoScrollTrack } from "@/components/home/auto-scroll-track";
 import { getProduct } from "@/lib/api";
+import { withHeadingIds } from "@/lib/rich-headings";
 
 /**
  * Chỗ hiện thẻ sản phẩm trong bài, đều là khối cấp ngoài cùng nên tách HTML tại đây vẫn giữ đúng thẻ đóng/mở:
@@ -45,7 +46,8 @@ function segment(html: string): Segment[] {
  * nhiều thẻ liền nhau xếp thành lưới. Sản phẩm đã ẩn / xoá thì bỏ qua.
  */
 export async function RichContent({ html, className = "" }: { html: string; className?: string }) {
-  const source = plainTextToHtml(html);
+  // Tiêu đề có id (muc-1, muc-2…) để mục lục bài viết bấm nhảy tới.
+  const source = withHeadingIds(html);
   if (!source) return null;
 
   const segments = segment(source);
@@ -93,8 +95,8 @@ function ProductRow({ products }: { products: Product[] }) {
   );
 
   return (
-    // py-2: chừa chỗ cho hiệu ứng thẻ nhấc lên khi rê chuột (dải cuộn ngang cắt mất phần tràn dọc).
-    <AutoScrollTrack className="rich-content-products my-4 flex snap-x snap-mandatory gap-3 overflow-x-auto py-2 sm:gap-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    // px-1 / py-2: chừa chỗ cho viền đỏ và hiệu ứng nhấc lên khi rê chuột (dải cuộn cắt mất phần tràn ra ngoài).
+    <AutoScrollTrack className="rich-content-products -mx-1 my-4 flex scroll-px-1 snap-x snap-mandatory gap-3 overflow-x-auto px-1 py-2 sm:gap-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {products.map((product) => renderItem(product, false))}
       {products.map((product) => renderItem(product, true))}
     </AutoScrollTrack>
