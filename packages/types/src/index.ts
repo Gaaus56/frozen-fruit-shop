@@ -455,6 +455,44 @@ export type AdminRealtimeEvent =
  */
 export const PRODUCT_EMBED_ATTR = "data-product-slug";
 
+/**
+ * Bố cục chia đôi: `<div data-columns="2"><div data-column>…</div><div data-column>…</div></div>`.
+ * Mỗi cột chứa đoạn văn / tiêu đề / ảnh / danh sách / khung ghi chú — không lồng cột, không ô sản phẩm.
+ * Web: 2 cột cạnh nhau từ màn hình vừa trở lên, điện thoại xếp dọc.
+ */
+export const COLUMNS_ATTR = "data-columns";
+export const COLUMN_ATTR = "data-column";
+
+/**
+ * Màu chữ admin được chọn — chỉ các màu trong chủ đề web, lưu dạng `<span data-color="red">`
+ * (không lưu mã màu) để đổi màu chủ đề thì nội dung cũ đổi theo.
+ */
+export const TEXT_COLORS = ["red", "green", "gray"] as const;
+export type TextColor = (typeof TEXT_COLORS)[number];
+export const TEXT_COLOR_LABELS: Record<TextColor, string> = { red: "Đỏ", green: "Xanh lá", gray: "Xám" };
+
+/** Căn ngang đoạn văn / tiêu đề / hàng nút: `data-align="center|right"` (không có = căn trái). */
+export const TEXT_ALIGNS = ["left", "center", "right"] as const;
+export type TextAlign = (typeof TEXT_ALIGNS)[number];
+
+/** Căn dọc nội dung hai cột so với nhau: `data-valign="top|bottom"` trên khung cột (không có = giữa). */
+export const COLUMN_VALIGNS = ["top", "center", "bottom"] as const;
+export type ColumnValign = (typeof COLUMN_VALIGNS)[number];
+
+/**
+ * Hàng nút điều hướng trong nội dung: `<p data-buttons><a data-button="red" href="/products">Xem sản phẩm</a>…</p>`.
+ * Màu nút chỉ chọn trong chủ đề web, giống các nút có sẵn của trang.
+ */
+export const BUTTON_STYLES = ["red", "dark", "light", "green"] as const;
+export type ButtonStyle = (typeof BUTTON_STYLES)[number];
+export const BUTTON_STYLE_LABELS: Record<ButtonStyle, string> = {
+  red: "Đỏ (nút chính)",
+  dark: "Đỏ đậm",
+  light: "Trắng viền",
+  green: "Xanh lá",
+};
+export const MAX_BUTTONS_PER_ROW = 3;
+
 /** Nội dung lưu trước khi có trình soạn thảo là chữ thường; nội dung mới là HTML (bắt đầu bằng thẻ). */
 export function isRichHtml(content: string): boolean {
   return /^\s*</.test(content);
@@ -475,6 +513,32 @@ export function plainTextToHtml(content: string): string {
     .filter(Boolean)
     .map((block) => `<p>${escapeHtml(block).replace(/\n/g, "<br>")}</p>`)
     .join("");
+}
+
+// ───────────── Khối nội dung tự soạn trên trang chủ ─────────────
+
+/** Vị trí khối trên trang chủ, xen giữa các phần có sẵn. */
+export const HOME_BLOCK_POSITIONS = ["after_hero", "after_categories", "after_products", "after_news"] as const;
+export type HomeBlockPosition = (typeof HOME_BLOCK_POSITIONS)[number];
+
+export const HOME_BLOCK_POSITION_LABELS: Record<HomeBlockPosition, string> = {
+  after_hero: "Sau phần giới thiệu đầu trang",
+  after_categories: "Sau Danh mục sản phẩm",
+  after_products: "Sau Sản phẩm",
+  after_news: "Cuối trang (sau Tin tức)",
+};
+
+export interface HomeBlock {
+  id: string;
+  /** Tiêu đề khối (không bắt buộc) — hiện giống tiêu đề các phần khác của trang chủ. */
+  title: string;
+  /** HTML đã được API lọc. */
+  content: string;
+  /** true = nằm trong khung trắng bo góc như các phần khác; false = nằm thẳng trên nền trang. */
+  framed: boolean;
+  position: HomeBlockPosition;
+  sortOrder: number;
+  isActive: boolean;
 }
 
 // ───────────── Trang nội dung cố định (admin sửa được) ─────────────

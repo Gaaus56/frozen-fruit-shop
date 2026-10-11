@@ -95,6 +95,59 @@ h3 {
   color: #a19c9a;
 }
 
+/* Màu chữ trong chủ đề web — cùng mã màu với web khách hàng (apps/web globals.css). */
+.rich-editor-content span[data-color="red"], .editor-color-swatch[data-color="red"] { color: #ae1800; }
+.rich-editor-content span[data-color="green"], .editor-color-swatch[data-color="green"] { color: #1f6b3f; }
+.rich-editor-content span[data-color="gray"], .editor-color-swatch[data-color="gray"] { color: #6b6563; }
+.editor-color-swatch { font-weight: 900; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 2px; }
+
+/* Chia 2 cột: khung nét đứt để admin thấy rõ từng cột (trên web không có khung). */
+.rich-editor-content div[data-columns] {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0.5rem;
+  border: 1px dashed #b8b3b1;
+  background: #fafafa;
+}
+.rich-editor-content div[data-column] {
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed #d6d4d3;
+  background: #fff;
+}
+.rich-editor-content div[data-column] > * + * { margin-top: 0.85em; }
+.rich-editor-content div[data-column] p.is-empty:only-child::before {
+  content: "Gõ chữ hoặc kéo ảnh vào cột này…";
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: #a19c9a;
+}
+
+/* Căn lề, căn dọc cột, hàng nút — xem trước giống web khách hàng. */
+.rich-editor-content [data-align="center"] { text-align: center; }
+.rich-editor-content [data-align="right"] { text-align: right; }
+.rich-editor-content div[data-columns][data-valign="top"] { align-items: start; }
+.rich-editor-content div[data-columns][data-valign="bottom"] { align-items: end; }
+.rich-editor-content div[data-columns] { align-items: center; }
+
+.editor-buttons { margin: 1em 0; padding: 0.75rem; border: 1px dashed #b8b3b1; background: #fafafa; }
+.editor-buttons.is-selected { outline: 2px solid #1f6b3f; }
+.editor-buttons-preview { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.editor-buttons-preview[data-align="center"] { justify-content: center; }
+.editor-buttons-preview[data-align="right"] { justify-content: flex-end; }
+.editor-button { display: inline-flex; align-items: center; padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 800; }
+.editor-button[data-button="red"] { background: #cf2a10; color: #fff; }
+.editor-button[data-button="dark"] { background: #ae1800; color: #fff; }
+.editor-button[data-button="light"] { background: #fff; color: #201e1d; border: 1px solid #d6d4d3; }
+.editor-button[data-button="green"] { background: #1f6b3f; color: #fff; }
+.editor-buttons-form { display: flex; flex-direction: column; gap: 0.375rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e7e5e4; }
+.editor-buttons-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto auto; gap: 0.375rem; align-items: center; }
+.editor-buttons-row input,
+.editor-buttons-row select { min-width: 0; border: 1px solid #d6d4d3; background: #fff; padding: 0.3rem 0.5rem; font-size: 0.8125rem; }
+.editor-buttons-form > .editor-chip-btn { align-self: flex-start; }
+
 /* Ảnh có chú thích */
 .editor-figure { position: relative; margin: 1.25em 0; }
 .editor-figure img { display: block; max-width: 100%; margin: 0 auto; }

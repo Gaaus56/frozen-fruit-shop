@@ -4,10 +4,10 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { CharacterCount, Placeholder } from "@tiptap/extensions";
-import { plainTextToHtml } from "@frozen-fruit-shop/types";
+import { TEXT_COLORS, TEXT_COLOR_LABELS, plainTextToHtml } from "@frozen-fruit-shop/types";
 import { ACCEPT, uploadFile } from "@/components/ui/image-upload";
 import { formatCurrency } from "@/lib/format";
-import { Callout, Figure, ProductEmbed, type ProductOption } from "./extensions";
+import { ButtonRow, Callout, Column, Columns, Figure, ProductEmbed, TextAlign, TextColor, type ProductOption } from "./extensions";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
@@ -28,9 +28,9 @@ function normalizeHref(value: string): string {
 }
 
 /**
- * Trình soạn thảo có định dạng dùng chung cho bài viết, chính sách, mô tả sản phẩm, trang Giới thiệu.
+ * Trình soạn thảo có định dạng dùng chung cho bài viết, chính sách, mô tả sản phẩm, trang Giới thiệu, khối trang chủ.
  * Giá trị gửi lên server qua input ẩn `name` (HTML); API lọc lại trước khi lưu.
- * Cố ý KHÔNG có chọn màu / cỡ chữ / font: kiểu chữ do giao diện web quyết định để mọi bài đồng nhất.
+ * Màu chữ chỉ chọn trong vài màu của chủ đề web; cố ý KHÔNG có cỡ chữ / font để mọi bài đồng nhất.
  */
 export function RichTextEditor({
   name,
@@ -91,6 +91,8 @@ export function RichTextEditor({
       }),
       Placeholder.configure({
         showOnlyCurrent: false,
+        // Gắn class "is-empty" cả cho đoạn trống bên trong cột (CSS hiện chữ gợi ý cho từng cột).
+        includeChildren: true,
         placeholder: ({ editor: current, node }) => {
           if (node.type.name === "figure") return "Nhập chú thích ảnh (không bắt buộc)…";
           if (node.type.name === "heading") return "Tiêu đề…";
@@ -101,6 +103,11 @@ export function RichTextEditor({
       Figure,
       Callout,
       ProductEmbed.configure({ products: products ?? [] }),
+      Columns,
+      Column,
+      TextColor,
+      TextAlign,
+      ButtonRow,
     ],
     editorProps: {
       attributes: { class: "rich-editor-content", "aria-label": "Nội dung" },
@@ -236,6 +243,15 @@ function Toolbar({
       green: e.isActive("callout", { tone: "green" }),
       red: e.isActive("callout", { tone: "red" }),
       link: e.isActive("link"),
+      columns: e.isActive("columns"),
+      valign: (e.getAttributes("columns").valign as string | undefined) ?? "center",
+      // Căn của đoạn / tiêu đề / hàng nút đang chọn.
+      align:
+        (e.getAttributes("buttonRow").textAlign as string | undefined) ??
+        (e.getAttributes("heading").textAlign as string | undefined) ??
+        (e.getAttributes("paragraph").textAlign as string | undefined) ??
+        "left",
+      color: (e.getAttributes("textColor").color as string | undefined) ?? null,
       canUndo: e.can().undo(),
       canRedo: e.can().redo(),
     }),
@@ -270,6 +286,35 @@ function Toolbar({
         </Btn>
       </Group>
       <Group>
+        <Btn label="Căn trái" active={state.align === "left"} onClick={() => run((c) => c.setTextAlign("left"))}>
+          <AlignIcon lines={["M4 6h16", "M4 10h10", "M4 14h16", "M4 18h10"]} />
+        </Btn>
+        <Btn label="Căn giữa" active={state.align === "center"} onClick={() => run((c) => c.setTextAlign("center"))}>
+          <AlignIcon lines={["M4 6h16", "M7 10h10", "M4 14h16", "M7 18h10"]} />
+        </Btn>
+        <Btn label="Căn phải" active={state.align === "right"} onClick={() => run((c) => c.setTextAlign("right"))}>
+          <AlignIcon lines={["M4 6h16", "M10 10h10", "M4 14h16", "M10 18h10"]} />
+        </Btn>
+      </Group>
+      <Group>
+        {/* Màu chữ: chỉ các màu trong chủ đề web. Bôi đen chữ rồi bấm màu; bấm lại màu đang dùng để bỏ. */}
+        {TEXT_COLORS.map((color) => (
+          <Btn
+            key={color}
+            label={`Chữ màu ${TEXT_COLOR_LABELS[color].toLowerCase()}`}
+            active={state.color === color}
+            onClick={() => run((c) => (state.color === color ? c.unsetTextColor() : c.setTextColor(color)))}
+          >
+            <span className="editor-color-swatch" data-color={color}>
+              A
+            </span>
+          </Btn>
+        ))}
+        <Btn label="Bỏ màu chữ (về màu mặc định)" disabled={!state.color} onClick={() => run((c) => c.unsetTextColor())}>
+          <span className="text-foreground/70">A̸</span>
+        </Btn>
+      </Group>
+      <Group>
         <Btn label="Danh sách chấm" active={state.bullet} onClick={() => run((c) => c.toggleBulletList())}>
           • Danh sách
         </Btn>
@@ -293,6 +338,9 @@ function Toolbar({
         <Btn label="Chèn ảnh (hoặc dán / kéo ảnh vào bài)" onClick={onPickImage} disabled={uploading > 0}>
           🖼 {uploading > 0 ? `Đang tải ${uploading} ảnh…` : "Ảnh"}
         </Btn>
+        <Btn label="Chèn hàng nút điều hướng (ví dụ: Khám phá sản phẩm, Liên hệ)" onClick={() => run((c) => c.insertButtonRow())}>
+          🔘 Nút
+        </Btn>
         {hasProducts ? (
           <Btn label="Chèn ô sản phẩm" active={panel === "product"} onClick={() => onPanel(panel === "product" ? null : "product")}>
             🛒 Sản phẩm
@@ -303,6 +351,31 @@ function Toolbar({
         </Btn>
       </Group>
       <Group>
+        {state.columns ? (
+          <>
+            <Btn label="Đổi chỗ cột trái / phải" onClick={() => run((c) => c.swapColumns())}>
+              ⇄ Đổi bên
+            </Btn>
+            <Btn label="Hai cột căn theo mép trên" active={state.valign === "top"} onClick={() => run((c) => c.setColumnsValign("top"))}>
+              ⤒ Trên
+            </Btn>
+            <Btn label="Hai cột căn giữa theo chiều dọc" active={state.valign === "center"} onClick={() => run((c) => c.setColumnsValign("center"))}>
+              ↕ Giữa
+            </Btn>
+            <Btn label="Hai cột căn theo mép dưới" active={state.valign === "bottom"} onClick={() => run((c) => c.setColumnsValign("bottom"))}>
+              ⤓ Dưới
+            </Btn>
+            <Btn label="Bỏ chia cột (nội dung hai cột nối tiếp nhau)" onClick={() => run((c) => c.unsetColumns())}>
+              ✕ Bỏ chia cột
+            </Btn>
+          </>
+        ) : (
+          <Btn label="Chia đôi trái / phải (ví dụ: ảnh một bên, chữ một bên)" onClick={() => run((c) => c.insertColumns())}>
+            ▥ Chia 2 cột
+          </Btn>
+        )}
+      </Group>
+      <Group>
         <Btn label="Hoàn tác (Ctrl+Z)" disabled={!state.canUndo} onClick={() => run((c) => c.undo())}>
           ↶
         </Btn>
@@ -311,6 +384,17 @@ function Toolbar({
         </Btn>
       </Group>
     </div>
+  );
+}
+
+/** Biểu tượng căn lề: 4 vạch ngang dài / ngắn. */
+function AlignIcon({ lines }: { lines: string[] }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4" aria-hidden>
+      {lines.map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </svg>
   );
 }
 

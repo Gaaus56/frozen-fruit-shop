@@ -351,6 +351,31 @@ model Page {
   @@map("pages")
 }
 
+/// Vị trí khối nội dung trên trang chủ, xen giữa các phần có sẵn.
+enum HomeBlockPosition {
+  after_hero
+  after_categories
+  after_products
+  after_news
+}
+
+/// Khối nội dung admin tự soạn trên trang chủ (giới thiệu, câu chuyện, khuyến mãi...). Nội dung là HTML đã lọc.
+model HomeBlock {
+  id        String            @id @default(cuid())
+  title     String            @default("")
+  content   String            @default("")
+  /// true = nằm trong khung trắng bo góc như các phần khác của trang chủ.
+  framed    Boolean           @default(true)
+  position  HomeBlockPosition @default(after_hero)
+  sortOrder Int               @default(0)
+  isActive  Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([isActive, position, sortOrder])
+  @@map("home_blocks")
+}
+
 // ───────────────────────────── Bình luận bài viết ─────────────────────────────
 
 enum CommentStatus {

@@ -36,6 +36,14 @@ interface LinkButtonProps {
 }
 
 export function LinkButton({ href, variant = "primary", className = "", children }: LinkButtonProps) {
+  // Link ra ngoài web (banner gắn link Shopee, Facebook...) → mở tab mới, giữ nguyên tab web.
+  if (/^https?:\/\//i.test(href)) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
+        {children}
+      </a>
+    );
+  }
   return (
     <Link href={href} className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
       {children}

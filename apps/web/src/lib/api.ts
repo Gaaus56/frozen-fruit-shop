@@ -9,6 +9,7 @@ import {
   type BannerPlacement,
   type CacheTag,
   type Category,
+  type HomeBlock,
   type Page,
   type PageSlug,
   type Policy,
@@ -119,6 +120,11 @@ export function getPolicies(): Promise<Policy[]> {
 }
 
 /** Trang nội dung admin sửa được (trang Giới thiệu). API luôn trả nội dung (mặc định nếu chưa lưu); null khi API lỗi. */
+/** Khối nội dung admin tự soạn trên trang chủ (đã lọc khối đang ẩn). Lỗi API thì trang chủ vẫn hiện bình thường. */
+export function getHomeBlocks(): Promise<HomeBlock[]> {
+  return withFallback(apiGet<HomeBlock[]>("/home-blocks", "content"), [], "khối trang chủ");
+}
+
 export function getPage(slug: PageSlug): Promise<Page | null> {
   return orNull(apiGet<Page>(`/pages/${slug}`, "content"), `trang ${slug}`);
 }

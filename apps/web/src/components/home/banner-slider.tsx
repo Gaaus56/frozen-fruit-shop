@@ -5,18 +5,21 @@ import { useState } from "react";
 import type { Banner } from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
 import { LinkButton } from "@/components/ui/button";
+import { useSwipe } from "@/lib/use-swipe";
 
 /** Banner lấy từ trang quản trị (mục Banner). Không có banner nào đang bật thì không hiển thị gì. */
 export function BannerSlider({ banners }: { banners: Banner[] }) {
   const [index, setIndex] = useState(0);
+  const go = (next: number) => setIndex((next + banners.length) % banners.length);
+  // Điện thoại: vuốt trái / phải để đổi banner (nút mũi tên ẩn trên màn nhỏ).
+  const swipe = useSwipe(() => go(index + 1), () => go(index - 1));
 
   if (banners.length === 0) return null;
   const hasMany = banners.length > 1;
-  const go = (next: number) => setIndex((next + banners.length) % banners.length);
 
   return (
     <section aria-roledescription="carousel" aria-label="Banner nổi bật">
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface sm:aspect-[21/8] sm:max-h-[80vh]">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface sm:aspect-[21/8] sm:max-h-[80vh]" {...(hasMany ? swipe : {})}>
         {banners.map((slide, i) => (
           <div
             key={slide.id}
@@ -40,7 +43,7 @@ export function BannerSlider({ banners }: { banners: Banner[] }) {
             ) : null}
             <Container className="absolute inset-0 flex items-center">
               <div
-                className={`flex max-w-xl flex-col gap-3 pl-8 text-white transition-all delay-300 duration-700 sm:pl-0 ${
+                className={`flex max-w-xl flex-col gap-3 text-white transition-all delay-300 duration-700 sm:pl-12 xl:pl-0 ${
                   i === index ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
                 }`}
               >
@@ -64,7 +67,7 @@ export function BannerSlider({ banners }: { banners: Banner[] }) {
               type="button"
               onClick={() => go(index - 1)}
               aria-label="Banner trước"
-              className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-black/40 text-xl text-white hover:bg-accent-600"
+              className="absolute left-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center bg-black/40 text-xl text-white hover:bg-accent-600 sm:flex"
             >
               ‹
             </button>
@@ -72,7 +75,7 @@ export function BannerSlider({ banners }: { banners: Banner[] }) {
               type="button"
               onClick={() => go(index + 1)}
               aria-label="Banner sau"
-              className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-black/40 text-xl text-white hover:bg-accent-600"
+              className="absolute right-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center bg-black/40 text-xl text-white hover:bg-accent-600 sm:flex"
             >
               ›
             </button>

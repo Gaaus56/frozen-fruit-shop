@@ -33,6 +33,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
     title: "Nội dung web",
     items: [
       { href: "/banners", label: "Banner" },
+      { href: "/home-blocks", label: "Khối trang chủ" },
       { href: "/posts", label: "Bài viết" },
       { href: "/comments", label: "Bình luận", badgeKey: "comments" },
       { href: "/pages/about", label: "Trang Giới thiệu" },

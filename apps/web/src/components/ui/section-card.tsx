@@ -13,7 +13,8 @@ export function SectionCard({
   children,
   className = "",
 }: {
-  title: string;
+  /** Để trống thì không có dòng tiêu đề + hoa văn (khối trang chủ không tiêu đề). */
+  title?: string;
   action?: ReactNode;
   children: ReactNode;
   className?: string;
@@ -48,26 +49,33 @@ export function SectionCard({
         isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
       } ${className}`}
     >
-      <div className="mb-6 text-center">
-        <h2 className="text-xl font-extrabold uppercase tracking-wide text-accent-700 sm:text-2xl">{title}</h2>
-        <div className="mt-1 flex items-center justify-center gap-2.5" aria-hidden>
-          <span className="h-1 w-1 shrink-0 rotate-45 bg-leaf/60" />
-          <span
-            className="h-px w-14 sm:w-24"
-            style={{ background: "linear-gradient(to right, transparent, var(--leaf) 92%)" }}
-          />
-          <span className="h-2 w-2 shrink-0 rotate-45 bg-leaf" />
-          <span
-            className="h-px w-14 sm:w-24"
-            style={{ background: "linear-gradient(to left, transparent, var(--leaf) 92%)" }}
-          />
-          <span className="h-1 w-1 shrink-0 rotate-45 bg-leaf/60" />
-        </div>
-      </div>
+      {title ? <SectionTitle title={title} /> : null}
 
       {children}
 
       {action ? <div className="mt-8 flex justify-center">{action}</div> : null}
     </section>
+  );
+}
+
+/** Tiêu đề căn giữa chữ đỏ in hoa + đường kẻ hoa văn — dùng chung cho khung và khối không khung ở trang chủ. */
+export function SectionTitle({ title }: { title: string }) {
+  return (
+    <div className="mb-6 text-center">
+      <h2 className="text-xl font-extrabold uppercase tracking-wide text-accent-700 sm:text-2xl">{title}</h2>
+      <div className="mt-1 flex items-center justify-center gap-2.5" aria-hidden>
+        <span className="h-1 w-1 shrink-0 rotate-45 bg-leaf/60" />
+        <span
+          className="h-px w-14 sm:w-24"
+          style={{ background: "linear-gradient(to right, transparent, var(--leaf) 92%)" }}
+        />
+        <span className="h-2 w-2 shrink-0 rotate-45 bg-leaf" />
+        <span
+          className="h-px w-14 sm:w-24"
+          style={{ background: "linear-gradient(to left, transparent, var(--leaf) 92%)" }}
+        />
+        <span className="h-1 w-1 shrink-0 rotate-45 bg-leaf/60" />
+      </div>
+    </div>
   );
 }

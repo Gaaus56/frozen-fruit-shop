@@ -1,5 +1,5 @@
 import type { Product } from "@frozen-fruit-shop/types";
-import { PRODUCT_EMBED_ATTR } from "@frozen-fruit-shop/types";
+import { COLUMNS_ATTR, PRODUCT_EMBED_ATTR } from "@frozen-fruit-shop/types";
 import { ProductCard } from "@/components/product/product-card";
 import { AutoScrollTrack } from "@/components/home/auto-scroll-track";
 import { getProduct } from "@/lib/api";
@@ -21,22 +21,46 @@ const ONLY_GAP = /^(?:\s|<p>(?:<br\s*\/?>)?<\/p>)*$/;
 
 type Segment = { kind: "html"; html: string } | { kind: "products"; slugs: string[] };
 
+/**
+ * Khối chia 2 cột: `<div data-columns="2"><div data-column>…</div><div data-column>…</div></div>`.
+ * Trong cột không có div nào khác (không lồng cột, không ô sản phẩm) nên "</div></div>" đầu tiên là chỗ khối kết thúc.
+ * Giữ nguyên cả khối, không tách thẻ sản phẩm bên trong (link sản phẩm trong cột vẫn là link chữ bình thường).
+ */
+const COLUMNS_BLOCK = new RegExp(`<div ${COLUMNS_ATTR}="2">[\\s\\S]*?</div></div>`, "g");
+
 function segment(html: string): Segment[] {
   const segments: Segment[] = [];
-  let last = 0;
-  for (const match of html.matchAll(PRODUCT_BLOCK)) {
-    const before = html.slice(last, match.index);
-    const slug = match[1] ?? match[2];
+  // Đoạn HTML liền nhau gộp làm một để khoảng cách giữa các khối vẫn đều.
+  const pushHtml = (part: string) => {
+    if (!part.trim()) return;
     const previous = segments.at(-1);
-    if (previous?.kind === "products" && ONLY_GAP.test(before)) previous.slugs.push(slug);
-    else {
-      if (before.trim()) segments.push({ kind: "html", html: before });
-      segments.push({ kind: "products", slugs: [slug] });
+    if (previous?.kind === "html") previous.html += part;
+    else segments.push({ kind: "html", html: part });
+  };
+
+  const splitProducts = (part: string) => {
+    let last = 0;
+    for (const match of part.matchAll(PRODUCT_BLOCK)) {
+      const before = part.slice(last, match.index);
+      const slug = match[1] ?? match[2];
+      const previous = segments.at(-1);
+      if (previous?.kind === "products" && ONLY_GAP.test(before)) previous.slugs.push(slug);
+      else {
+        pushHtml(before);
+        segments.push({ kind: "products", slugs: [slug] });
+      }
+      last = match.index + match[0].length;
     }
+    pushHtml(part.slice(last));
+  };
+
+  let last = 0;
+  for (const match of html.matchAll(COLUMNS_BLOCK)) {
+    splitProducts(html.slice(last, match.index));
+    pushHtml(match[0]);
     last = match.index + match[0].length;
   }
-  const rest = html.slice(last);
-  if (rest.trim()) segments.push({ kind: "html", html: rest });
+  splitProducts(html.slice(last));
   return segments;
 }
 

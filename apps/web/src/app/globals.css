@@ -319,3 +319,210 @@ h4 {
   color: color-mix(in srgb, var(--foreground) 55%, transparent);
 }
 .rich-content-flow figcaption:empty { display: none; }
+
+/* Màu chữ admin chọn (chỉ màu trong chủ đề web). Đủ tương phản trên nền trắng và nền trang. */
+.rich-content-flow span[data-color="red"] { color: var(--color-accent-700); }
+.rich-content-flow span[data-color="green"] { color: var(--leaf); }
+.rich-content-flow span[data-color="gray"] { color: color-mix(in srgb, var(--foreground) 65%, transparent); }
+
+/* Chia 2 cột (ảnh một bên, chữ một bên): điện thoại xếp dọc, từ màn hình vừa trở lên chia đôi, căn giữa theo chiều dọc. */
+.rich-content-flow div[data-columns] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: center;
+  margin-top: 1.75em;
+  margin-bottom: 1.75em;
+}
+@media (min-width: 768px) {
+  .rich-content-flow div[data-columns] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem; }
+}
+.rich-content-flow div[data-columns]:first-child { margin-top: 0; }
+.rich-content-flow div[data-columns]:last-child { margin-bottom: 0; }
+.rich-content-flow div[data-column] { min-width: 0; }
+.rich-content-flow div[data-column] > * + * { margin-top: 0.9em; }
+.rich-content-flow div[data-column] > :first-child { margin-top: 0; }
+.rich-content-flow div[data-column] > figure { margin-block: 0; }
+
+/* Căn ngang admin chọn cho đoạn văn / tiêu đề / hàng nút. */
+.rich-content-flow [data-align="center"] { text-align: center; }
+.rich-content-flow [data-align="right"] { text-align: right; }
+
+/* Căn dọc hai cột (mặc định giữa). */
+.rich-content-flow div[data-columns][data-valign="top"] { align-items: start; }
+.rich-content-flow div[data-columns][data-valign="bottom"] { align-items: end; }
+
+/* Hàng nút điều hướng: cùng kiểu nút của web (components/ui/button.tsx), màu trong chủ đề. */
+.rich-content-flow p[data-buttons] { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5em; }
+.rich-content-flow p[data-buttons][data-align="center"] { justify-content: center; }
+.rich-content-flow p[data-buttons][data-align="right"] { justify-content: flex-end; }
+.rich-content-flow a[data-button] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1.25rem;
+  text-decoration: none;
+  transition: background-color 150ms, color 150ms, border-color 150ms;
+}
+.rich-content-flow a[data-button="red"] { background: var(--color-accent-600); color: #fff; }
+.rich-content-flow a[data-button="red"]:hover { background: var(--color-accent-700); color: #fff; }
+.rich-content-flow a[data-button="dark"] { background: var(--color-accent-700); color: #fff; }
+.rich-content-flow a[data-button="dark"]:hover { background: var(--color-accent-800); color: #fff; }
+.rich-content-flow a[data-button="light"] { background: var(--card); color: var(--foreground); border: 1px solid var(--divider); box-shadow: 0 1px 2px rgb(0 0 0 / 0.05); }
+.rich-content-flow a[data-button="light"]:hover { border-color: var(--color-accent-600); color: var(--color-accent-700); }
+.rich-content-flow a[data-button="green"] { background: var(--leaf); color: #fff; }
+.rich-content-flow a[data-button="green"]:hover { background: color-mix(in srgb, var(--leaf) 85%, black); color: #fff; }
+/* Dòng trống trình soạn thảo tự thêm sau ảnh / cuối nội dung: không chiếm chỗ (dòng trống ở giữa vẫn giữ để admin giãn cách). */
+.rich-content-flow div[data-column] > p:empty:last-child,
+.rich-content-flow > p:empty:last-child { display: none; }
+.rich-content-flow div[data-column] > figure + *,
+.rich-content-flow div[data-column] > * + figure { margin-top: 1.25em; }
+
+/* ───────────── Nút Đặt hàng: xe tải chở hàng (components/checkout/order-button.tsx) ───────────── */
+.order-button .order-label,
+.order-button .order-done { position: relative; z-index: 1; transition: opacity 250ms ease, transform 250ms ease; }
+.order-button .order-done { position: absolute; opacity: 0; transform: translateY(0.75rem); }
+.order-button[data-state="sending"] .order-label { opacity: 0; transform: translateY(-0.75rem); }
+.order-button[data-state="done"] .order-label { opacity: 0; }
+.order-button[data-state="done"] { background: var(--leaf); }
+.order-button[data-state="done"] .order-done { opacity: 1; transform: none; }
+
+.order-road {
+  position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: 17px; opacity: 0;
+  background: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.55) 0 14px, transparent 14px 28px);
+}
+/* Xe nằm thấp trong nút (thân xe từ -10px đến +14px quanh đường giữa) để thùng hàng rơi lên không bị cắt. */
+.order-truck { position: absolute; left: -90px; top: 50%; width: 58px; height: 24px; margin-top: -10px; opacity: 0; }
+.order-truck-back { position: absolute; left: 0; top: 0; width: 40px; height: 21px; border-radius: 3px; background: #f3f2f2; }
+.order-truck-front {
+  position: absolute; left: 42px; top: 4px; width: 16px; height: 17px; border-radius: 2px 7px 3px 2px;
+  background: #ff563c; box-shadow: inset -3px 0 0 #ffc4b8;
+}
+.order-truck-window { position: absolute; right: 3px; top: 3px; width: 7px; height: 6px; border-radius: 1px 4px 1px 1px; background: #4d170e; }
+.order-wheel { position: absolute; bottom: -4px; width: 9px; height: 9px; border-radius: 9999px; background: #201e1d; box-shadow: 0 0 0 2px #fff; }
+.order-wheel-1 { left: 8px; }
+.order-wheel-2 { left: 44px; }
+.order-box {
+  position: absolute; left: 12px; top: -12px; width: 16px; height: 12px; border-radius: 2px; opacity: 0;
+  background: linear-gradient(#fbbf24 0 45%, #f59e0b 45% 55%, #fbbf24 55%);
+}
+
+.order-button[data-state="sending"] .order-truck { animation: order-truck 2.6s cubic-bezier(0.45, 0, 0.55, 1) forwards; }
+.order-button[data-state="sending"] .order-box { animation: order-box 2.6s ease forwards; }
+.order-button[data-state="sending"] .order-road { animation: order-road 2.6s linear forwards; }
+
+@keyframes order-truck {
+  0% { left: -90px; opacity: 1; }
+  30%, 62% { left: calc(50% - 29px); opacity: 1; }
+  100% { left: calc(100% + 30px); opacity: 1; }
+}
+@keyframes order-box {
+  0%, 32% { opacity: 0; transform: translateY(-24px); }
+  40% { opacity: 1; transform: translateY(0); }
+  46% { transform: translateY(-4px); }
+  52%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes order-road {
+  0% { opacity: 0; background-position: 0 0; }
+  10%, 90% { opacity: 1; }
+  100% { opacity: 0; background-position: -280px 0; }
+}
+
+/* ───────────── Bill giấy in nhiệt (components/receipt/*) ───────────── */
+.receipt-paper { position: relative; }
+.receipt-band {
+  position: relative; display: flex; align-items: flex-end; justify-content: center; height: 4.25rem; margin: 0.75rem 0.75rem 0;
+  border-radius: 0.375rem; overflow: hidden;
+  background:
+    radial-gradient(120% 140% at 85% -20%, rgb(255 255 255 / 0.28) 0 22%, transparent 23%),
+    radial-gradient(90% 120% at 60% -40%, rgb(255 255 255 / 0.18) 0 30%, transparent 31%),
+    linear-gradient(115deg, #7c1405, #cf2a10 55%, #ff563c);
+}
+.receipt-band-tag {
+  margin-bottom: 0.5rem; padding: 0.125rem 0.75rem; border-radius: 9999px; background: rgb(0 0 0 / 0.35);
+  color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+}
+.receipt-dots { height: 2px; margin: 0.5rem 1.25rem; background: radial-gradient(circle, #b8b3b1 1.2px, transparent 1.4px) 0 0 / 12px 2px repeat-x; }
+.receipt-dash { margin: 0.25rem 1.25rem; border-top: 1px dashed #c9c4c2; }
+
+/* Mép dưới răng cưa như giấy xé. */
+.receipt-feed {
+  max-width: 26rem;
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+  padding-bottom: 6px;
+}
+/* Class is-done gắn đúng lúc in xong (tờ giấy đã ở vị trí cuối) → thay bằng cú bật nhẹ. */
+.receipt-feed.is-done { animation: receipt-settle 600ms ease-out both; }
+/* Nhả giấy: chiều cao phần giấy đã ra tăng dần 0 → hết tờ (grid 0fr → 1fr), từng nấc như máy in nhiệt. */
+.receipt-unroll { display: grid; grid-template-rows: 1fr; animation: receipt-unroll 2.8s steps(28, end) both; }
+@keyframes receipt-unroll { from { grid-template-rows: 0fr; } to { grid-template-rows: 1fr; } }
+/* In xong: tờ giấy hơi bật nhẹ như vừa xé khỏi máy. */
+@keyframes receipt-settle { 0% { transform: translateY(0); } 40% { transform: translateY(6px) rotate(-0.6deg); } 100% { transform: translateY(0) rotate(0); } }
+
+.receipt-action {
+  display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; border-radius: 9999px;
+  font-size: 0.8125rem; font-weight: 800; transition: color 150ms, background-color 150ms, box-shadow 150ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .receipt-unroll, .receipt-feed.is-done { animation: none; }
+  .order-button[data-state="sending"] .order-truck,
+  .order-button[data-state="sending"] .order-box,
+  .order-button[data-state="sending"] .order-road { animation: none; }
+}
+
+/* ───────────── In / Lưu PDF: hoá đơn A4 chỉ có thông tin (components/receipt/print-invoice.tsx) ───────────── */
+.print-invoice { display: none; }
+
+@media print {
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+  html, body { background: #fff !important; }
+  /* Chỉ in hoá đơn: mọi phần khác của trang không chiếm chỗ (nên không bị tràn sang trang 2). */
+  body > *:not(.print-invoice) { display: none !important; }
+  body { display: block !important; min-height: 0 !important; padding: 0 !important; }
+
+  .print-invoice {
+    display: block; color: #1a1a1a; font-size: 10.5pt; line-height: 1.45;
+    font-family: var(--font-archivo), Arial, "Helvetica Neue", sans-serif;
+  }
+  .print-invoice p { margin: 0; }
+  .pi-header { display: flex; justify-content: space-between; gap: 24px; padding-bottom: 12px; border-bottom: 2px solid #1a1a1a; }
+  .pi-store { font-size: 14pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px !important; }
+  .pi-title-block { text-align: right; }
+  .pi-title { font-size: 15pt; font-weight: 800; letter-spacing: 0.04em; margin-bottom: 4px !important; }
+  .pi-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 14px 0; border-bottom: 1px solid #c8c8c8; }
+  .pi-label { font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b6b6b; margin-bottom: 3px !important; }
+  .pi-strong { font-weight: 700; }
+
+  .pi-table { width: 100%; margin-top: 16px; border-collapse: collapse; }
+  .pi-table th {
+    padding: 7px 8px; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a;
+    font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; text-align: left;
+  }
+  .pi-table td { padding: 7px 8px; border-bottom: 1px solid #e2e2e2; vertical-align: top; }
+  .pi-table tr { break-inside: avoid; }
+  .pi-num { width: 7%; text-align: center !important; }
+  .pi-money { width: 16%; text-align: right !important; white-space: nowrap; }
+
+  .pi-totals { width: 48%; margin: 14px 0 0 auto; }
+  .pi-totals > div { display: flex; justify-content: space-between; gap: 16px; padding: 3px 8px; }
+  .pi-totals dt { color: #4a4a4a; }
+  .pi-totals .pi-grand { margin-top: 6px; padding-top: 8px; border-top: 2px solid #1a1a1a; font-size: 12pt; font-weight: 800; }
+  .pi-totals .pi-grand dt { color: #1a1a1a; }
+
+  .pi-footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #c8c8c8; font-size: 9pt; color: #4a4a4a; text-align: center; }
+  .pi-header, .pi-parties, .pi-totals, .pi-footer { break-inside: avoid; }
+}
+
+/* Dấu ✓ đặt hàng thành công nảy lên; hộp xem bill hiện dần. */
+.checkout-success-badge { animation: success-pop 550ms cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+@keyframes success-pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.receipt-dialog { animation: dialog-fade 200ms ease-out both; }
+@keyframes dialog-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .checkout-success-badge, .receipt-dialog { animation: none; }
+}
