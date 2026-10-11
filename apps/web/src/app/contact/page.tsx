@@ -5,6 +5,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { ContactForm } from "@/components/contact/contact-form";
 import { getSettings } from "@/lib/api";
 import { getMapEmbedUrl } from "@/lib/map-embed";
+import { editSettings } from "@/lib/edit-target";
 
 export const metadata: Metadata = {
   title: "Liên hệ",
@@ -34,7 +35,7 @@ export default async function ContactPage() {
 
         <div className="flex flex-col gap-6">
           {/* Hai khung bên phải giãn đều để mép dưới thẳng hàng với khung form bên trái. */}
-          <section className={`${cardClass} lg:flex-1`}>
+          <section {...editSettings("contact", "Thông tin liên hệ")} className={`${cardClass} lg:flex-1`}>
             <h2 className="text-lg font-bold text-foreground">Thông tin liên hệ</h2>
             <ul className="mt-3 space-y-2 text-sm text-foreground/70">
               <li>
@@ -66,7 +67,7 @@ export default async function ContactPage() {
           </section>
 
           {settings.address ? (
-            <section className={`${cardClass} lg:flex-1`}>
+            <section {...editSettings("address", "Địa chỉ cửa hàng")} className={`${cardClass} lg:flex-1`}>
               <h2 className="text-lg font-bold text-foreground">Địa chỉ cửa hàng</h2>
               <ul className="mt-3 space-y-2 text-sm text-foreground/70">
                 <li>{settings.address}</li>
@@ -91,7 +92,7 @@ export default async function ContactPage() {
       </div>
 
       {mapEmbedUrl ? (
-        <section className={`${cardClass} mt-6`} aria-labelledby="map-heading">
+        <section {...editSettings("address", "Bản đồ (link Google Maps)")} className={`${cardClass} mt-6`} aria-labelledby="map-heading">
           <h2 id="map-heading" className="mb-4 text-lg font-bold text-foreground">
             Bản đồ đến cửa hàng
           </h2>

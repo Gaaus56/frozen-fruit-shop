@@ -1,6 +1,7 @@
 import type { HomeBlock, HomeBlockPosition } from "@frozen-fruit-shop/types";
 import { RichContent } from "@/components/ui/rich-content";
 import { SectionCard, SectionTitle } from "@/components/ui/section-card";
+import { editTarget } from "@/lib/edit-target";
 
 /**
  * Các khối nội dung admin tự soạn (mục "Khối trang chủ") ở một vị trí trên trang chủ.
@@ -14,11 +15,17 @@ export function HomeBlocks({ blocks, position }: { blocks: HomeBlock[]; position
     <>
       {items.map((block) =>
         block.framed ? (
-          <SectionCard key={block.id} title={block.title || undefined}>
-            <RichContent html={block.content} />
-          </SectionCard>
+          <div key={block.id} {...editTarget("homeBlock", block.id, `Khối trang chủ${block.title ? `: ${block.title}` : ""}`)}>
+            <SectionCard title={block.title || undefined}>
+              <RichContent html={block.content} />
+            </SectionCard>
+          </div>
         ) : (
-          <section key={block.id} className="px-1 py-4 sm:py-6">
+          <section
+            key={block.id}
+            {...editTarget("homeBlock", block.id, `Khối trang chủ${block.title ? `: ${block.title}` : ""}`)}
+            className="px-1 py-4 sm:py-6"
+          >
             {block.title ? <SectionTitle title={block.title} /> : null}
             <RichContent html={block.content} />
           </section>

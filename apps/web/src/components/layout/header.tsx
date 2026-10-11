@@ -14,6 +14,7 @@ import {
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
 import { LogoBadge } from "./logo-badge";
+import { editSettings } from "@/lib/edit-target";
 
 const NAV_LINKS = [
   { href: "/", label: "Trang chủ" },
@@ -108,7 +109,7 @@ export function Header({ settings, categories }: HeaderProps) {
   return (
     <>
       {settings.marqueeEnabled ? (
-        <aside aria-label="Thông báo của cửa hàng" className="overflow-hidden bg-accent-700 text-white">
+        <aside {...editSettings("brand", "Dải chữ chạy đầu trang")} aria-label="Thông báo của cửa hàng" className="overflow-hidden bg-accent-700 text-white">
           <div className="marquee py-2 text-[13px] font-semibold">
             <span className="marquee-track">
               {settings.marqueeText ||

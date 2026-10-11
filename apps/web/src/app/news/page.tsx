@@ -5,6 +5,7 @@ import { PageHero } from "@/components/ui/page-hero";
 import { FilterChip, FilterChips } from "@/components/ui/filter-chips";
 import { PostCard } from "@/components/post/post-card";
 import { getBanners, getPosts, getSettings } from "@/lib/api";
+import { editTarget } from "@/lib/edit-target";
 
 interface NewsPageProps {
   searchParams: Promise<{ type?: string }>;
@@ -40,7 +41,17 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
 
   return (
     <>
-      <PageHero image={banner?.image ?? FALLBACK_BANNER} eyebrow="Tin tức" title={heading.title} description={heading.description}>
+      <PageHero
+        edit={
+          banner
+            ? editTarget("banner", banner.id, "Banner đầu trang Tin tức")
+            : editTarget("bannerNew", "news", "Banner đầu trang Tin tức (chưa có — tạo mới)")
+        }
+        image={banner?.image ?? FALLBACK_BANNER}
+        eyebrow="Tin tức"
+        title={heading.title}
+        description={heading.description}
+      >
         <FilterChips label="Loại bài viết">
           <FilterChip href="/news" active={!type}>
             Tất cả

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { POST_TYPE_LABELS, type Post } from "@frozen-fruit-shop/types";
 import { ProductImage } from "@/components/product/product-image";
+import { editTarget } from "@/lib/edit-target";
 
 /** `showType`: hiện nhãn Kiến thức / Tuyển dụng — tắt khi danh sách đã lọc theo một loại. */
 export function PostCard({ post, showType = true }: { post: Post; showType?: boolean }) {
   return (
-    <Link href={`/news/${post.slug}`} className="group min-w-0 [overflow-wrap:anywhere]">
+    <Link {...editTarget("post", post.id, `Bài viết: ${post.title}`)} href={`/news/${post.slug}`} className="group min-w-0 [overflow-wrap:anywhere]">
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface ring-1 ring-divider/70">
         <ProductImage
           src={post.coverImage}

@@ -6,6 +6,7 @@ import type { Product } from "@frozen-fruit-shop/types";
 import { useCart } from "@/lib/cart-context";
 import { formatCurrency } from "@/lib/format";
 import { ProductImage } from "./product-image";
+import { editTarget } from "@/lib/edit-target";
 
 /** Quy cách hiển thị mặc định: rẻ nhất trong các quy cách còn hàng (hoặc quy cách đầu nếu hết hàng cả). */
 function defaultVariant(product: Product) {
@@ -45,6 +46,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link
+      {...editTarget("product", product.id, product.name)}
       href={`/products/${product.slug}`}
       className="group flex flex-col overflow-hidden rounded-xl bg-card shadow-sm ring-1 ring-divider/70 transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent-900/10 hover:ring-2 hover:ring-accent-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >

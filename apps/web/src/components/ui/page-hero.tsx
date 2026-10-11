@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
+import type { editTarget } from "@/lib/edit-target";
 
 /**
  * Đầu trang có ảnh nền (banner admin chọn, hoặc ảnh mặc định) + tiêu đề + bộ lọc dạng chip.
@@ -13,6 +14,7 @@ export function PageHero({
   title,
   description,
   children,
+  edit,
 }: {
   image: string;
   eyebrow: string;
@@ -20,9 +22,11 @@ export function PageHero({
   description?: string;
   /** Bộ lọc (FilterChips) hiện dưới tiêu đề. */
   children?: ReactNode;
+  /** Đánh dấu "sửa được" cho trang Xem trước & sửa của admin (editTarget). */
+  edit?: ReturnType<typeof editTarget>;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-divider bg-[#2a2f33]">
+    <section {...edit} className="relative overflow-hidden border-b border-divider bg-[#2a2f33]">
       <Image src={image} alt="" fill priority sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/20" aria-hidden />
       {/* Chiều cao tối thiểu bằng banner có hàng chip lọc, để trang không có bộ lọc (Giới thiệu) cao bằng các trang khác. */}

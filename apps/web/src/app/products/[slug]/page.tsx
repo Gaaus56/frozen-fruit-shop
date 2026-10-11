@@ -10,6 +10,7 @@ import { ProductGallery } from "@/components/product/product-gallery";
 import { AddToCartForm } from "@/components/product/add-to-cart-form";
 import { fillSettingsPlaceholders } from "@frozen-fruit-shop/types";
 import { getPolicies, getProduct, getSettings } from "@/lib/api";
+import { editSettings, editTarget } from "@/lib/edit-target";
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -54,7 +55,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   return (
     <Container className="flex flex-col gap-6 py-6 sm:py-8 lg:py-12">
       {/* Khung trắng bo góc giống các khối ở trang chủ (SectionCard): ảnh + thông tin mua hàng. */}
-      <section className="grid grid-cols-1 gap-8 rounded-2xl border border-divider bg-card p-4 shadow-sm sm:p-7 lg:grid-cols-2 lg:gap-12">
+      <section
+        {...editTarget("product", product.id, `Sản phẩm: ${product.name}`)}
+        className="grid grid-cols-1 gap-8 rounded-2xl border border-divider bg-card p-4 shadow-sm sm:p-7 lg:grid-cols-2 lg:gap-12"
+      >
         <ProductGallery images={product.images} name={product.name} />
 
         <div>
@@ -73,7 +77,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           </div>
 
           {assurances.length > 0 ? (
-            <ul className={`mt-6 grid grid-cols-1 gap-2 ${assurances.length === 1 ? "" : assurances.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
+            <ul
+              {...editSettings("assurances", "Thẻ cam kết trang sản phẩm")}
+              className={`mt-6 grid grid-cols-1 gap-2 ${assurances.length === 1 ? "" : assurances.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
               {assurances.map((item, index) => {
                 const body = (
                   <>
@@ -110,7 +116,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       </section>
 
       {specs.length > 0 || product.description ? (
-        <SectionCard title="Thông tin sản phẩm">
+        <SectionCard title="Thông tin sản phẩm" edit={editTarget("product", product.id, `Thông tin sản phẩm: ${product.name}`)}>
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {specs.length > 0 ? (
               // Không có mô tả chi tiết: bảng thông tin đứng một mình, căn giữa khung.

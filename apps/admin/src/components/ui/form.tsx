@@ -60,9 +60,10 @@ export function FormAlert({ state }: { state: { error?: string; success?: string
   return null;
 }
 
-export function Section({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
+export function Section({ id, title, description, children }: { id?: string; title: string; description?: string; children: ReactNode }) {
   return (
-    <section className="border border-divider bg-surface p-5">
+    // scroll-mt: nhảy tới bằng #id (từ trang Xem trước & sửa) không bị che bởi mép trên.
+    <section id={id} className="scroll-mt-6 border border-divider bg-surface p-5 target:ring-2 target:ring-accent-600">
       <h2 className="text-base">{title}</h2>
       {description ? <p className="mt-1 text-sm text-foreground/60">{description}</p> : null}
       <div className="mt-4 flex flex-col gap-4">{children}</div>

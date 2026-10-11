@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Archivo } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/header";
@@ -6,6 +7,7 @@ import { Footer } from "@/components/layout/footer";
 import { FloatingContact } from "@/components/layout/floating-contact";
 import { LiveUpdates } from "@/components/layout/live-updates";
 import { NavigationTracker } from "@/components/ui/back-button";
+import { PreviewEditOverlay } from "@/components/layout/preview-edit-overlay";
 import { CartProvider } from "@/lib/cart-context";
 import { getCategories, getPolicies, getSettings } from "@/lib/api";
 
@@ -39,6 +41,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <Footer settings={settings} policies={policies} />
           <FloatingContact settings={settings} />
           <NavigationTracker />
+          {/* Chế độ sửa khi admin xem web trong trang "Xem trước & sửa"; khách xem bình thường không bật. */}
+          <Suspense fallback={null}>
+            <PreviewEditOverlay />
+          </Suspense>
           <LiveUpdates />
         </CartProvider>
       </body>

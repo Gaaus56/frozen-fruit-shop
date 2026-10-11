@@ -1,5 +1,6 @@
 import type { Comment, Inquiry, Order, Paginated } from "@frozen-fruit-shop/types";
 import { LiveUpdates } from "@/components/layout/live-updates";
+import { PreviewReturn } from "@/components/layout/preview-return";
 import { Sidebar } from "@/components/layout/sidebar";
 import { api } from "@/lib/api";
 import { getCurrentUser } from "@/lib/auth";
@@ -26,6 +27,7 @@ export default async function DashboardLayout({ children }: LayoutProps<"/">) {
       <Sidebar user={user} counts={counts} />
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8 print:p-0">{children}</main>
       <LiveUpdates />
+      <PreviewReturn />
     </div>
   );
 }

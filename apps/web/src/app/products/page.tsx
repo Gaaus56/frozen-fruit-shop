@@ -6,6 +6,7 @@ import { PageHero } from "@/components/ui/page-hero";
 import { ClearFilterChip, FilterChip, FilterChips } from "@/components/ui/filter-chips";
 import { ProductGrid } from "@/components/product/product-grid";
 import { getBanners, getCategories, getProducts, type ProductFilters } from "@/lib/api";
+import { editTarget } from "@/lib/edit-target";
 
 export const metadata: Metadata = {
   title: "Sản phẩm",
@@ -52,6 +53,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   return (
     <>
       <PageHero
+        edit={
+          banner
+            ? editTarget("banner", banner.id, "Banner đầu trang Sản phẩm")
+            : editTarget("bannerNew", "products", "Banner đầu trang Sản phẩm (chưa có — tạo mới)")
+        }
         image={banner?.image ?? FALLBACK_BANNER}
         eyebrow="Sản phẩm"
         title={activeCategory ? activeCategory.name : banner?.title || DEFAULT_TITLE}

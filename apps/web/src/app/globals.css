@@ -526,3 +526,6 @@ h4 {
 @media (prefers-reduced-motion: reduce) {
   .checkout-success-badge, .receipt-dialog { animation: none; }
 }
+
+/* Chế độ sửa trong khung "Xem trước & sửa" của admin: phần sửa được hiện con trỏ bàn tay. */
+html[data-preview-edit] [data-edit] { cursor: pointer; }

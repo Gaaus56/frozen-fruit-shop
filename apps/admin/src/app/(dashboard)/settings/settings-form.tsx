@@ -17,7 +17,7 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
 
   return (
     <form action={formAction} className="flex max-w-4xl flex-col gap-6">
-      <Section title="Thương hiệu">
+      <Section id="brand" title="Thương hiệu">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Tên cửa hàng" htmlFor="storeName" required hint="Hiện ở tiêu đề trang, chân trang.">
             <input id="storeName" name="storeName" required maxLength={120} defaultValue={settings.storeName} className={inputClass} />
@@ -37,7 +37,7 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
         </Field>
       </Section>
 
-      <Section title="Liên hệ" description="Dùng cho nút gọi, Zalo, Facebook nổi và trang Liên hệ.">
+      <Section id="contact" title="Liên hệ" description="Dùng cho nút gọi, Zalo, Facebook nổi và trang Liên hệ.">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Hotline" htmlFor="phone" required>
             <input id="phone" name="phone" required inputMode="tel" maxLength={15} defaultValue={settings.phone} className={inputClass} />
@@ -57,7 +57,7 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
         </div>
       </Section>
 
-      <Section title="Địa chỉ">
+      <Section id="address" title="Địa chỉ">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Địa chỉ cửa hàng" htmlFor="address">
             <input id="address" name="address" maxLength={200} defaultValue={settings.address} className={inputClass} />
@@ -72,6 +72,7 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
       </Section>
 
       <Section
+        id="assurances"
         title="Thẻ cam kết trang sản phẩm"
         description="Các ô nhỏ dưới nút «Mua ngay» ở mọi trang chi tiết sản phẩm. Để trống tiêu đề để ẩn ô đó. Có thể gõ {phone} (hotline) và {hotlineHours} (giờ nhận điện thoại) — web tự thay bằng thông tin ở mục Liên hệ."
       >
@@ -104,7 +105,7 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
         </div>
       </Section>
 
-      <Section title="Thanh toán & pháp lý">
+      <Section id="payment" title="Thanh toán & pháp lý">
         <Field label="Thông tin chuyển khoản" htmlFor="bankTransferInfo" hint="Hiện cho khách chọn chuyển khoản khi đặt hàng (ngân hàng, số tài khoản, chủ tài khoản, nội dung CK).">
           <textarea id="bankTransferInfo" name="bankTransferInfo" rows={4} maxLength={2000} defaultValue={settings.bankTransferInfo} className={inputClass} />
         </Field>

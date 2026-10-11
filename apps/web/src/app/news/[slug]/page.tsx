@@ -13,6 +13,7 @@ import { POST_TYPE_LABELS, POST_TYPE_SLUGS, formatPhone } from "@frozen-fruit-sh
 import { getComments, getPost, getSettings } from "@/lib/api";
 import { extractHeadings } from "@/lib/rich-headings";
 import { formatDate } from "@/lib/format";
+import { editTarget } from "@/lib/edit-target";
 
 interface BlogDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -41,7 +42,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   return (
     <Container className="py-8 sm:py-12">
       {/* Khung bo góc giống các khối ở trang chủ (SectionCard), căn giữa trang. */}
-      <article className="mx-auto max-w-4xl rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm [overflow-wrap:anywhere] sm:px-10 sm:py-10">
+      <article {...editTarget("post", post.id, `Bài viết: ${post.title}`)} className="mx-auto max-w-4xl rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm [overflow-wrap:anywhere] sm:px-10 sm:py-10">
         {/* Nút quay lại thay cho đường dẫn breadcrumb. */}
         <div className="flex items-center gap-3">
           <BackButton fallbackHref={typeHref} label="Quay lại danh sách bài viết" />

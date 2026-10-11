@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { formatPhone, type Policy, type SiteSettings } from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
 import { LogoBadge } from "./logo-badge";
+import { editSettings, editTarget } from "@/lib/edit-target";
 
 /** Xanh lá đậm cùng tông huy hiệu logo (#1f6b3f), đủ tối để chữ trắng dễ đọc. */
 const FOOTER_BG = "#143f29";
@@ -75,7 +76,7 @@ export function Footer({ settings, policies }: { settings: SiteSettings; policie
     <footer className="text-white" style={{ background: FOOTER_BG }}>
       <Container className="grid grid-cols-1 gap-10 py-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
         {/* Thương hiệu */}
-        <div className="lg:col-span-3">
+        <div {...editSettings("brand", "Tên & thương hiệu cửa hàng")} className="lg:col-span-3">
           <span className="block h-28 w-28 overflow-hidden rounded-full shadow-xl shadow-black/30 ring-4 ring-white">
             <LogoBadge className="h-full w-full" label={`Logo ${settings.storeName}`} />
           </span>
@@ -86,7 +87,7 @@ export function Footer({ settings, policies }: { settings: SiteSettings; policie
         </div>
 
         {/* Liên hệ */}
-        <div className="lg:col-span-4">
+        <div {...editSettings("contact", "Thông tin liên hệ")} className="lg:col-span-4">
           <ColumnTitle>Liên hệ</ColumnTitle>
           <ul className="mt-5 space-y-3 text-sm text-white/80">
             {settings.address ? (
@@ -129,7 +130,7 @@ export function Footer({ settings, policies }: { settings: SiteSettings; policie
           {policies.length > 0 ? (
             <ul className="mt-5 space-y-2.5 text-sm">
               {policies.map((policy) => (
-                <li key={policy.id}>
+                <li key={policy.id} {...editTarget("policy", policy.id, `Chính sách: ${policy.title}`)}>
                   <Link href={`/policies/${policy.slug}`} className={linkClass}>
                     {policy.title}
                   </Link>
@@ -148,7 +149,7 @@ export function Footer({ settings, policies }: { settings: SiteSettings; policie
 
         {/* Fanpage — theo link Facebook trong Thông tin cửa hàng */}
         {settings.facebookUrl ? (
-          <div className="lg:col-span-3 lg:justify-self-end">
+          <div {...editSettings("contact", "Link Fanpage Facebook")} className="lg:col-span-3 lg:justify-self-end">
             <ColumnTitle>Fanpage</ColumnTitle>
             <div className="mt-5 max-w-full overflow-hidden rounded-xl bg-white" style={{ width: FANPAGE_WIDTH, height: FANPAGE_HEIGHT }}>
               <iframe

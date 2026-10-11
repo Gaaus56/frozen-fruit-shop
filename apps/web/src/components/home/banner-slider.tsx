@@ -6,6 +6,7 @@ import type { Banner } from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
 import { LinkButton } from "@/components/ui/button";
 import { useSwipe } from "@/lib/use-swipe";
+import { editTarget } from "@/lib/edit-target";
 
 /** Banner lấy từ trang quản trị (mục Banner). Không có banner nào đang bật thì không hiển thị gì. */
 export function BannerSlider({ banners }: { banners: Banner[] }) {
@@ -23,6 +24,7 @@ export function BannerSlider({ banners }: { banners: Banner[] }) {
         {banners.map((slide, i) => (
           <div
             key={slide.id}
+            {...editTarget("banner", slide.id, "Banner trang chủ")}
             className={`absolute inset-0 transition-opacity duration-700 ${
               i === index ? "opacity-100" : "pointer-events-none opacity-0"
             }`}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { editTarget } from "@/lib/edit-target";
 
 /**
  * Khung bọc một khối trên trang chủ (danh mục, sản phẩm, tin tức...) giống một "bài viết" —
@@ -12,12 +13,15 @@ export function SectionCard({
   action,
   children,
   className = "",
+  edit,
 }: {
   /** Để trống thì không có dòng tiêu đề + hoa văn (khối trang chủ không tiêu đề). */
   title?: string;
   action?: ReactNode;
   children: ReactNode;
   className?: string;
+  /** Đánh dấu "sửa được" cho trang Xem trước & sửa của admin (editTarget). */
+  edit?: ReturnType<typeof editTarget>;
 }) {
   const ref = useRef<HTMLElement>(null);
   // Người dùng tắt hiệu ứng chuyển động: hiện sẵn, không cần quan sát cuộn.
@@ -45,6 +49,7 @@ export function SectionCard({
   return (
     <section
       ref={ref}
+      {...edit}
       className={`rounded-2xl border border-divider bg-card px-4 pb-4 pt-3 shadow-sm transition-all duration-700 ease-out sm:px-7 sm:pb-7 sm:pt-5 ${
         isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
       } ${className}`}

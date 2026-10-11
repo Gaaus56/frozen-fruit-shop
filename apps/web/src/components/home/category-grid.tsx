@@ -3,6 +3,7 @@ import type { Category } from "@frozen-fruit-shop/types";
 import { SectionCard } from "@/components/ui/section-card";
 import { ProductImage } from "@/components/product/product-image";
 import { AutoScrollTrack } from "@/components/home/auto-scroll-track";
+import { editTarget } from "@/lib/edit-target";
 
 /** Ô hiện đủ cố định: 2 (điện thoại) · 3 (tablet) · 6 (máy tính), không ô nào bị cắt nửa. */
 const ITEM_CLASS =
@@ -18,6 +19,7 @@ export function CategoryGrid({ categories }: { categories: Category[] }) {
   const renderItem = (category: Category, isCopy: boolean) => (
     <Link
       key={isCopy ? `${category.id}-copy` : category.id}
+      {...editTarget("category", category.id, `Danh mục ${category.name}`)}
       href={`/products?category=${category.slug}`}
       aria-hidden={isCopy || undefined}
       tabIndex={isCopy ? -1 : undefined}

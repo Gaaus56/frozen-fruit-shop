@@ -597,3 +597,64 @@ export interface CreateCommentInput {
   /** Ô ẩn chống bot. */
   website: string;
 }
+
+// ───────────── Xem trước & sửa (admin mở web trong khung, bấm vào phần nào thì sửa phần đó) ─────────────
+
+/**
+ * Loại nội dung web gắn được nút "Sửa" khi admin xem trước. Web gắn `data-edit="<kind>:<id>"` lên phần tử;
+ * admin đổi thành trang sửa tương ứng (editTargetPath).
+ */
+export const EDIT_KINDS = [
+  "banner",
+  "bannerNew",
+  "homeBlock",
+  "category",
+  "product",
+  "post",
+  "policy",
+  "page",
+  "settings",
+] as const;
+export type EditKind = (typeof EDIT_KINDS)[number];
+
+/** Mục trong trang "Thông tin cửa hàng" (id của khung trên trang admin, để nhảy thẳng tới). */
+export const SETTINGS_SECTIONS = ["brand", "contact", "address", "assurances", "payment"] as const;
+export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
+
+/** Thông điệp qua lại giữa trang admin và web trong khung xem trước (window.postMessage). */
+export type PreviewMessage =
+  /** Admin → web: bật xem trước, chọn chế độ sửa (hiện viền + nút Sửa) hoặc duyệt (bấm như khách). */
+  | { type: "tc28:preview"; mode: "edit" | "browse" }
+  /** Web → admin: code trên web đã chạy xong, sẵn sàng nhận chế độ (tránh lỡ lệnh gửi lúc trang còn đang tải). */
+  | { type: "tc28:ready" }
+  /** Web → admin: đang ở trang nào (để admin hiện đường dẫn và quay lại đúng chỗ). */
+  | { type: "tc28:path"; path: string }
+  /** Web → admin: admin bấm "Sửa" trên một phần. */
+  | { type: "tc28:edit"; kind: EditKind; id: string; path: string };
+
+/** Đường dẫn trang sửa trong admin cho một phần trên web; null nếu không nhận ra. */
+export function editTargetPath(kind: string, id: string): string | null {
+  const safeId = encodeURIComponent(id);
+  switch (kind) {
+    case "banner":
+      return `/banners/${safeId}`;
+    case "bannerNew":
+      return `/banners/new?placement=${safeId}`;
+    case "homeBlock":
+      return `/home-blocks/${safeId}`;
+    case "category":
+      return `/categories/${safeId}`;
+    case "product":
+      return `/products/${safeId}`;
+    case "post":
+      return `/posts/${safeId}`;
+    case "policy":
+      return `/policies/${safeId}`;
+    case "page":
+      return `/pages/${safeId}`;
+    case "settings":
+      return (SETTINGS_SECTIONS as readonly string[]).includes(id) ? `/settings#${id}` : "/settings";
+    default:
+      return null;
+  }
+}
