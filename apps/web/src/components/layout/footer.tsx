@@ -76,12 +76,13 @@ export function Footer({ settings, policies }: { settings: SiteSettings; policie
     <footer className="text-white" style={{ background: FOOTER_BG }}>
       <Container className="grid grid-cols-1 gap-10 py-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
         {/* Thương hiệu */}
-        <div {...editSettings("brand", "Tên & thương hiệu cửa hàng")} className="lg:col-span-3">
-          <span className="block h-28 w-28 overflow-hidden rounded-full shadow-xl shadow-black/30 ring-4 ring-white">
+        {/* Logo + tên + giới thiệu căn giữa trong cột thương hiệu. */}
+        <div {...editSettings("brand", "Tên & thương hiệu cửa hàng")} className="text-center lg:col-span-3">
+          <span className="mx-auto block h-28 w-28 overflow-hidden rounded-full shadow-xl shadow-black/30 ring-4 ring-white">
             <LogoBadge className="h-full w-full" label={`Logo ${settings.storeName}`} />
           </span>
           <p className="mt-5 text-lg font-extrabold leading-snug">{settings.storeName}</p>
-          <p className="mt-2 text-sm leading-relaxed text-white/75">
+          <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-white/75">
             Trái cây đông lạnh cấp đông nhanh sau thu hoạch, đóng gói hút chân không, giữ trọn hương vị và dinh dưỡng.
           </p>
         </div>

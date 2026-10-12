@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Injectable, NotFoundException, Param, Put } from '@nestjs/common';
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { DEFAULT_SITE_SETTINGS, PAGE_SLUGS, type Page, type PageSlug } from '@frozen-fruit-shop/types';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { sanitizeRichText, toRichTextOutput } from '../common/rich-text.js';
 import { iso } from '../common/utils.js';
 import { Trim } from '../common/validators.js';
@@ -98,6 +98,7 @@ export class PublicPagesController {
 /** Nhân viên cũng sửa được (giống bài viết, chính sách). */
 @Controller('admin/pages')
 @Auth()
+@Permission('pages')
 export class AdminPagesController {
   constructor(private readonly service: PagesService) {}
 

@@ -17,7 +17,7 @@ import { Type } from 'class-transformer';
 import { IsBoolean, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import type { Prisma } from '@prisma/client';
 import type { Category } from '@frozen-fruit-shop/types';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { slugify, toPublicUrl, toStoredPath } from '../common/utils.js';
 import { IsImagePath, IsSlug, Trim } from '../common/validators.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -163,10 +163,13 @@ export class PublicCategoriesController {
 
 @Controller('admin/categories')
 @Auth()
+@Permission('categories')
 export class AdminCategoriesController {
   constructor(private readonly service: CategoriesService) {}
 
+  // Form sản phẩm cần danh sách danh mục để chọn.
   @Get()
+  @Permission('categories', 'products')
   list() {
     return this.service.listAll();
   }

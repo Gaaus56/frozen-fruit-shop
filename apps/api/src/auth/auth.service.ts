@@ -4,6 +4,7 @@ import type { User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import type { AuthUser, LoginResponse } from '@frozen-fruit-shop/types';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { effectivePermissions } from './auth.guard.js';
 import type { ChangePasswordDto, LoginDto } from './auth.dto.js';
 
 const MAX_FAILED_ATTEMPTS = 5;
@@ -14,8 +15,8 @@ export function hashPassword(password: string) {
   return bcrypt.hash(password, BCRYPT_ROUNDS);
 }
 
-export function toAuthUser(user: Pick<User, 'id' | 'email' | 'name' | 'role'>): AuthUser {
-  return { id: user.id, email: user.email, name: user.name, role: user.role };
+export function toAuthUser(user: Pick<User, 'id' | 'email' | 'name' | 'role' | 'permissions'>): AuthUser {
+  return { id: user.id, email: user.email, name: user.name, role: user.role, permissions: effectivePermissions(user) };
 }
 
 @Injectable()

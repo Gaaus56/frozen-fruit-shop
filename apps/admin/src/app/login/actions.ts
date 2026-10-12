@@ -1,11 +1,17 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import type { LoginResponse } from "@frozen-fruit-shop/types";
 import { API_URL } from "@/lib/api";
 import { setToken } from "@/lib/session";
+import { homePathFor } from "@/lib/nav";
 
-export async function loginAction(_prev: { error?: string } | undefined, formData: FormData) {
+export type LoginState = { error?: string; redirectTo?: string } | undefined;
+
+/**
+ * Đăng nhập thành công → trả về trang đích (không redirect ngay) để form chạy hiệu ứng rời màn hình
+ * rồi mới chuyển trang (login-form.tsx).
+ */
+export async function loginAction(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
@@ -28,5 +34,6 @@ export async function loginAction(_prev: { error?: string } | undefined, formDat
   }
 
   await setToken(body.accessToken, body.expiresAt);
-  redirect(body.user.role === "ADMIN" ? "/" : "/orders");
+  // Vào thẳng mục đầu tiên tài khoản được phép (nhân viên có thể không có quyền Đơn hàng).
+  return { redirectTo: homePathFor(body.user) };
 }

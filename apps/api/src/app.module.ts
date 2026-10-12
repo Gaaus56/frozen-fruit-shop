@@ -1,4 +1,5 @@
 import { Controller, Get, Module } from '@nestjs/common';
+import { AuditModule } from './audit/audit.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { ContentModule } from './content/content.module.js';
@@ -32,6 +33,7 @@ class HealthController {
     RealtimeModule,
     RevalidateModule,
     AuthModule,
+    AuditModule,
     UsersModule,
     CategoriesModule,
     ProductsModule,

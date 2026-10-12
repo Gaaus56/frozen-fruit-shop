@@ -1,12 +1,21 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { editTargetPath, type PreviewMessage } from "@frozen-fruit-shop/types";
 import { WEB_ORIGIN, WEB_URL, setPreviewReturn } from "@/lib/preview";
 
 type Mode = "edit" | "browse";
 type Device = "desktop" | "tablet" | "mobile";
+
+/** Admin đang mở trên màn hình nhỏ (điện thoại / máy tính bảng dọc): chỉ xem được giao diện điện thoại của web. */
+const SMALL_SCREEN = "(max-width: 1023px)";
+const subscribeSmallScreen = (onChange: () => void) => {
+  const query = window.matchMedia(SMALL_SCREEN);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+};
+const isSmallScreen = () => window.matchMedia(SMALL_SCREEN).matches;
 
 const DEVICES: { key: Device; label: string; width: number | null }[] = [
   { key: "desktop", label: "Máy tính", width: null },
@@ -40,7 +49,10 @@ export function PreviewClient() {
   const [src, setSrc] = useState(`${WEB_URL}${initialPath}`);
   const [path, setPath] = useState(initialPath);
   const [mode, setMode] = useState<Mode>("edit");
-  const [device, setDevice] = useState<Device>("desktop");
+  const [chosenDevice, setDevice] = useState<Device>("desktop");
+  const smallScreen = useSyncExternalStore(subscribeSmallScreen, isSmallScreen, () => false);
+  // Màn hình admin hẹp không đủ chỗ cho bản máy tính / máy tính bảng → luôn xem bản điện thoại, khung rộng hết màn.
+  const device: Device = smallScreen ? "mobile" : chosenDevice;
   const [loading, setLoading] = useState(true);
   /** Đổi số này để khung tải lại (kể cả khi mở lại đúng trang đang xem). */
   const [reloadKey, setReloadKey] = useState(0);
@@ -90,10 +102,10 @@ export function PreviewClient() {
     open(String(new FormData(event.currentTarget).get("path") ?? "/"));
   }
 
-  const width = DEVICES.find((item) => item.key === device)?.width;
+  const width = smallScreen ? null : DEVICES.find((item) => item.key === device)?.width;
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col gap-3 lg:h-[calc(100vh-4rem)]">
+    <div className="flex flex-col gap-3 lg:h-[calc(100vh-4rem)]">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl uppercase">Xem trước &amp; sửa</h1>
@@ -148,20 +160,24 @@ export function PreviewClient() {
             Mở
           </button>
         </form>
-        <div className="flex gap-1" role="radiogroup" aria-label="Kích thước màn hình">
-          {DEVICES.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              role="radio"
-              aria-checked={device === item.key}
-              onClick={() => setDevice(item.key)}
-              className={`px-3 py-1.5 text-xs font-bold transition-colors ${device === item.key ? "bg-ink text-white" : "text-foreground/70 hover:bg-muted"}`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+        {smallScreen ? (
+          <span className="px-3 py-1.5 text-xs font-semibold text-foreground/60">Đang xem giao diện điện thoại</span>
+        ) : (
+          <div className="flex gap-1" role="radiogroup" aria-label="Kích thước màn hình">
+            {DEVICES.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                role="radio"
+                aria-checked={device === item.key}
+                onClick={() => setDevice(item.key)}
+                className={`px-3 py-1.5 text-xs font-bold transition-colors ${device === item.key ? "bg-ink text-white" : "text-foreground/70 hover:bg-muted"}`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
         <button type="button" onClick={() => open(path)} title="Tải lại trang đang xem" className="px-3 py-1.5 text-xs font-bold text-foreground/70 hover:bg-muted">
           ↻ Tải lại
         </button>
@@ -177,7 +193,8 @@ export function PreviewClient() {
       </div>
 
       {/* Khung web */}
-      <div className="relative min-h-0 flex-1 overflow-auto border border-divider bg-[repeating-linear-gradient(45deg,#ecebea_0_10px,#f4f3f2_10px_20px)]">
+      {/* Màn hình nhỏ: khung cao gần bằng một màn hình điện thoại (cuộn trang admin để xem tiếp); máy tính: lấp phần còn lại. */}
+      <div className="relative h-[85svh] min-h-[560px] overflow-auto border lg:h-auto lg:min-h-0 lg:flex-1 border-divider bg-[repeating-linear-gradient(45deg,#ecebea_0_10px,#f4f3f2_10px_20px)]">
         <div className="mx-auto h-full bg-white shadow-xl transition-[width] duration-300" style={{ width: width ? `${width}px` : "100%", maxWidth: "100%" }}>
           <iframe
             key={reloadKey}

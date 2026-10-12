@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { User } from '@prisma/client';
 import type { StaffAccount } from '@frozen-fruit-shop/types';
+import { effectivePermissions } from '../auth/auth.guard.js';
 import { hashPassword } from '../auth/auth.service.js';
 import { iso } from '../common/utils.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -12,6 +13,7 @@ function toStaffAccount(user: User): StaffAccount {
     email: user.email,
     name: user.name,
     role: user.role,
+    permissions: effectivePermissions(user),
     isActive: user.isActive,
     lastLoginAt: iso(user.lastLoginAt),
     createdAt: iso(user.createdAt),
@@ -33,7 +35,13 @@ export class UsersService {
 
   async create(dto: CreateStaffDto): Promise<StaffAccount> {
     const user = await this.prisma.user.create({
-      data: { email: dto.email, name: dto.name, role: 'STAFF', passwordHash: await hashPassword(dto.password) },
+      data: {
+        email: dto.email,
+        name: dto.name,
+        role: 'STAFF',
+        permissions: dto.permissions ?? [],
+        passwordHash: await hashPassword(dto.password),
+      },
     });
     return toStaffAccount(user);
   }

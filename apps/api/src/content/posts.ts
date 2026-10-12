@@ -16,7 +16,7 @@ import { Type } from 'class-transformer';
 import { IsBoolean, IsDateString, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 import type { Post as PostRow } from '@prisma/client';
 import { POST_TYPES, type Post, type PostType } from '@frozen-fruit-shop/types';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { sanitizeRichText, toRichTextOutput } from '../common/rich-text.js';
 import { iso, slugify, toPublicUrl, toStoredPath } from '../common/utils.js';
 import { IsImagePath, IsSlug, Trim } from '../common/validators.js';
@@ -186,6 +186,7 @@ export class PublicPostsController {
 
 @Controller('admin/posts')
 @Auth()
+@Permission('posts')
 export class AdminPostsController {
   constructor(private readonly service: PostsService) {}
 

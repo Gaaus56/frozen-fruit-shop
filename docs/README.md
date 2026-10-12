@@ -54,6 +54,7 @@ Một website hoàn chỉnh = **Domain + DNS + Hosting + Frontend + Backend + Da
 | | | [web.md](06-testing/web.md) · [admin.md](06-testing/admin.md) · [api.md](06-testing/api.md) | Kịch bản test từng trang, nút bấm, trường hợp lỗi |
 | | | [e2e.md](06-testing/e2e.md) | Kịch bản xuyên suốt trước mỗi lần phát hành |
 | | | [findings.md](06-testing/findings.md) | Lỗi / điểm lệch đang mở |
+| | | [bug-log.md](06-testing/bug-log.md) | Lỗi đã gặp khi code: nguyên nhân, cách sửa, bài học |
 | — | [archive/](archive/) | `plan-v0/` | Kế hoạch ban đầu (lỗi thời, chỉ để tham khảo lịch sử) |
 
 ## Đọc theo vai trò

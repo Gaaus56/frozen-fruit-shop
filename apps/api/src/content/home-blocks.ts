@@ -14,7 +14,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { IsBoolean, IsIn, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 import type { HomeBlock as HomeBlockRow } from '@prisma/client';
 import { HOME_BLOCK_POSITIONS, type HomeBlock, type HomeBlockPosition } from '@frozen-fruit-shop/types';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { sanitizeRichText, toRichTextOutput } from '../common/rich-text.js';
 import { Trim } from '../common/validators.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -129,6 +129,7 @@ export class PublicHomeBlocksController {
 
 @Controller('admin/home-blocks')
 @Auth()
+@Permission('homeBlocks')
 export class AdminHomeBlocksController {
   constructor(private readonly service: HomeBlocksService) {}
 

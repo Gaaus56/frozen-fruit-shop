@@ -22,7 +22,7 @@ import {
   type Paginated,
   type PublicComment,
 } from '@frozen-fruit-shop/types';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { PaginationQueryDto, paginate } from '../common/pagination.js';
 import { RateLimit } from '../common/rate-limit.guard.js';
 import { iso } from '../common/utils.js';
@@ -190,6 +190,7 @@ export class PublicCommentsController {
 /** Nhân viên cũng duyệt / trả lời được (giống liên hệ). */
 @Controller('admin/comments')
 @Auth()
+@Permission('comments')
 export class AdminCommentsController {
   constructor(private readonly service: CommentsService) {}
 

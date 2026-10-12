@@ -1,4 +1,4 @@
-import type { StaffAccount } from "@frozen-fruit-shop/types";
+import { STAFF_PERMISSIONS, STAFF_PERMISSION_LABELS, type StaffAccount } from "@frozen-fruit-shop/types";
 import { Badge } from "@/components/ui/badge";
 import { DeleteButton } from "@/components/ui/delete-button";
 import { Section } from "@/components/ui/form";
@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import { requireAdmin } from "@/lib/auth";
 import { formatDateTime } from "@/lib/format";
 import { deleteStaffAction } from "./actions";
-import { CreateStaffForm, ResetPasswordForm, ToggleActiveButton } from "./staff-forms";
+import { CreateStaffForm, EditPermissionsForm, ResetPasswordForm, ToggleActiveButton } from "./staff-forms";
 
 export const metadata = { title: "Tài khoản nhân viên" };
 
@@ -20,7 +20,7 @@ export default async function UsersPage() {
     <div>
       <PageHeader
         title="Tài khoản nhân viên"
-        description="Nhân viên xử lý đơn hàng, liên hệ và nội dung web; không xem được tổng quan doanh thu, thông tin cửa hàng và trang này."
+        description="Mỗi nhân viên chỉ thấy và dùng được các mục bạn cấp quyền (bấm «Phân quyền»). Tổng quan doanh thu, thông tin cửa hàng và trang này luôn chỉ dành cho chủ cửa hàng."
       />
       <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
@@ -29,6 +29,7 @@ export default async function UsersPage() {
               <>
                 <Th>Tài khoản</Th>
                 <Th>Vai trò</Th>
+                <Th>Quyền</Th>
                 <Th>Đăng nhập gần nhất</Th>
                 <Th />
               </>
@@ -44,10 +45,26 @@ export default async function UsersPage() {
                   {user.role === "ADMIN" ? <Badge tone="red">Quản trị</Badge> : <Badge tone="blue">Nhân viên</Badge>}{" "}
                   {!user.isActive ? <Badge>Đã khoá</Badge> : null}
                 </Td>
+                <Td className="max-w-xs">
+                  {user.role === "ADMIN" ? (
+                    <span className="text-xs text-foreground/60">Toàn quyền</span>
+                  ) : user.permissions.length === 0 ? (
+                    <span className="text-xs font-semibold text-accent-700">Chưa cấp quyền nào</span>
+                  ) : user.permissions.length === STAFF_PERMISSIONS.length ? (
+                    <span className="text-xs text-foreground/60">Mọi mục nhân viên</span>
+                  ) : (
+                    <span className="flex flex-wrap gap-1">
+                      {user.permissions.map((permission) => (
+                        <Badge key={permission}>{STAFF_PERMISSION_LABELS[permission].label}</Badge>
+                      ))}
+                    </span>
+                  )}
+                </Td>
                 <Td className="whitespace-nowrap text-foreground/70">{formatDateTime(user.lastLoginAt)}</Td>
                 <Td>
                   {user.role === "STAFF" ? (
-                    <div className="flex flex-wrap items-start justify-end gap-2">
+                    <div className="flex flex-col items-end gap-1.5">
+                      <EditPermissionsForm id={user.id} name={user.name} permissions={user.permissions} />
                       <ResetPasswordForm id={user.id} />
                       <ToggleActiveButton id={user.id} isActive={user.isActive} />
                       <DeleteButton

@@ -20,11 +20,49 @@ export interface ApiErrorBody {
 
 export type Role = "ADMIN" | "STAFF";
 
+/**
+ * Quyền admin cấp cho từng nhân viên (STAFF) — mỗi quyền mở một mục trong trang quản trị.
+ * ADMIN luôn có mọi quyền. Tổng quan bán hàng, Thông tin cửa hàng, Tài khoản nhân viên chỉ ADMIN.
+ */
+export const STAFF_PERMISSIONS = [
+  "orders",
+  "inquiries",
+  "products",
+  "categories",
+  "banners",
+  "homeBlocks",
+  "posts",
+  "comments",
+  "pages",
+  "policies",
+] as const;
+export type StaffPermission = (typeof STAFF_PERMISSIONS)[number];
+
+export const STAFF_PERMISSION_LABELS: Record<StaffPermission, { label: string; hint: string }> = {
+  orders: { label: "Đơn hàng", hint: "Xem, xác nhận, cập nhật trạng thái đơn" },
+  inquiries: { label: "Liên hệ & báo giá", hint: "Xem và xử lý tin nhắn khách gửi" },
+  products: { label: "Sản phẩm", hint: "Thêm, sửa giá, tồn kho, ảnh sản phẩm" },
+  categories: { label: "Danh mục", hint: "Thêm, sửa, ẩn danh mục sản phẩm" },
+  banners: { label: "Banner", hint: "Banner trang chủ và đầu các trang" },
+  homeBlocks: { label: "Khối trang chủ", hint: "Nội dung tự soạn trên trang chủ" },
+  posts: { label: "Bài viết", hint: "Kiến thức, tuyển dụng" },
+  comments: { label: "Bình luận", hint: "Duyệt, trả lời, xoá bình luận" },
+  pages: { label: "Trang Giới thiệu", hint: "Nội dung trang Giới thiệu" },
+  policies: { label: "Chính sách", hint: "Đổi trả, giao hàng, bảo mật…" },
+};
+
 export interface AuthUser {
   id: string;
   email: string;
   name: string;
   role: Role;
+  /** Quyền của nhân viên; ADMIN trả về đủ mọi quyền. */
+  permissions: StaffPermission[];
+}
+
+/** ADMIN có mọi quyền; STAFF chỉ có quyền được admin cấp. */
+export function hasPermission(user: Pick<AuthUser, "role" | "permissions">, permission: StaffPermission): boolean {
+  return user.role === "ADMIN" || user.permissions.includes(permission);
 }
 
 export interface LoginResponse {
@@ -658,3 +696,42 @@ export function editTargetPath(kind: string, id: string): string | null {
       return null;
   }
 }
+
+// ───────────── Lịch sử chỉnh sửa (chỉ ADMIN xem) ─────────────
+
+export interface AuditChange {
+  field: string;
+  before: string | null;
+  after: string | null;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  userId: string | null;
+  userName: string;
+  userEmail: string;
+  userRole: Role;
+  /** create | update | delete | reset-password */
+  action: string;
+  /** Mục bị sửa (đoạn đường dẫn sau /admin/): products, orders, settings… */
+  resource: string;
+  entityId: string | null;
+  entityLabel: string;
+  changes: AuditChange[];
+  createdAt: string;
+}
+
+export const AUDIT_RESOURCE_LABELS: Record<string, string> = {
+  orders: "Đơn hàng",
+  inquiries: "Liên hệ & báo giá",
+  products: "Sản phẩm",
+  categories: "Danh mục",
+  banners: "Banner",
+  "home-blocks": "Khối trang chủ",
+  posts: "Bài viết",
+  comments: "Bình luận",
+  pages: "Trang nội dung",
+  policies: "Chính sách",
+  settings: "Thông tin cửa hàng",
+  users: "Tài khoản nhân viên",
+};

@@ -212,3 +212,71 @@ h3 {
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
 }
 .editor-chip-btn:hover { background: #fff2ef; }
+
+/* ───────────── Hiệu ứng đăng nhập (app/login, components/layout/enter-animation.tsx) ─────────────
+   1. Đăng nhập hợp lệ: banner trượt mờ sang trái, form trượt mờ sang phải (.login-root[data-leaving]).
+   2. Chuyển trang với <html data-enter>: menu bên trượt vào từ bên phải, từng nút hiện lần lượt,
+      nội dung hiện dần; trang Tổng quan: số liệu nhảy (ScrambleNumber), biểu đồ mọc dần. */
+.login-banner,
+.login-panel { transition: transform 650ms cubic-bezier(0.65, 0, 0.35, 1), opacity 550ms ease; }
+.login-root[data-leaving] .login-banner { transform: translateX(-35%); opacity: 0; }
+.login-root[data-leaving] .login-panel { transform: translateX(35%); opacity: 0; }
+
+/* Điện thoại (banner nằm trên, form dưới): banner trượt lên và mờ, form mờ dần. */
+@media (max-width: 1023px) {
+  .login-root[data-leaving] .login-banner { transform: translateY(-100%); opacity: 0; }
+  .login-root[data-leaving] .login-panel { transform: none; opacity: 0; }
+}
+
+/* Vừa đăng xuất (?bye=1): ngược lại lúc đăng nhập — banner trượt vào từ trái, form từ phải (mobile: banner từ trên xuống). */
+.login-root[data-returning] .login-banner { animation: login-return-left 700ms cubic-bezier(0.22, 1, 0.36, 1) 150ms both; }
+.login-root[data-returning] .login-panel { animation: login-return-right 700ms cubic-bezier(0.22, 1, 0.36, 1) 150ms both; }
+@keyframes login-return-left { from { transform: translateX(-35%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes login-return-right { from { transform: translateX(35%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes login-return-top { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes login-return-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 1023px) {
+  .login-root[data-returning] .login-banner { animation-name: login-return-top; }
+  .login-root[data-returning] .login-panel { animation-name: login-return-fade; }
+}
+
+/* Đăng xuất (LogoutButton → <html data-leave>): nội dung mờ xuống, nút menu ẩn dần từ dưới lên, menu bên trượt ra phải. */
+html[data-leave] .enter-main { animation: leave-fade-down 380ms ease-in both; }
+html[data-leave] .enter-nav-item {
+  animation: leave-fade-right 300ms ease-in both;
+  animation-delay: max(0ms, calc(420ms - var(--i, 0) * 22ms));
+}
+html[data-leave] .enter-sidebar { animation: leave-sidebar 380ms cubic-bezier(0.65, 0, 0.35, 1) 500ms both; }
+@keyframes leave-fade-down { to { transform: translateY(16px); opacity: 0; } }
+@keyframes leave-fade-right { to { transform: translateX(18px); opacity: 0; } }
+@keyframes leave-sidebar { to { transform: translateX(48px); opacity: 0; } }
+
+html[data-enter] .enter-sidebar { animation: enter-sidebar 650ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+html[data-enter] .enter-nav-item { animation: enter-fade-left 420ms ease-out both; animation-delay: calc(250ms + var(--i, 0) * 45ms); }
+html[data-enter] .enter-main { animation: enter-fade-up 650ms ease-out 420ms both; }
+html[data-enter] .enter-grow-x { transform-origin: left; animation: enter-grow-x 900ms cubic-bezier(0.22, 1, 0.36, 1) 750ms both; }
+html[data-enter] .enter-grow-y {
+  transform-origin: bottom;
+  animation: enter-grow-y 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(700ms + var(--i, 0) * 12ms);
+}
+
+@keyframes enter-sidebar { from { transform: translateX(48px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes enter-fade-left { from { transform: translateX(18px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes enter-fade-up { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes enter-grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes enter-grow-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .login-banner, .login-panel { transition: none; }
+  html[data-enter] .enter-sidebar,
+  html[data-enter] .enter-nav-item,
+  html[data-enter] .enter-main,
+  html[data-enter] .enter-grow-x,
+  html[data-enter] .enter-grow-y,
+  .login-root[data-returning] .login-banner,
+  .login-root[data-returning] .login-panel,
+  html[data-leave] .enter-main,
+  html[data-leave] .enter-nav-item,
+  html[data-leave] .enter-sidebar { animation: none; }
+}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import {
   ORDER_STATUS_LABELS,
   PAYMENT_METHOD_LABELS,
@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { api } from "@/lib/api";
 import { requireAdmin } from "@/lib/auth";
 import { formatCurrency, formatDate, formatDateTime, formatNumber } from "@/lib/format";
+import { ScrambleNumber } from "@/components/ui/scramble-number";
 
 export const metadata = { title: "Tổng quan" };
 
@@ -26,7 +27,9 @@ function Stat({ label, value, sub, subTone = "text-foreground/55" }: { label: st
   return (
     <div className="border border-divider bg-surface p-5">
       <p className="text-xs font-bold uppercase tracking-wide text-foreground/55">{label}</p>
-      <p className="mt-2 text-2xl font-extrabold">{value}</p>
+      <p className="mt-2 text-2xl font-extrabold">
+        <ScrambleNumber value={value} />
+      </p>
       {sub ? <p className={`mt-1 text-xs font-semibold ${subTone}`}>{sub}</p> : null}
     </div>
   );
@@ -59,7 +62,7 @@ function Bars({ rows, format }: { rows: { label: string; value: number; hint?: s
             </span>
           </div>
           <div className="mt-1 h-2 bg-muted">
-            <div className="h-2 bg-accent-600" style={{ width: `${(row.value / max) * 100}%` }} />
+            <div className="enter-grow-x h-2 bg-accent-600" style={{ width: `${(row.value / max) * 100}%` }} />
           </div>
         </li>
       ))}
@@ -85,12 +88,12 @@ function RevenueChart({ data }: { data: DashboardStats["revenueByDay"] }) {
   return (
     <div>
       <div className="flex h-48 items-end gap-[3px]" role="img" aria-label="Biểu đồ doanh thu theo thời gian">
-        {buckets.map((bucket) => (
+        {buckets.map((bucket, index) => (
           <div
             key={bucket.label}
             title={`${bucket.label}: ${formatCurrency(bucket.revenue)} · ${bucket.orders} đơn`}
-            className="min-h-[2px] flex-1 bg-accent-600/85 transition-colors hover:bg-accent-700"
-            style={{ height: `${Math.max((bucket.revenue / bucketMax) * 100, 1)}%` }}
+            className="enter-grow-y min-h-[2px] flex-1 bg-accent-600/85 transition-colors hover:bg-accent-700"
+            style={{ height: `${Math.max((bucket.revenue / bucketMax) * 100, 1)}%`, "--i": index } as CSSProperties}
           />
         ))}
       </div>

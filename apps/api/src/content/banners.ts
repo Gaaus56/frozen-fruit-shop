@@ -15,7 +15,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 import type { Banner as BannerRow } from '@prisma/client';
 import { BANNER_PLACEMENTS, type Banner, type BannerPlacement } from '@frozen-fruit-shop/types';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { toPublicUrl, toStoredPath } from '../common/utils.js';
 import { IsImagePath, Trim } from '../common/validators.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -159,6 +159,7 @@ export class PublicBannersController {
 
 @Controller('admin/banners')
 @Auth()
+@Permission('banners')
 export class AdminBannersController {
   constructor(private readonly service: BannersService) {}
 

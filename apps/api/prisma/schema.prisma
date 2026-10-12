@@ -24,6 +24,8 @@ model User {
   name              String
   passwordHash      String
   role              Role      @default(STAFF)
+  /// Quyền theo mục của nhân viên (STAFF_PERMISSIONS trong packages/types); ADMIN bỏ qua, luôn đủ quyền.
+  permissions       String[]  @default([])
   isActive          Boolean   @default(true)
   failedLoginCount  Int       @default(0)
   lockedUntil       DateTime?
@@ -32,6 +34,7 @@ model User {
   passwordChangedAt DateTime  @default(now())
 
   orderLogs OrderStatusLog[]
+  auditLogs AuditLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -401,4 +404,32 @@ model Comment {
   @@index([postId, status, createdAt])
   @@index([status, createdAt])
   @@map("comments")
+}
+
+// ───────────────────────────── Lịch sử chỉnh sửa (chỉ ADMIN xem) ─────────────────────────────
+
+/// Mỗi lần tài khoản quản trị thêm / sửa / xoá dữ liệu qua API /admin/*. Ghi tự động (audit/audit.interceptor.ts).
+model AuditLog {
+  id          String   @id @default(cuid())
+  /// null khi tài khoản đã bị xoá — tên vẫn giữ ở userName.
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userName    String
+  userEmail   String
+  userRole    Role
+  /// create | update | delete | reset-password | ...
+  action      String
+  /// Mục bị sửa: products, orders, settings, ... (đoạn đường dẫn sau /admin/).
+  resource    String
+  entityId    String?
+  /// Tên dễ đọc của đối tượng lúc sửa (tên sản phẩm, mã đơn, tiêu đề bài...).
+  entityLabel String   @default("")
+  /// [{ field, before, after }] — giá trị đã rút gọn (bỏ HTML, cắt chuỗi dài, ẩn mật khẩu).
+  changes     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([resource, createdAt])
+  @@map("audit_logs")
 }

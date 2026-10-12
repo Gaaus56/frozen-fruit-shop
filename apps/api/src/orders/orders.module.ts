@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Module, Param, Patch, Post, Query } from '@nestjs/common';
-import { Auth, CurrentUser, type RequestUser } from '../auth/auth.guard.js';
+import { Auth, CurrentUser, Permission, type RequestUser } from '../auth/auth.guard.js';
 import { RateLimit } from '../common/rate-limit.guard.js';
 import { AdminOrderQuery, CreateOrderDto, LookupOrderQuery, QuoteDto, UpdateOrderDto } from './orders.dto.js';
 import { OrdersService } from './orders.service.js';
@@ -30,6 +30,7 @@ export class PublicOrdersController {
 
 @Controller('admin/orders')
 @Auth()
+@Permission('orders')
 export class AdminOrdersController {
   constructor(private readonly service: OrdersService) {}
 

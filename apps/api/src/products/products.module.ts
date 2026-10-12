@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Module, Param, Patch, Post, Query } from '@nestjs/common';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { AdminProductQuery, CreateProductDto, PublicProductQuery, UpdateProductDto } from './products.dto.js';
 import { ProductsService } from './products.service.js';
 
@@ -20,10 +20,13 @@ export class PublicProductsController {
 
 @Controller('admin/products')
 @Auth()
+@Permission('products')
 export class AdminProductsController {
   constructor(private readonly service: ProductsService) {}
 
+  // Người soạn bài viết / trang / chính sách / khối trang chủ cần danh sách sản phẩm để chèn "ô sản phẩm".
   @Get()
+  @Permission('products', 'posts', 'pages', 'policies', 'homeBlocks')
   list(@Query() query: AdminProductQuery) {
     return this.service.listAdmin(query);
   }

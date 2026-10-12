@@ -1,6 +1,6 @@
 # Phát hiện khi viết kịch bản test
 
-Ghi lại các lỗi và điểm lệch thấy được khi **đọc code** để viết kịch bản (chưa chạy thử). Mỗi mục có ca test để xác nhận. Xử lý xong thì ghi ✅ và commit sửa lỗi vào cột "Trạng thái".
+Ghi lại các lỗi và điểm lệch thấy được khi **đọc code** để viết kịch bản (chưa chạy thử). Lỗi đã gặp và đã xử lý trong lúc code xem [bug-log.md](bug-log.md). Mỗi mục có ca test để xác nhận. Xử lý xong thì ghi ✅ và commit sửa lỗi vào cột "Trạng thái".
 
 Mức độ: **Cao** ảnh hưởng dữ liệu / trải nghiệm chính · **Vừa** gây khó chịu, có cách khắc phục · **Thấp** hiển thị, trường hợp hiếm.
 

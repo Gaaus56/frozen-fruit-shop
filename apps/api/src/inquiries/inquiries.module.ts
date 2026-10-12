@@ -16,7 +16,7 @@ import {
 import { IsEmail, IsIn, IsOptional, IsString, Matches, MaxLength, MinLength, ValidateIf } from 'class-validator';
 import type { Inquiry as InquiryRow, Prisma } from '@prisma/client';
 import type { Inquiry, Paginated } from '@frozen-fruit-shop/types';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { PaginationQueryDto, paginate } from '../common/pagination.js';
 import { RateLimit } from '../common/rate-limit.guard.js';
 import { iso } from '../common/utils.js';
@@ -164,6 +164,7 @@ export class PublicInquiriesController {
 
 @Controller('admin/inquiries')
 @Auth()
+@Permission('inquiries')
 export class AdminInquiriesController {
   constructor(private readonly service: InquiriesService) {}
 

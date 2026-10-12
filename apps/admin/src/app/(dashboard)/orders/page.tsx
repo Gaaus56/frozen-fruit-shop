@@ -42,12 +42,6 @@ export default async function OrdersPage({ searchParams }: PageProps<"/orders">)
     <div>
       <PageHeader title="Đơn hàng" description="Đơn khách đặt trên website. Gọi xác nhận, chốt phí vận chuyển rồi cập nhật trạng thái." />
 
-      {params.forbidden ? (
-        <p className="mb-4 border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Tài khoản nhân viên không truy cập được trang vừa chọn.
-        </p>
-      ) : null}
-
       <div className="mb-4 flex flex-wrap items-center gap-1 border-b border-divider">
         {[undefined, ...STATUSES].map((value) => (
           <Link

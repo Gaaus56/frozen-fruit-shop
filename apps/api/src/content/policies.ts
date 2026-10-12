@@ -14,7 +14,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { IsBoolean, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import type { Policy as PolicyRow } from '@prisma/client';
 import type { Policy } from '@frozen-fruit-shop/types';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { sanitizeRichText, toRichTextOutput } from '../common/rich-text.js';
 import { slugify } from '../common/utils.js';
 import { IsSlug, Trim } from '../common/validators.js';
@@ -137,6 +137,7 @@ export class PublicPoliciesController {
 
 @Controller('admin/policies')
 @Auth()
+@Permission('policies')
 export class AdminPoliciesController {
   constructor(private readonly service: PoliciesService) {}
 
