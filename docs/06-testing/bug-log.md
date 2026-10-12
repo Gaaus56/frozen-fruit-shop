@@ -45,6 +45,7 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 | [B-30](#b-30--chữ-đỏ-không-đủ-tương-phản) | Truy cập | Chữ / nút đỏ không đủ tương phản (axe) | ✅ |
 | [B-31](#b-31--quá-nhiều-yêu-cầu-429-khi-test) | API | "Bạn thao tác quá nhanh" (429) khi test | ℹ️ |
 | [B-32](#b-32--seed-tạo-nhân-viên-không-có-quyền-nào) | Dữ liệu mẫu | Seed tạo nhân viên không có quyền nào | ✅ |
+| [B-33](#b-33--ảnh-mẫu-404-trên-render) | Deploy | Ảnh mẫu 404 trên Render (bị `.dockerignore` loại khỏi image) | ✅ |
 | [T-01](#t-01--prisma-generate-báo-eperm-trên-windows) | Công cụ | `prisma generate` báo EPERM trên Windows | ⚠️ |
 | [T-02](#t-02--sửa-packagestypes-mà-api--web-không-thấy-thay-đổi) | Công cụ | Sửa `packages/types` mà app không thấy thay đổi | ⚠️ |
 | [T-03](#t-03--lỗi-type-trong-nexttypes-sau-khi-xoá-trang) | Công cụ | Lỗi type trong `.next/types` sau khi xoá trang | ⚠️ |
@@ -264,6 +265,13 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 - **Nguyên nhân:** cột `permissions` mặc định rỗng; migration chỉ cấp quyền cho nhân viên **đang có**, còn seed tạo tài khoản mới không ghi quyền.
 - **Cách sửa:** seed cấp đủ quyền cho `staff1`, chỉ Đơn hàng + Liên hệ cho `staff2` (để thử phân quyền).
 - **Bài học:** thêm cột / ràng buộc mới → cập nhật **cả migration lẫn seed**.
+
+### B-33 — Ảnh mẫu 404 trên Render
+- **Ngày:** 2026-10-12
+- **Hiện tượng:** bản demo trên Vercel hiện tên, giá sản phẩm nhưng mọi ảnh vỡ; `https://<api>.onrender.com/uploads/seed/xoai1.jpg` trả 404.
+- **Nguyên nhân:** `.dockerignore` (viết từ khi ảnh mẫu chỉ dùng ở máy dev) loại `apps/api/prisma/seed-assets` khỏi Docker image. Sau khi API chuyển sang phục vụ ảnh mẫu thẳng từ thư mục này (vì Render không có ổ đĩa lâu dài), thư mục không có trong image → `existsSync` sai → không đăng ký route → 404.
+- **Cách sửa:** bỏ dòng đó khỏi `.dockerignore`, deploy lại API.
+- **Bài học:** đổi chỗ đọc file lúc chạy → kiểm tra cả `.dockerignore` / Dockerfile; thử build image (hoặc gọi URL ảnh trên bản deploy) trước khi báo xong.
 
 ---
 
