@@ -11,6 +11,7 @@ import { AddToCartForm } from "@/components/product/add-to-cart-form";
 import { fillSettingsPlaceholders } from "@frozen-fruit-shop/types";
 import { getPolicies, getProduct, getSettings } from "@/lib/api";
 import { editSettings, editTarget } from "@/lib/edit-target";
+import { AssuranceIconView } from "@/components/ui/line-icon";
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -83,8 +84,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               {assurances.map((item, index) => {
                 const body = (
                   <>
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-leaf/10 text-sm text-leaf" aria-hidden>
-                      {item.icon}
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-leaf/10 text-leaf" aria-hidden>
+                      <AssuranceIconView icon={item.icon} className="h-4 w-4" />
                     </span>
                     <span className="min-w-0">
                       <span className="block text-xs font-bold text-foreground">{item.title}</span>

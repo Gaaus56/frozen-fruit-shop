@@ -7,12 +7,14 @@ import { Checkbox, Field, FormAlert, inputClass } from "@/components/ui/form";
 import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import type { ProductOption } from "@/components/editor/extensions";
 import { saveHomeBlockAction } from "./actions";
+import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 export function HomeBlockForm({ block, products }: { block?: HomeBlock; products: ProductOption[] }) {
   const [state, formAction] = useActionState(saveHomeBlockAction.bind(null, block?.id ?? null), undefined);
 
   return (
-    <form action={formAction} className="flex max-w-4xl flex-col gap-5 border border-divider bg-surface p-6">
+    <form action={formAction} className="flex flex-col gap-5 border border-divider bg-surface p-6">
+      <UnsavedChangesGuard state={state} />
       <Field
         label="Tiêu đề khối"
         htmlFor="title"

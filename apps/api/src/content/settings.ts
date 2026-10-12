@@ -1,11 +1,13 @@
 import { Body, Controller, Get, Injectable, Put } from '@nestjs/common';
-import { Type } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsBoolean, IsOptional, IsString, Matches, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { ArrayMaxSize, IsArray, IsBoolean, IsIn, IsOptional, IsString, Matches, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { Prisma } from '@prisma/client';
 import {
   DEFAULT_PRODUCT_ASSURANCES,
   DEFAULT_SITE_SETTINGS,
+  ASSURANCE_ICONS,
   MAX_PRODUCT_ASSURANCES,
+  normalizeAssuranceIcon,
   type ProductAssurance,
   type SiteSettings,
 } from '@frozen-fruit-shop/types';
@@ -19,7 +21,10 @@ const URL_OR_EMPTY = /^(https?:\/\/\S+)?$/;
 const ASSURANCE_LINK = /^((\/|https?:\/\/|tel:|mailto:)\S*)?$/;
 
 export class ProductAssuranceDto implements ProductAssurance {
-  @Trim() @IsString() @MaxLength(8) icon!: string;
+  // Tên icon nét (snowflake, truck…); emoji kiểu cũ (❄️, 🚚…) được đổi sang tên icon tương ứng.
+  @Transform(({ value }) => (typeof value === 'string' ? normalizeAssuranceIcon(value) : value))
+  @IsIn(ASSURANCE_ICONS)
+  icon!: string;
   @Trim() @IsString() @MaxLength(60) title!: string;
   @Trim() @IsString() @MaxLength(160) text!: string;
   @Trim() @Matches(ASSURANCE_LINK, { message: 'Link thẻ cam kết không hợp lệ' }) @MaxLength(500) linkUrl!: string;
@@ -61,7 +66,9 @@ export class SettingsService {
     if (!row) return DEFAULT_SITE_SETTINGS;
     const { id: _id, updatedAt: _updatedAt, productAssurances, ...settings } = row;
     // null = admin chưa chỉnh thẻ cam kết lần nào → dùng bộ mặc định.
-    return { ...settings, productAssurances: (productAssurances as ProductAssurance[] | null) ?? DEFAULT_PRODUCT_ASSURANCES };
+    const assurances = (productAssurances as ProductAssurance[] | null) ?? DEFAULT_PRODUCT_ASSURANCES;
+    // Dữ liệu lưu từ trước khi đổi sang icon nét còn là emoji → trả tên icon tương ứng.
+    return { ...settings, productAssurances: assurances.map((item) => ({ ...item, icon: normalizeAssuranceIcon(item.icon) })) };
   }
 
   async update(dto: UpdateSettingsDto): Promise<SiteSettings> {

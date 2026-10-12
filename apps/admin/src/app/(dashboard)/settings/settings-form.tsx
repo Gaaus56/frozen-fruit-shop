@@ -1,12 +1,20 @@
 "use client";
 
-import { useActionState } from "react";
-import { ASSURANCE_ICONS, MAX_PRODUCT_ASSURANCES, type ProductAssurance, type SiteSettings } from "@frozen-fruit-shop/types";
+import { useActionState, useState } from "react";
+import {
+  ASSURANCE_ICONS,
+  ASSURANCE_ICON_INFO,
+  MAX_PRODUCT_ASSURANCES,
+  normalizeAssuranceIcon,
+  type ProductAssurance,
+  type SiteSettings,
+} from "@frozen-fruit-shop/types";
 import { SubmitButton } from "@/components/ui/button";
 import { Checkbox, Field, FormAlert, Section, inputClass } from "@/components/ui/form";
 import { LinkPicker } from "../banners/link-picker";
 import type { LinkOptionGroup } from "../banners/link-options";
 import { saveSettingsAction } from "./actions";
+import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 const EMPTY_ASSURANCE: ProductAssurance = { icon: ASSURANCE_ICONS[0], title: "", text: "", linkUrl: "" };
 
@@ -16,7 +24,8 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
   const assurances = Array.from({ length: MAX_PRODUCT_ASSURANCES }, (_, index) => settings.productAssurances[index] ?? EMPTY_ASSURANCE);
 
   return (
-    <form action={formAction} className="flex max-w-4xl flex-col gap-6">
+    <form action={formAction} className="flex flex-col gap-6">
+      <UnsavedChangesGuard state={state} />
       <Section id="brand" title="Thương hiệu">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Tên cửa hàng" htmlFor="storeName" required hint="Hiện ở tiêu đề trang, chân trang.">
@@ -80,17 +89,7 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
           {assurances.map((item, index) => (
             <fieldset key={index} className="flex flex-col gap-3 border border-divider bg-card p-4">
               <legend className="px-1 text-xs font-bold uppercase tracking-wide text-foreground/60">Ô {index + 1}</legend>
-              <Field label="Biểu tượng" htmlFor={`assurance${index}Icon`}>
-                <select id={`assurance${index}Icon`} name={`assurance${index}Icon`} defaultValue={item.icon} className={inputClass}>
-                  {/* Giữ biểu tượng cũ nếu không nằm trong danh sách (dữ liệu nhập tay trước đây). */}
-                  {(ASSURANCE_ICONS as readonly string[]).includes(item.icon) ? null : <option value={item.icon}>{item.icon}</option>}
-                  {ASSURANCE_ICONS.map((icon) => (
-                    <option key={icon} value={icon}>
-                      {icon}
-                    </option>
-                  ))}
-                </select>
-              </Field>
+              <AssuranceIconPicker name={`assurance${index}Icon`} defaultValue={item.icon} />
               <Field label="Tiêu đề" htmlFor={`assurance${index}Title`}>
                 <input id={`assurance${index}Title`} name={`assurance${index}Title`} maxLength={60} defaultValue={item.title} className={inputClass} />
               </Field>
@@ -124,5 +123,35 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
         <FormAlert state={state} />
       </div>
     </form>
+  );
+}
+
+/**
+ * Chọn biểu tượng thẻ cam kết: lưới icon nét (đổi màu theo chủ đề web), bấm để chọn.
+ * Thẻ cũ lưu emoji (❄️, ↺, ☎…) tự hiện đúng icon tương ứng.
+ */
+function AssuranceIconPicker({ name, defaultValue }: { name: string; defaultValue: string }) {
+  const [value, setValue] = useState(() => normalizeAssuranceIcon(defaultValue));
+  return (
+    <fieldset>
+      <legend className="text-sm font-semibold text-foreground/85">Biểu tượng</legend>
+      <div className="mt-1.5 grid grid-cols-5 gap-1.5">
+        {ASSURANCE_ICONS.map((icon) => (
+          <label
+            key={icon}
+            title={ASSURANCE_ICON_INFO[icon].label}
+            className={`flex aspect-square cursor-pointer items-center justify-center border transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-600 ${
+              value === icon ? "border-leaf-600 bg-leaf-50 text-leaf-700" : "border-divider bg-surface text-foreground/55 hover:border-foreground/40 hover:text-foreground"
+            }`}
+          >
+            <input type="radio" name={name} value={icon} checked={value === icon} onChange={() => setValue(icon)} className="sr-only" />
+            <span className="sr-only">{ASSURANCE_ICON_INFO[icon].label}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden>
+              <path d={ASSURANCE_ICON_INFO[icon].d} />
+            </svg>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }

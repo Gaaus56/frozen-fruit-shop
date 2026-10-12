@@ -7,6 +7,7 @@ import { ClearFilterChip, FilterChip, FilterChips } from "@/components/ui/filter
 import { ProductGrid } from "@/components/product/product-grid";
 import { getBanners, getCategories, getProducts, type ProductFilters } from "@/lib/api";
 import { editTarget } from "@/lib/edit-target";
+import { EMPTY_ICONS, EmptyStateIcon } from "@/components/ui/line-icon";
 
 export const metadata: Metadata = {
   title: "Sản phẩm",
@@ -120,9 +121,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <ProductGrid products={products} />
           ) : (
             <div className="flex flex-col items-center gap-4 rounded-xl bg-card px-6 py-14 text-center ring-1 ring-divider/70">
-              <span className="text-4xl" aria-hidden>
-                {query ? "🔍" : "🧊"}
-              </span>
+              <EmptyStateIcon d={query ? EMPTY_ICONS.search : EMPTY_ICONS.box} />
               <p className="max-w-md text-foreground/70">
                 {query
                   ? `Không tìm thấy sản phẩm nào khớp với "${query}". Thử từ khoá ngắn hơn, ví dụ "xoài" hoặc "dâu".`

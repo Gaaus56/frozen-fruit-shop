@@ -18,6 +18,7 @@ import {
   type TextColor as TextColorName,
 } from "@frozen-fruit-shop/types";
 import { formatCurrency } from "@/lib/format";
+import { LinkSelect } from "./link-select";
 
 /** Sản phẩm để chọn chèn vào bài (lấy sẵn từ server, không gọi API khi gõ). */
 export interface ProductOption {
@@ -493,12 +494,12 @@ function ButtonRowView({ node, updateAttributes, deleteNode, selected }: ReactNo
               maxLength={40}
               aria-label={`Chữ trên nút ${index + 1}`}
             />
-            <input
+            <LinkSelect
               value={item.href}
-              onChange={(event) => update(index, { href: event.target.value })}
-              onBlur={(event) => update(index, { href: normalizeButtonHref(event.target.value) })}
-              placeholder="/products hoặc https://zalo.me/…"
-              aria-label={`Link của nút ${index + 1}`}
+              onChange={(href) => update(index, { href })}
+              onCommit={(href) => update(index, { href: normalizeButtonHref(href) })}
+              allowNone={false}
+              label={`Link của nút ${index + 1}`}
             />
             <select
               value={item.style}
@@ -562,7 +563,9 @@ export const ButtonRow = Node.create({
   },
 
   parseHTML() {
-    return [{ tag: "p[data-buttons]" }];
+    // Ưu tiên hơn Paragraph (50): không có priority thì <p data-buttons> bị đọc thành đoạn văn chứa liên kết
+    // → mở lại bài, hàng nút biến thành chữ có gạch chân và mất hẳn khi lưu.
+    return [{ tag: "p[data-buttons]", priority: 60 }];
   },
 
   renderHTML({ node, HTMLAttributes }) {

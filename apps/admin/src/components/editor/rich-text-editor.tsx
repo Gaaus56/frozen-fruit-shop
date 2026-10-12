@@ -7,6 +7,7 @@ import { CharacterCount, Placeholder } from "@tiptap/extensions";
 import { TEXT_COLORS, TEXT_COLOR_LABELS, plainTextToHtml } from "@frozen-fruit-shop/types";
 import { ACCEPT, uploadFile } from "@/components/ui/image-upload";
 import { HelpButton, HelpPanel } from "@/components/ui/help";
+import { LinkSelect, useLinkOptionGroups } from "./link-select";
 import { formatCurrency } from "@/lib/format";
 import { BlockStyle, ButtonRow, Callout, Column, Columns, Figure, ProductEmbed, TextAlign, TextColor, type ProductOption } from "./extensions";
 
@@ -454,6 +455,7 @@ function LinkBar({ editor, onClose }: { editor: Editor; onClose: () => void }) {
   const current = (editor.getAttributes("link").href as string | undefined) ?? "";
   const [url, setUrl] = useState(current);
   const hasSelection = !editor.state.selection.empty || editor.isActive("link");
+  const linkGroups = useLinkOptionGroups();
 
   function apply() {
     const value = url.trim();
@@ -462,7 +464,11 @@ function LinkBar({ editor, onClose }: { editor: Editor; onClose: () => void }) {
     } else {
       const href = normalizeHref(value);
       if (hasSelection) editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
-      else editor.chain().focus().insertContent({ type: "text", text: value, marks: [{ type: "link", attrs: { href } }] }).run();
+      else {
+        // Chưa bôi đen chữ: chèn tên trang (vd "Liên hệ") thay vì đường dẫn thô "/contact".
+        const text = linkGroups?.flatMap((group) => group.options).find((option) => option.value === value)?.label ?? value;
+        editor.chain().focus().insertContent({ type: "text", text, marks: [{ type: "link", attrs: { href } }] }).run();
+      }
     }
     onClose();
   }
@@ -470,19 +476,15 @@ function LinkBar({ editor, onClose }: { editor: Editor; onClose: () => void }) {
   return (
     <div className="flex flex-wrap items-center gap-2 border-b border-divider bg-leaf-50 px-3 py-2 text-sm">
       <span className="font-semibold text-leaf-700">{hasSelection ? "Liên kết cho chữ đang chọn:" : "Chèn liên kết:"}</span>
-      <input
+      <LinkSelect
         autoFocus
         value={url}
-        onChange={(event) => setUrl(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            apply();
-          }
-          if (event.key === "Escape") onClose();
-        }}
-        placeholder="/products/xoai-cat hoặc https://zalo.me/…"
-        className="min-w-56 flex-1 border border-divider bg-white px-2 py-1"
+        onChange={setUrl}
+        onEnter={apply}
+        onEscape={onClose}
+        label="Trang cần liên kết"
+        className="min-w-56 flex-1"
+        inputClassName="w-full border border-divider bg-white px-2 py-1"
       />
       <button type="button" onClick={apply} className="bg-leaf-600 px-3 py-1 font-bold text-white hover:bg-leaf-700">
         Áp dụng

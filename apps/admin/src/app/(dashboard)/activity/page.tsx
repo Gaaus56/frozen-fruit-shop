@@ -18,13 +18,19 @@ const ACTION_TONE: Record<string, "green" | "blue" | "red" | "amber"> = {
   "reset-password": "amber",
 };
 
-/** Mục có trang sửa theo id → link mở thẳng bản ghi. */
+/** Mục có trang sửa riêng theo id (app/(dashboard)/<mục>/[id]) — chỉ những mục này mới có link "Mở bản ghi này". */
+const HAS_DETAIL_PAGE = new Set(["banners", "categories", "home-blocks", "orders", "policies", "posts", "products"]);
+
+/**
+ * Link mở thẳng bản ghi; `null` = ẩn nút (đã xoá, hoặc mục không có trang riêng như Liên hệ & báo giá, Bình luận —
+ * xử lý ngay trong danh sách) để không dẫn tới trang 404.
+ */
 function entityHref(entry: AuditLogEntry): string | null {
   if (entry.action === "delete") return null;
   if (entry.resource === "settings") return "/settings";
   if (entry.resource === "pages" && entry.entityId) return `/pages/${entry.entityId}`;
   if (entry.resource === "users") return "/users";
-  return entry.entityId ? `/${entry.resource}/${entry.entityId}` : null;
+  return entry.entityId && HAS_DETAIL_PAGE.has(entry.resource) ? `/${entry.resource}/${entry.entityId}` : null;
 }
 
 export default async function ActivityPage({ searchParams }: PageProps<"/activity">) {
