@@ -46,6 +46,7 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 | [B-31](#b-31--quá-nhiều-yêu-cầu-429-khi-test) | API | "Bạn thao tác quá nhanh" (429) khi test | ℹ️ |
 | [B-32](#b-32--seed-tạo-nhân-viên-không-có-quyền-nào) | Dữ liệu mẫu | Seed tạo nhân viên không có quyền nào | ✅ |
 | [B-33](#b-33--ảnh-mẫu-404-trên-render) | Deploy | Ảnh mẫu 404 trên Render (bị `.dockerignore` loại khỏi image) | ✅ |
+| [B-34](#b-34--số-điện-thoại-bị-bẻ-xuống-dòng) | Giao diện | Số điện thoại bị bẻ đôi xuống dòng trên điện thoại | ✅ |
 | [T-01](#t-01--prisma-generate-báo-eperm-trên-windows) | Công cụ | `prisma generate` báo EPERM trên Windows | ⚠️ |
 | [T-02](#t-02--sửa-packagestypes-mà-api--web-không-thấy-thay-đổi) | Công cụ | Sửa `packages/types` mà app không thấy thay đổi | ⚠️ |
 | [T-03](#t-03--lỗi-type-trong-nexttypes-sau-khi-xoá-trang) | Công cụ | Lỗi type trong `.next/types` sau khi xoá trang | ⚠️ |
@@ -159,6 +160,13 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 ### B-18 — Khung Fanpage bị cắt, email bị ngắt giữa chừng
 - **Nguyên nhân:** Facebook Page Plugin dạng iframe **không tự co theo khung** (vẽ đúng `width` truyền vào); email dài trong cột hẹp + `overflow-wrap:anywhere` bị ngắt giữa từ.
 - **Cách sửa:** đặt bề ngang cố định 280px cho plugin; nới cột Liên hệ (`lg:col-span-4`).
+
+### B-34 — Số điện thoại bị bẻ xuống dòng
+- **Ngày:** 2026-10-12
+- **Hiện tượng:** trên điện thoại, trang Đặt hàng thành công hiện "gọi **0396 799** / **579**" — số bị tách làm hai dòng.
+- **Nguyên nhân:** `formatPhone` (packages/types) nhóm số bằng dấu cách thường, trình duyệt được phép ngắt dòng ở đó.
+- **Cách sửa:** `formatPhone` nối các cụm bằng dấu cách không ngắt dòng (U+00A0) → mọi nơi dùng hàm (web, bill, thẻ cam kết qua `{phone}`) không bao giờ bẻ đôi số; link `tel:` vẫn bỏ khoảng trắng bằng `\s` (khớp cả U+00A0). Chỗ hiện số thô ở trang Tin tức (Zalo tuyển dụng) chuyển sang dùng `formatPhone`.
+- **Bài học:** chuỗi phải đọc liền một khối (số điện thoại, mã đơn, giá tiền) thì dùng khoảng trắng không ngắt hoặc `whitespace-nowrap` ngay từ hàm định dạng, không vá từng chỗ hiển thị.
 
 ---
 
