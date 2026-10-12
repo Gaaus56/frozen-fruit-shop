@@ -7,6 +7,7 @@ import { formatCurrency } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
 import { Button } from "@/components/ui/button";
 import { Price } from "./price";
+import { CheckIcon } from "@/components/ui/check-icon";
 
 export function AddToCartForm({ product }: { product: Product }) {
   const firstAvailable = product.variants.find((variant) => variant.stockStatus !== "out_of_stock") ?? product.variants[0];
@@ -117,7 +118,13 @@ export function AddToCartForm({ product }: { product: Product }) {
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button variant="secondary" className="rounded-lg sm:flex-1" onClick={handleAddToCart} disabled={isOutOfStock}>
-          {justAdded ? "Đã thêm vào giỏ ✓" : "Thêm vào giỏ hàng"}
+          {justAdded ? (
+            <span className="inline-flex items-center gap-1.5">
+              Đã thêm vào giỏ <CheckIcon className="h-4 w-4 text-leaf" />
+            </span>
+          ) : (
+            "Thêm vào giỏ hàng"
+          )}
         </Button>
         <Button className="rounded-lg sm:flex-1" onClick={handleBuyNow} disabled={isOutOfStock}>
           Mua ngay

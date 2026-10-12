@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import {
   ORDER_STATUS_LABELS,
   PAYMENT_METHOD_LABELS,
@@ -44,6 +44,8 @@ export function OrderLookup({ store }: { store: ReceiptStore }) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState<string | null>(null);
+  const [receiptHelpOpen, setReceiptHelpOpen] = useState(false);
+  const receiptHelpId = useId();
   const [openReceipt, setOpenReceipt] = useState<SavedReceipt | null>(null);
   const receipts = useSavedReceipts();
 
@@ -207,9 +209,37 @@ export function OrderLookup({ store }: { store: ReceiptStore }) {
 
         {/* Bill đã xuất trên máy này (localStorage) — lần sau vào web vẫn thấy. */}
         <section className={cardClass} aria-labelledby="saved-receipts-heading">
-          <h2 id="saved-receipts-heading" className="text-lg font-bold text-foreground">
-            Bill đã lưu trên máy này
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 id="saved-receipts-heading" className="text-lg font-bold text-foreground">
+              Bill đã lưu trên máy này
+            </h2>
+            <button
+              type="button"
+              onClick={() => setReceiptHelpOpen((value) => !value)}
+              aria-expanded={receiptHelpOpen}
+              aria-controls={receiptHelpId}
+              aria-label="Giải thích: bill lưu ở đâu"
+              className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs font-bold leading-none transition-colors ${
+                receiptHelpOpen ? "border-accent-600 bg-accent-600 text-white" : "border-foreground/30 text-foreground/50 hover:border-accent-600 hover:text-accent-700"
+              }`}
+            >
+              ?
+            </button>
+          </div>
+          {/* Trượt xuống / thu lên mượt: grid-rows 0fr ↔ 1fr + mờ dần; khi đóng `inert` để không Tab tới. */}
+          <div
+            id={receiptHelpId}
+            inert={!receiptHelpOpen}
+            className={`grid transition-[grid-template-rows,opacity,translate] duration-300 ease-out motion-reduce:transition-none ${
+              receiptHelpOpen ? "grid-rows-[1fr] translate-y-0 opacity-100" : "grid-rows-[0fr] -translate-y-1 opacity-0"
+            }`}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <p className="mt-2 rounded-lg bg-field px-3 py-2 text-xs text-foreground/65">
+                Bill chỉ lưu trong trình duyệt này, không gửi đi đâu. Xoá dữ liệu trình duyệt sẽ mất bill.
+              </p>
+            </div>
+          </div>
           {receipts.length === 0 ? (
             <p className="mt-3 text-sm text-foreground/65">
               Chưa có bill nào. Bill được tự lưu khi bạn đặt hàng trên máy này, hoặc khi bấm «Xuất bill» sau khi tra cứu.
@@ -258,7 +288,6 @@ export function OrderLookup({ store }: { store: ReceiptStore }) {
               ))}
             </ul>
           )}
-          <p className="mt-4 text-xs text-foreground/55">Bill chỉ lưu trong trình duyệt này, không gửi đi đâu. Xoá dữ liệu trình duyệt sẽ mất bill.</p>
         </section>
       </div>
 

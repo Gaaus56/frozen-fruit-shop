@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { useActionState, useEffect, useId, useRef, useState, useTransition } from "react";
 import { STAFF_PERMISSIONS, STAFF_PERMISSION_LABELS, type StaffPermission } from "@frozen-fruit-shop/types";
 import { SubmitButton, buttonClass } from "@/components/ui/button";
 import { Field, FormAlert, inputClass } from "@/components/ui/form";
+import { HelpButton, HelpPanel } from "@/components/ui/help";
 import { createStaffAction, resetStaffPasswordAction, setStaffActiveAction, updateStaffPermissionsAction } from "./actions";
 
 export const PASSWORD_MIN_LENGTH = 8;
@@ -18,6 +19,8 @@ const PRESETS: { label: string; permissions: StaffPermission[] }[] = [
 /** Bảng tick quyền (gửi lên qua các ô name="permissions"). */
 function PermissionPicker({ defaultValue }: { defaultValue: StaffPermission[] }) {
   const [selected, setSelected] = useState<StaffPermission[]>(defaultValue);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const helpId = useId();
   const toggle = (permission: StaffPermission) =>
     setSelected((current) => (current.includes(permission) ? current.filter((item) => item !== permission) : [...current, permission]));
   const addPreset = (permissions: StaffPermission[]) =>
@@ -25,7 +28,15 @@ function PermissionPicker({ defaultValue }: { defaultValue: StaffPermission[] })
 
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="mb-1 text-sm font-bold">Quyền được dùng</legend>
+      <legend className="mb-1 flex items-center gap-1.5 text-sm font-bold">
+        Quyền được dùng
+        <HelpButton open={helpOpen} onToggle={() => setHelpOpen((value) => !value)} controls={helpId} label="Quyền được dùng" />
+      </legend>
+      <HelpPanel id={helpId} open={helpOpen}>
+        <p className="mb-1 border-l-2 border-accent-600 bg-accent-50/60 px-3 py-1.5 text-xs text-foreground/70">
+          Tổng quan doanh thu, Thông tin cửa hàng, Xem trước &amp; sửa và Tài khoản nhân viên luôn chỉ dành cho chủ cửa hàng.
+        </p>
+      </HelpPanel>
       <div className="flex flex-wrap gap-1.5">
         {PRESETS.map((preset) => (
           <button key={preset.label} type="button" onClick={() => addPreset(preset.permissions)} className={buttonClass("secondary", "sm")}>
@@ -57,9 +68,6 @@ function PermissionPicker({ defaultValue }: { defaultValue: StaffPermission[] })
           </label>
         ))}
       </div>
-      <p className="text-xs text-foreground/55">
-        Tổng quan doanh thu, Thông tin cửa hàng, Xem trước &amp; sửa và Tài khoản nhân viên luôn chỉ dành cho chủ cửa hàng.
-      </p>
     </fieldset>
   );
 }

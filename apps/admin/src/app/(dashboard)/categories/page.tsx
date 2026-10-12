@@ -17,7 +17,7 @@ export default async function CategoriesPage() {
     <div>
       <PageHeader
         title="Danh mục"
-        description="Nhóm sản phẩm hiển thị ở trang chủ, menu và bộ lọc trang sản phẩm."
+        help="Nhóm sản phẩm hiển thị ở trang chủ, menu và bộ lọc trang sản phẩm."
         action={<LinkButton href="/categories/new">+ Thêm danh mục</LinkButton>}
       />
       <Table

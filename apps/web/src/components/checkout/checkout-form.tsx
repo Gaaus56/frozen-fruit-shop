@@ -14,6 +14,7 @@ import { useCart } from "@/lib/cart-context";
 import { lookupOrder, placeOrder, quoteCart } from "@/lib/api-client";
 import { formatCurrency } from "@/lib/format";
 import { saveReceipt, type ReceiptStore, type SavedReceipt } from "@/lib/saved-receipts";
+import { SuccessCheck } from "@/components/ui/check-icon";
 
 const PAYMENT_OPTIONS: { value: PaymentMethod; label: string; description: string }[] = [
   { value: "cod", label: "Thanh toán khi nhận hàng (COD)", description: "Trả tiền mặt cho người giao hàng." },
@@ -130,14 +131,8 @@ export function CheckoutForm({ bankTransferInfo, store }: { bankTransferInfo: st
     return (
       <Container className="py-10">
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
-          {/* Nảy lên một lần rồi gỡ class (lúc "In / Lưu PDF" trang bị ẩn rồi hiện lại, class còn gắn thì nảy lại). */}
-          <span
-            className={`${badgeShown ? "" : "checkout-success-badge"} flex h-14 w-14 items-center justify-center rounded-full bg-leaf text-2xl text-white shadow-lg`}
-            onAnimationEnd={() => setBadgeShown(true)}
-            aria-hidden
-          >
-            ✓
-          </span>
+          {/* Vẽ một lần rồi gỡ hiệu ứng (lúc "In / Lưu PDF" trang bị ẩn rồi hiện lại, còn gắn thì vẽ lại). */}
+          <SuccessCheck animate={!badgeShown} onDone={() => setBadgeShown(true)} className="h-16 w-16" />
           <h1 className="text-2xl uppercase text-foreground">Đặt hàng thành công!</h1>
           <p className="text-foreground/75">
             Mã đơn hàng: <strong className="text-lg text-accent-700">{receipt.orderNumber}</strong>
@@ -231,7 +226,7 @@ export function CheckoutForm({ bankTransferInfo, store }: { bankTransferInfo: st
                   <input id="customerPhone" name="customerPhone" type="tel" inputMode="tel" required autoComplete="tel" className={inputClass} />
                 </Field>
               </div>
-              <Field label="Email" htmlFor="customerEmail" hint="Không bắt buộc.">
+              <Field label="Email" htmlFor="customerEmail">
                 <input id="customerEmail" name="customerEmail" type="email" autoComplete="email" className={inputClass} />
               </Field>
               <Field label="Địa chỉ giao hàng" htmlFor="shippingAddress" required hint="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố.">

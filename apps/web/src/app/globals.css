@@ -551,14 +551,88 @@ h4 {
   .pi-header, .pi-parties, .pi-totals, .pi-footer { break-inside: avoid; }
 }
 
-/* Dấu ✓ đặt hàng thành công nảy lên; hộp xem bill hiện dần. */
-.checkout-success-badge { animation: success-pop 550ms cubic-bezier(0.2, 1.4, 0.4, 1) both; }
-@keyframes success-pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* Hộp xem bill hiện dần. */
 .receipt-dialog { animation: dialog-fade 200ms ease-out both; }
 @keyframes dialog-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .checkout-success-badge, .receipt-dialog { animation: none; }
+  .receipt-dialog { animation: none; }
+}
+
+/* Vòng tròn xanh + dấu V (components/ui/check-icon.tsx → SuccessCheck). Mặc định đã vẽ đủ;
+   .success-check-animate mới chạy hiệu ứng vẽ, chờ var(--check-delay). */
+.success-check { color: var(--color-leaf); }
+.success-check-circle { stroke-dasharray: 176; }
+.success-check-mark { stroke-dasharray: 40; }
+.success-check-animate { animation: success-check-pop 450ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--check-delay, 0ms) both; }
+.success-check-animate .success-check-circle { animation: success-check-circle 450ms ease-out var(--check-delay, 0ms) both; }
+.success-check-animate .success-check-mark { animation: success-check-mark 320ms ease-out calc(var(--check-delay, 0ms) + 330ms) both; }
+@keyframes success-check-pop { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+@keyframes success-check-circle { from { stroke-dashoffset: 176; } to { stroke-dashoffset: 0; } }
+@keyframes success-check-mark { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .success-check-animate,
+  .success-check-animate .success-check-circle,
+  .success-check-animate .success-check-mark { animation: none; }
 }
 
 /* Chế độ sửa trong khung "Xem trước & sửa" của admin: phần sửa được hiện con trỏ bàn tay. */
 html[data-preview-edit] [data-edit] { cursor: pointer; }
+
+/* ── Form liên hệ: gửi xong máy bay giấy → dấu V → chữ cảm ơn; "Gửi tin nhắn khác" trượt phải, form vào từ trái ── */
+.contact-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem 0;
+  text-align: center;
+}
+.contact-sent-icon {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+}
+.contact-sent-icon svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.contact-plane {
+  color: var(--color-accent-600);
+  opacity: 0;
+  animation: contact-plane-fly 1000ms cubic-bezier(0.45, 0, 0.25, 1) forwards;
+}
+.contact-success-text {
+  animation: contact-fade-up 450ms ease-out 1400ms both;
+}
+.contact-success-leave {
+  animation: contact-leave-right 380ms ease-in forwards;
+}
+.contact-form-enter {
+  animation: contact-enter-left 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes contact-plane-fly {
+  0% { opacity: 0; transform: translate(-90px, 40px) rotate(-14deg) scale(0.7); }
+  15% { opacity: 1; }
+  55% { opacity: 1; transform: translate(0, -6px) rotate(4deg) scale(1); }
+  70% { opacity: 1; transform: translate(0, 0) rotate(0) scale(1); }
+  100% { opacity: 0; transform: translate(0, 0) rotate(25deg) scale(0.15); }
+}
+@keyframes contact-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes contact-leave-right {
+  to { opacity: 0; transform: translateX(48px); }
+}
+@keyframes contact-enter-left {
+  from { opacity: 0; transform: translateX(-48px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-plane { display: none; }
+  .contact-success-text,
+  .contact-success-leave,
+  .contact-form-enter { animation: none; }
+}

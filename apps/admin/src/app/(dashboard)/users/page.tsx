@@ -20,7 +20,7 @@ export default async function UsersPage() {
     <div>
       <PageHeader
         title="Tài khoản nhân viên"
-        description="Mỗi nhân viên chỉ thấy và dùng được các mục bạn cấp quyền (bấm «Phân quyền»). Tổng quan doanh thu, thông tin cửa hàng và trang này luôn chỉ dành cho chủ cửa hàng."
+        help="Mỗi nhân viên chỉ thấy và dùng được các mục bạn cấp quyền (bấm «Phân quyền»). Tổng quan doanh thu, thông tin cửa hàng và trang này luôn chỉ dành cho chủ cửa hàng."
       />
       <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">

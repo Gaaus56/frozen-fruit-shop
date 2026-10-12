@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { CharacterCount, Placeholder } from "@tiptap/extensions";
 import { TEXT_COLORS, TEXT_COLOR_LABELS, plainTextToHtml } from "@frozen-fruit-shop/types";
 import { ACCEPT, uploadFile } from "@/components/ui/image-upload";
+import { HelpButton, HelpPanel } from "@/components/ui/help";
 import { formatCurrency } from "@/lib/format";
 import { BlockStyle, ButtonRow, Callout, Column, Columns, Figure, ProductEmbed, TextAlign, TextColor, type ProductOption } from "./extensions";
 
@@ -587,6 +588,8 @@ function ProductPicker({ products, onPick, onClose }: { products: ProductOption[
 // ───────────── Thống kê nhỏ cuối khung ─────────────
 
 function Stats({ editor }: { editor: Editor }) {
+  const [helpOpen, setHelpOpen] = useState(false);
+  const helpId = useId();
   const stats = useEditorState({
     editor,
     selector: ({ editor: e }) => {
@@ -604,7 +607,12 @@ function Stats({ editor }: { editor: Editor }) {
       <span>
         {stats.words} chữ · {stats.images} ảnh · {stats.products} ô sản phẩm
       </span>
-      <span>Enter: đoạn mới · Shift+Enter: xuống dòng trong cùng đoạn · kéo ảnh / ô sản phẩm để đổi vị trí</span>
+      <span className="flex items-center gap-1.5">
+        <HelpPanel id={helpId} open={helpOpen} axis="x">
+          <span>Enter: đoạn mới · Shift+Enter: xuống dòng trong cùng đoạn · kéo ảnh / ô sản phẩm để đổi vị trí</span>
+        </HelpPanel>
+        <HelpButton open={helpOpen} onToggle={() => setHelpOpen((value) => !value)} controls={helpId} label="phím tắt soạn thảo" />
+      </span>
     </div>
   );
 }

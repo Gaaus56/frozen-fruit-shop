@@ -43,7 +43,7 @@ export default async function CommentsPage({ searchParams }: PageProps<"/comment
     <div>
       <PageHeader
         title="Bình luận"
-        description="Bình luận của khách dưới bài viết. Bình luận mới chờ duyệt — chỉ hiện trên web sau khi bấm Duyệt (hoặc trả lời)."
+        help="Bình luận của khách dưới bài viết. Bình luận mới chờ duyệt — chỉ hiện trên web sau khi bấm Duyệt (hoặc trả lời)."
       />
 
       <nav className="mb-4 flex flex-wrap gap-1 border-b border-divider" aria-label="Lọc theo trạng thái">
