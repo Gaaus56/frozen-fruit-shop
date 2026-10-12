@@ -560,7 +560,7 @@ export const HOME_BLOCK_POSITIONS = ["after_hero", "after_categories", "after_pr
 export type HomeBlockPosition = (typeof HOME_BLOCK_POSITIONS)[number];
 
 export const HOME_BLOCK_POSITION_LABELS: Record<HomeBlockPosition, string> = {
-  after_hero: "Sau phần giới thiệu đầu trang",
+  after_hero: "Đầu trang chủ (ngay dưới banner)",
   after_categories: "Sau Danh mục sản phẩm",
   after_products: "Sau Sản phẩm",
   after_news: "Cuối trang (sau Tin tức)",

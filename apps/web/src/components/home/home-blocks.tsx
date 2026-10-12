@@ -24,7 +24,8 @@ export function HomeBlocks({ blocks, position }: { blocks: HomeBlock[]; position
           <section
             key={block.id}
             {...editTarget("homeBlock", block.id, `Khối trang chủ${block.title ? `: ${block.title}` : ""}`)}
-            className="px-1 py-4 sm:py-6"
+            // Không khung: nằm thẳng trên nền trang, khoảng trống rộng như phần đầu trang chủ.
+            className="px-1 py-10 sm:py-14 lg:py-16"
           >
             {block.title ? <SectionTitle title={block.title} /> : null}
             <RichContent html={block.content} />

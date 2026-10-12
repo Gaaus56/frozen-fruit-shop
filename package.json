@@ -23,6 +23,7 @@
     "db:studio": "npm run prisma:studio -w apps/api",
     "db:deploy": "npm run prisma:deploy -w apps/api",
     "admin:create": "npm run prisma:create-admin -w apps/api",
-    "db:seed:test": "npm run prisma:seed-test -w apps/api"
+    "db:seed:test": "npm run prisma:seed-test -w apps/api",
+    "db:reset:clean": "npm run prisma:reset-clean -w apps/api"
   }
 }

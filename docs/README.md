@@ -44,6 +44,7 @@ Một website hoàn chỉnh = **Domain + DNS + Hosting + Frontend + Backend + Da
 | | | [database.md](03-apps/database.md) | Bảng, quan hệ, quy tắc toàn vẹn, migration |
 | 4 | **[04-operations/](04-operations/)** | [local-development.md](04-operations/local-development.md) | Cài và chạy trên máy dev |
 | | | [deployment.md](04-operations/deployment.md) | Đưa lên VPS: domain, DNS, HTTPS, Docker |
+| | | [demo-deploy.md](04-operations/demo-deploy.md) | Deploy bản demo miễn phí cho khách xem (Vercel + Render + Neon), khởi tạo lại database sạch |
 | | | [monitoring-and-backup.md](04-operations/monitoring-and-backup.md) | Log, giám sát, sao lưu, khôi phục sự cố |
 | | | [ci-cd.md](04-operations/ci-cd.md) | Quy trình nhánh, PR, CI, phát hành |
 | 5 | **[05-roadmap/](05-roadmap/)** | [roadmap.md](05-roadmap/roadmap.md) | **Kế hoạch tổng thể** — làm gì tiếp, theo thứ tự nào |

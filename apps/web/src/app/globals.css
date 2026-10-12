@@ -344,6 +344,39 @@ h4 {
 .rich-content-flow div[data-column] > :first-child { margin-top: 0; }
 .rich-content-flow div[data-column] > figure { margin-block: 0; }
 
+/* Kiểu khối chữ (giống phần đầu trang chủ cũ): nhãn nhỏ nền hồng, tiêu đề rất lớn, đoạn dẫn. */
+.rich-content-flow p[data-variant="badge"] {
+  width: fit-content;
+  padding: 0.25rem 0.75rem;
+  background: var(--color-accent-100);
+  color: var(--color-accent-800);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.rich-content-flow p[data-variant="badge"][data-align="center"] { margin-inline: auto; }
+.rich-content-flow p[data-variant="badge"][data-align="right"] { margin-left: auto; }
+.rich-content-flow h2[data-size="xl"] {
+  margin-top: 1rem;
+  font-size: clamp(2.25rem, 1.6rem + 2.6vw, 3.4rem);
+  line-height: 1.08;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--foreground);
+}
+.rich-content-flow > h2[data-size="xl"]:first-child { margin-top: 0; }
+.rich-content-flow p[data-variant="lead"] {
+  max-width: 32rem;
+  margin-top: 1.25rem;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+}
+.rich-content-flow p[data-variant="lead"][data-align="center"] { margin-inline: auto; }
+.rich-content-flow p[data-variant="lead"] + p[data-buttons] { margin-top: 2rem; }
+
 /* Căn ngang admin chọn cho đoạn văn / tiêu đề / hàng nút. */
 .rich-content-flow [data-align="center"] { text-align: center; }
 .rich-content-flow [data-align="right"] { text-align: right; }
