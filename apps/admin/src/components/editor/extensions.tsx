@@ -49,6 +49,10 @@ declare module "@tiptap/core" {
     };
     textAlign: { setTextAlign: (align: TextAlignName) => ReturnType };
     buttonRow: { insertButtonRow: () => ReturnType };
+    blockStyle: {
+      toggleParagraphVariant: (variant: "badge" | "lead") => ReturnType;
+      toggleHeadingXl: () => ReturnType;
+    };
   }
 }
 
@@ -581,6 +585,64 @@ export const ButtonRow = Node.create({
         () =>
         (props) =>
           insertBlock(props, { type: this.name, attrs: { buttons: [DEFAULT_BUTTON] } }),
+    };
+  },
+});
+
+// ───────────── Kiểu khối chữ: nhãn / đoạn dẫn (p[data-variant]), tiêu đề rất lớn (h2[data-size="xl"]) ─────────────
+
+export type ParagraphVariant = "badge" | "lead";
+
+export const BlockStyle = Extension.create({
+  name: "blockStyle",
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["paragraph"],
+        attributes: {
+          variant: {
+            default: null,
+            parseHTML: (el) => {
+              const value = el.getAttribute("data-variant");
+              return value === "badge" || value === "lead" ? value : null;
+            },
+            renderHTML: (attrs) => (attrs.variant ? { "data-variant": attrs.variant } : {}),
+          },
+        },
+      },
+      {
+        types: ["heading"],
+        attributes: {
+          size: {
+            default: null,
+            parseHTML: (el) => (el.getAttribute("data-size") === "xl" ? "xl" : null),
+            renderHTML: (attrs) => (attrs.size === "xl" ? { "data-size": "xl" } : {}),
+          },
+        },
+      },
+    ];
+  },
+
+  addCommands() {
+    return {
+      // Bấm lại đúng kiểu đang dùng → về đoạn văn thường.
+      toggleParagraphVariant:
+        (variant: ParagraphVariant) =>
+        ({ editor, chain }) => {
+          const active = editor.isActive("paragraph", { variant });
+          return chain()
+            .setParagraph()
+            .updateAttributes("paragraph", { variant: active ? null : variant })
+            .run();
+        },
+      toggleHeadingXl:
+        () =>
+        ({ editor, chain }) => {
+          const active = editor.isActive("heading", { size: "xl" });
+          if (active) return chain().updateAttributes("heading", { size: null }).run();
+          return chain().setHeading({ level: 2 }).updateAttributes("heading", { size: "xl" }).run();
+        },
     };
   },
 });

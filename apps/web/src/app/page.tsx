@@ -1,19 +1,19 @@
 import { BannerSlider } from "@/components/home/banner-slider";
-import { Hero } from "@/components/home/hero";
 import { CategoryGrid } from "@/components/home/category-grid";
 import { FeaturedProducts } from "@/components/home/featured-products";
 import { BlogPreview } from "@/components/home/blog-preview";
 import { HomeBlocks } from "@/components/home/home-blocks";
 import { Container } from "@/components/ui/container";
-import { getBanners, getCategories, getHomeBlocks, getPosts, getProducts } from "@/lib/api";
+import { getBanners, getCategories, getHomeBlocks, getPosts, getProducts, getSettings } from "@/lib/api";
 
 export default async function HomePage() {
-  const [banners, categories, featured, posts, blocks] = await Promise.all([
+  const [banners, categories, featured, posts, blocks, settings] = await Promise.all([
     getBanners(),
     getCategories(),
     getProducts({ featured: true, limit: 8 }),
     getPosts(6),
     getHomeBlocks(),
+    getSettings(),
   ]);
 
   // Đủ 8 ô (2 hàng trên màn hình lớn, 4 hàng trên điện thoại): sản phẩm nổi bật trước, thiếu thì lấy sản phẩm mới nhất.
@@ -29,7 +29,8 @@ export default async function HomePage() {
     <>
       <BannerSlider banners={banners} />
       <div>
-        <Hero />
+        {/* Tiêu đề chính của trang cho Google / trình đọc màn hình; phần chữ lớn đầu trang là khối trang chủ admin soạn. */}
+        <h1 className="sr-only">{settings.storeName}</h1>
         <section className="pb-10 pt-2 sm:pb-16 sm:pt-4">
           {/* Khối nội dung admin tự soạn (mục "Khối trang chủ") xen giữa các phần có sẵn. */}
           <Container className="flex flex-col gap-3 sm:gap-4">

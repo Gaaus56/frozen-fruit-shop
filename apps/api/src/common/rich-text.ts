@@ -15,6 +15,7 @@ import { toStoredPath } from './utils.js';
  *   div[data-columns=2] > div[data-column] — bố cục chia đôi trái / phải
  *   span[data-color=red|green|gray] — màu chữ trong chủ đề web (không nhận mã màu tự do)
  *   p/h2/h3[data-align=center|right] — căn giữa / phải
+ *   p[data-variant=badge|lead] — nhãn nhỏ / đoạn dẫn; h2[data-size=xl] — tiêu đề rất lớn
  *   div[data-columns][data-valign=top|bottom] — căn dọc hai cột
  *   p[data-buttons] > a[data-button=red|dark|light|green] — hàng nút điều hướng
  */
@@ -25,8 +26,8 @@ const OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: ['p', 'h2', 'h3', 'strong', 'em', 'u', 's', 'br', 'hr', 'ul', 'ol', 'li', 'blockquote', 'a', 'figure', 'img', 'figcaption', 'aside', 'div', 'span'],
   allowedAttributes: {
     a: ['href', 'target', 'rel', { name: 'data-button', multiple: false, values: [...BUTTON_STYLES] }],
-    p: [ALIGN, 'data-buttons'],
-    h2: [ALIGN],
+    p: [ALIGN, 'data-buttons', { name: 'data-variant', multiple: false, values: ['badge', 'lead'] }],
+    h2: [ALIGN, { name: 'data-size', multiple: false, values: ['xl'] }],
     h3: [ALIGN],
     img: ['src', 'alt', 'loading'],
     aside: ['data-tone'],

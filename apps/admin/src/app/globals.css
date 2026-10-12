@@ -125,6 +125,16 @@ h3 {
   color: #a19c9a;
 }
 
+/* Nhãn / tiêu đề rất lớn / đoạn dẫn — xem trước giống web khách hàng. */
+.rich-editor-content p[data-variant="badge"] {
+  width: fit-content; padding: 0.25rem 0.75rem; background: #fff2ef; color: #7c1405;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.025em; text-transform: uppercase;
+}
+.rich-editor-content p[data-variant="badge"][data-align="center"] { margin-inline: auto; }
+.rich-editor-content h2[data-size="xl"] { font-size: 2.4rem; line-height: 1.08; text-transform: uppercase; }
+.rich-editor-content p[data-variant="lead"] { max-width: 32rem; font-size: 15.5px; color: #6b6563; }
+.rich-editor-content p[data-variant="lead"][data-align="center"] { margin-inline: auto; }
+
 /* Căn lề, căn dọc cột, hàng nút — xem trước giống web khách hàng. */
 .rich-editor-content [data-align="center"] { text-align: center; }
 .rich-editor-content [data-align="right"] { text-align: right; }

@@ -44,6 +44,7 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 | [B-29](#b-29--viền-sửa-lệch-khi-cuộn) | Xem trước & sửa | Viền sửa lệch khỏi đối tượng khi cuộn | ✅ |
 | [B-30](#b-30--chữ-đỏ-không-đủ-tương-phản) | Truy cập | Chữ / nút đỏ không đủ tương phản (axe) | ✅ |
 | [B-31](#b-31--quá-nhiều-yêu-cầu-429-khi-test) | API | "Bạn thao tác quá nhanh" (429) khi test | ℹ️ |
+| [B-32](#b-32--seed-tạo-nhân-viên-không-có-quyền-nào) | Dữ liệu mẫu | Seed tạo nhân viên không có quyền nào | ✅ |
 | [T-01](#t-01--prisma-generate-báo-eperm-trên-windows) | Công cụ | `prisma generate` báo EPERM trên Windows | ⚠️ |
 | [T-02](#t-02--sửa-packagestypes-mà-api--web-không-thấy-thay-đổi) | Công cụ | Sửa `packages/types` mà app không thấy thay đổi | ⚠️ |
 | [T-03](#t-03--lỗi-type-trong-nexttypes-sau-khi-xoá-trang) | Công cụ | Lỗi type trong `.next/types` sau khi xoá trang | ⚠️ |
@@ -52,6 +53,7 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 | [T-06](#t-06--chữ-tiếng-việt-bị-lỗi-font-khi-gọi-api-bằng-curl) | Công cụ | Chữ tiếng Việt bị lỗi khi gọi API bằng curl | ⚠️ |
 | [T-07](#t-07--test-playwright-hay-gặp) | Công cụ | Lỗi hay gặp khi viết test Playwright | ⚠️ |
 | [T-08](#t-08--bước-dọn-dẹp-của-test-xoá-nhầm-dữ-liệu-thật) | Công cụ | Bước dọn dẹp của test xoá nhầm tài khoản nhân viên thật | ⚠️ |
+| [T-09](#t-09--thư-mục-build-thử-bị-commit-vào-git) | Công cụ | Thư mục build thử `.buildcheck/` bị commit vào git | ✅ |
 
 ---
 
@@ -256,6 +258,13 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 - **Nguyên nhân:** ℹ️ giới hạn tốc độ chống spam (lưu trong bộ nhớ, theo IP). Ví dụ bình luận: 5 lần / 10 phút.
 - **Khi test:** chờ vài phút, hoặc khởi động lại API (xoá bộ đếm). Ở môi trường dev API tin header `X-Forwarded-For` → test tự động có thể đặt IP giả khác nhau cho mỗi lượt.
 
+### B-32 — Seed tạo nhân viên không có quyền nào
+- **Ngày:** 2026-10-12
+- **Hiện tượng:** sau khi có phân quyền nhân viên, chạy lại `npm run db:seed:test` thì tài khoản `staff1`, `staff2` đăng nhập không vào được mục nào.
+- **Nguyên nhân:** cột `permissions` mặc định rỗng; migration chỉ cấp quyền cho nhân viên **đang có**, còn seed tạo tài khoản mới không ghi quyền.
+- **Cách sửa:** seed cấp đủ quyền cho `staff1`, chỉ Đơn hàng + Liên hệ cho `staff2` (để thử phân quyền).
+- **Bài học:** thêm cột / ràng buộc mới → cập nhật **cả migration lẫn seed**.
+
 ---
 
 ## Công cụ & môi trường
@@ -309,6 +318,15 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
   2. Ưu tiên dọn dẹp qua **API theo id** của bản ghi vừa tạo (biết chắc đối tượng), thay vì bấm giao diện.
   3. Sau khi dọn, **kiểm tra số bản ghi còn lại** so với trước khi chạy test (không chỉ kiểm tra bản ghi tạm đã mất).
   4. Thao tác ghi / xoá trên dữ liệu không tạo ra trong test → không làm; luồng có ghi (đặt hàng…) thì chặn request bằng `page.route` trả dữ liệu giả.
+
+---
+
+### T-09 — Thư mục build thử bị commit vào git
+- **Ngày:** 2026-10-12
+- **Hiện tượng:** commit `cc7ce72` có thêm ~270 file trong `.buildcheck/` (bản sao web / admin / api).
+- **Nguyên nhân:** để build thử production mà không ghi đè `.next` của dev server đang chạy, bản sao app được đặt trong `.buildcheck/` **bên trong repo** (cần để tìm `node_modules` gốc), không có trong `.gitignore`; đúng lúc đó có lệnh commit tất cả.
+- **Cách sửa:** xoá thư mục, thêm `/.buildcheck/` vào `.gitignore`; commit việc xoá (hoặc sửa lại commit nếu chưa push).
+- **Bài học:** thư mục tạm trong repo phải được ignore **trước khi** tạo; kiểm tra `git status` ngay sau khi xong.
 
 ---
 

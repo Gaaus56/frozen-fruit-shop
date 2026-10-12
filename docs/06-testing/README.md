@@ -60,23 +60,28 @@ Các kịch bản test dùng đúng mã dưới đây. Sửa dữ liệu mẫu �
 | Mã | Tên (slug) | Hiển thị | Ghi chú |
 |---|---|:-:|---|
 | `C1` | Xoài đông lạnh (`xoai-dong-lanh`) | ✅ | có ảnh, có mô tả |
-| `C2` | Dâu đông lạnh (`dau-dong-lanh`) | ✅ | |
+| `C2` | Dâu tây đông lạnh (`dau-dong-lanh`) | ✅ | |
+| `C6` | Sầu riêng đông lạnh (`sau-rieng-dong-lanh`) | ✅ | |
+| `C7` | Bơ đông lạnh (`bo-dong-lanh`) | ✅ | |
 | `C5` | Trái cây nhiệt đới (`trai-cay-nhiet-doi`) | ✅ | mô tả trống → web hiện câu mặc định |
-| `C4` | Danh mục rỗng (`danh-muc-rong`) | ✅ | không có sản phẩm (không hiện ở trang chủ, xoá được) |
-| `C3` | Danh mục ẩn (`danh-muc-an`) | ❌ | chứa `P5` |
+| `C4` | Combo quà tặng (`combo-qua-tang`) | ✅ | không có sản phẩm (không hiện ở trang chủ, xoá được) |
+| `C3` | Hàng mùa Tết (đang ẩn) (`hang-mua-tet`) | ❌ | chứa `P5` |
 
 ### Sản phẩm
+Ảnh thật lấy từ `design/product/` (đã thu nhỏ vào `apps/api/prisma/seed-assets/`).
+
 | Mã | Tên (slug) | Danh mục | Quy cách (khối lượng – giá – giá gốc – tồn kho) | Cờ |
 |---|---|---|---|---|
-| `P1` | Xoài cát cắt miếng (`xoai-cat-cat-mieng`) | C1 | 500g (500 g – 85.000 – 100.000 – còn hàng, SKU `XCM-500`) · 1kg (1000 g – 160.000 – – còn hàng, `XCM-1K`) | Nổi bật, 3 ảnh |
-| `P2` | Dâu tây đông lạnh | C2 | 500g (– 120.000 – – **hết hàng**) | 1 ảnh |
-| `P3` | Sầu riêng Ri6 | C1 | 1kg (1000 g – 250.000 – – **sắp hết**) · 2kg (2000 g – 480.000 – – **hết hàng**) | Nổi bật, **không ảnh** |
-| `P4` | Mãng cầu (ngừng bán) | C1 | 500g – 70.000 | **Đang bán = tắt** |
-| `P5` | Bơ sáp | C3 (ẩn) | 500g – 60.000 | |
-| `P6` | Thanh long ruột đỏ cắt hạt lựu | C5 | 500g 45.000 · 1kg 85.000 · Thùng 5kg 400.000 | |
-| `P7` | Nho xanh không hạt | C5 | 500g – 95.000 – 110.000 | 2 ảnh |
-| `P8` | Mít Thái múi | C5 | Hộp 500g – 55.000, **không khối lượng** | thiếu mô tả, bảo quản, ảnh (kiểm tra khối tự ẩn) |
-| `P9` | Dâu tây cắt lát | C2 | 250g – 65.000 · 500g – 120.000 **quy cách tắt bán** | web chỉ hiện 250g |
+| `P1` | Xoài cát Hòa Lộc cắt miếng (`xoai-cat-cat-mieng`) | C1 | 500g (500 g – 85.000 – 100.000 – còn hàng, SKU `XCM-500`) · 1kg (1000 g – 160.000 – – còn hàng, `XCM-1K`) | Nổi bật, 3 ảnh, mô tả HTML |
+| `P2` | Dâu tây Đà Lạt nguyên trái (`dau-tay-dong-lanh`) | C2 | 500g (– 120.000 – – **hết hàng**) | 1 ảnh |
+| `P3` | Múi sầu riêng Ri6 (`sau-rieng-ri6`) | C6 | 1kg (1000 g – 250.000 – – **sắp hết**) · 2kg (2000 g – 480.000 – – **hết hàng**) | Nổi bật, 2 ảnh |
+| `P4` | Mãng cầu na (ngừng bán) (`mang-cau-ngung-ban`) | C5 | 500g – 70.000 | **Đang bán = tắt** |
+| `P5` | Bơ sáp mùa Tết (`bo-sap-mua-tet`) | C3 (ẩn) | 500g – 60.000 | |
+| `P6` | Mãng cầu xiêm tách hạt (`mang-cau-xiem-tach-hat`) | C5 | 500g 45.000 · 1kg 85.000 · Thùng 5kg 400.000 | 2 ảnh |
+| `P7` | Bơ sáp Đắk Lắk cắt hạt lựu (`bo-sap-cat-hat-luu`) | C7 | 500g – 95.000 – 110.000 | Nổi bật, 2 ảnh |
+| `P8` | Mít Thái múi (`mit-thai-mui`) | C5 | Hộp 500g – 55.000, **không khối lượng** | thiếu mô tả, bảo quản, ảnh (kiểm tra khối tự ẩn) |
+| `P9` | Dâu tây cắt lát (`dau-tay-cat-lat`) | C2 | 250g – 65.000 · 500g – 120.000 **quy cách tắt bán** | web chỉ hiện 250g |
+| `P10` | Sầu riêng Monthong nguyên múi (`sau-rieng-monthong`) | C6 | 500g 165.000 · 1kg 320.000 | 1 ảnh |
 
 ### Đơn hàng và liên hệ
 **8 đơn cố định** của khách `0905123456`, mã `DH{yyMMdd}TSTA` … `TSTH` (ngày theo lúc seed — script in danh sách mã khi chạy xong):
@@ -96,11 +101,15 @@ Các kịch bản test dùng đúng mã dưới đây. Sửa dữ liệu mẫu �
 - **8 liên hệ**: Mới / Đang xử lý / Xong; 3 liên hệ "Báo giá sỉ" đóng vai dữ liệu cũ (tính năng sỉ đã bỏ); một liên hệ chứa mã HTML.
 
 ### Nội dung
+Ảnh bìa bài viết tạm lấy từ `design/bg/` (`bai-viet-v1…v8.jpg`).
+
 | Mã | Loại | Thiết lập |
 |---|---|---|
 | `B1`, `B2`, `B3` | Banner | B1: tiêu đề + mô tả + liên kết `/products` + nút "Mua ngay"; B2: chỉ ảnh; B3: **tắt** |
-| `N1` | Bài viết | `cach-ra-dong-trai-cay` — đã đăng hôm qua, có ảnh bìa |
-| — | Bài viết | 2 bài Kiến thức đã đăng cũ hơn (1 bài không có ảnh bìa) |
+| `HB1` | Khối trang chủ | Phần chữ lớn đầu trang (không khung): nhãn + tiêu đề rất lớn + đoạn dẫn + 2 nút — trước đây viết cố định trong code |
+| `HB2` | Khối trang chủ | "Vì sao chọn Trái Cây 28" (có khung, sau Sản phẩm): chia 2 cột ảnh / chữ + nút xanh |
+| `N1` | Bài viết | `cach-ra-dong-trai-cay` — đã đăng hôm qua; có tiêu đề mục (mục lục), khung cảnh báo, ảnh có chú thích, hàng 3 ô sản phẩm |
+| — | Bài viết | 3 bài Kiến thức cũ hơn (sinh tố, dinh dưỡng, bảo quản sầu riêng — có chia 2 cột) |
 | `N4` | Bài viết | `tuyen-nhan-vien-ban-hang` — **Tuyển dụng**, đã đăng 3 ngày trước |
 | `N2` | Bài viết | `bai-hen-gio` — hẹn giờ ngày mai |
 | `N3` | Bài viết | `bai-nhap` — tắt hiển thị |
@@ -108,6 +117,9 @@ Các kịch bản test dùng đúng mã dưới đây. Sửa dữ liệu mẫu �
 | — | Chính sách | Giao hàng, Bảo mật — hiển thị |
 | `POL2` | Chính sách | `chinh-sach-noi-bo` — **tắt** |
 | `SET` | Thông tin cửa hàng | Thông tin thật của cửa hàng + dải chữ chạy tự nhập + thông tin chuyển khoản (TÀI KHOẢN TEST) |
+
+**Bản cho khách xem:** `SEED_DEMO=1 npm run db:seed:test` — giống hệt bộ trên nhưng **bỏ** đơn `…TSTH`, liên hệ chứa mã HTML và bình luận spam (dữ liệu chỉ để test bảo mật).
+**Database trống hoàn toàn** (không dữ liệu mẫu, không khối trang chủ): `npm run db:reset:clean` — xem [demo-deploy.md §8](../04-operations/demo-deploy.md#8-khởi-tạo-lại-database-sạch-không-dữ-liệu-mẫu).
 
 ### Dữ liệu nhập dùng chung
 | Loại | Hợp lệ | Không hợp lệ |

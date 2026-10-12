@@ -1,5 +1,6 @@
-// Nạp bộ dữ liệu kiểm thử (docs/06-testing/README.md §3) — CHỈ dùng cho máy dev / staging.
+// Nạp bộ dữ liệu kiểm thử (docs/06-testing/README.md §3) — CHỈ dùng cho máy dev / staging / demo.
 //   npm run db:seed:test            (chạy từ gốc repo)
+//   SEED_DEMO=1 npm run db:seed:test   (bản cho khách xem: bỏ dữ liệu test bảo mật)
 //
 // XOÁ TOÀN BỘ dữ liệu hiện có (kể cả tài khoản quản trị) rồi nạp lại từ đầu, nên chạy lại bao nhiêu lần
 // cũng ra cùng một bộ dữ liệu. Ảnh mẫu được chép từ prisma/seed-assets/ vào UPLOAD_DIR/seed/.
@@ -11,7 +12,7 @@ import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Prisma, PrismaClient, type OrderStatus, type PaymentMethod, type PaymentStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
-import { DEFAULT_SITE_SETTINGS } from '@frozen-fruit-shop/types';
+import { DEFAULT_SITE_SETTINGS, STAFF_PERMISSIONS } from '@frozen-fruit-shop/types';
 
 if (existsSync('.env')) process.loadEnvFile('.env');
 
@@ -82,17 +83,30 @@ function assertSafeTarget() {
 
 const PASSWORDS = { admin: 'Admin@123456', staff: 'Staff@1234' };
 
+/**
+ * SEED_DEMO=1: bản cho khách xem — bỏ các bản ghi chỉ dùng để test bảo mật (tên / địa chỉ chứa mã HTML,
+ * đơn TSTH, liên hệ XSS) và bình luận spam, để trang quản trị trông như dữ liệu thật.
+ */
+const DEMO = process.env.SEED_DEMO === '1';
+
 const CATEGORIES = [
-  { key: 'C1', slug: 'xoai-dong-lanh', name: 'Xoài đông lạnh', image: 'xoai-1.png', sortOrder: 1, isActive: true,
-    description: 'Xoài cát chín cây, gọt sẵn, cấp đông nhanh giữ trọn vị ngọt.' },
-  { key: 'C2', slug: 'dau-dong-lanh', name: 'Dâu đông lạnh', image: 'dau-1.png', sortOrder: 2, isActive: true,
-    description: 'Dâu tây Đà Lạt cấp đông, hợp làm sinh tố, mứt, bánh.' },
-  { key: 'C5', slug: 'trai-cay-nhiet-doi', name: 'Trái cây nhiệt đới', image: 'thanh-long.png', sortOrder: 3, isActive: true,
+  { key: 'C1', slug: 'xoai-dong-lanh', name: 'Xoài đông lạnh', image: 'xoai1.jpg', sortOrder: 1, isActive: true,
+    description: 'Xoài cát Hòa Lộc chín cây, gọt sẵn, cấp đông nhanh giữ trọn vị ngọt.' },
+  { key: 'C2', slug: 'dau-dong-lanh', name: 'Dâu tây đông lạnh', image: 'dau3.jpg', sortOrder: 2, isActive: true,
+    description: 'Dâu tây Đà Lạt cấp đông nguyên trái hoặc cắt lát — hợp làm sinh tố, mứt, bánh.' },
+  { key: 'C6', slug: 'sau-rieng-dong-lanh', name: 'Sầu riêng đông lạnh', image: 'saurieng2.jpg', sortOrder: 3, isActive: true,
+    description: 'Múi sầu riêng cơm vàng, hạt lép, hút chân không từng hộp.' },
+  { key: 'C7', slug: 'bo-dong-lanh', name: 'Bơ đông lạnh', image: 'bo1.jpg', sortOrder: 4, isActive: true,
+    description: 'Bơ sáp Đắk Lắk dẻo béo, cắt sẵn — làm sinh tố bơ chỉ trong 1 phút.' },
+  // Mô tả trống: web hiện câu mặc định.
+  { key: 'C5', slug: 'trai-cay-nhiet-doi', name: 'Trái cây nhiệt đới', image: 'mangcau1.jpg', sortOrder: 5, isActive: true,
     description: '' },
-  { key: 'C4', slug: 'danh-muc-rong', name: 'Danh mục rỗng', image: null, sortOrder: 8, isActive: true,
-    description: 'Không có sản phẩm — không hiện ở trang chủ.' },
-  { key: 'C3', slug: 'danh-muc-an', name: 'Danh mục ẩn', image: null, sortOrder: 9, isActive: false,
-    description: 'Danh mục đã tắt hiển thị — sản phẩm bên trong không được lộ ra web.' },
+  // Đang bật nhưng chưa có sản phẩm: không hiện ở trang chủ, vẫn hiện ở bộ lọc trang Sản phẩm.
+  { key: 'C4', slug: 'combo-qua-tang', name: 'Combo quà tặng', image: null, sortOrder: 8, isActive: true,
+    description: 'Sắp ra mắt — hộp quà trái cây đông lạnh nhiều loại.' },
+  // Đã tắt hiển thị: sản phẩm bên trong không được lộ ra web.
+  { key: 'C3', slug: 'hang-mua-tet', name: 'Hàng mùa Tết (đang ẩn)', image: null, sortOrder: 9, isActive: false,
+    description: 'Danh mục theo mùa, bật lại vào dịp Tết.' },
 ] as const;
 
 type CategoryKey = (typeof CATEGORIES)[number]['key'];
@@ -129,12 +143,21 @@ const STORAGE = {
   thawInstructions: 'Rã đông ngăn mát 6–8 tiếng, hoặc ngâm cả túi vào nước 5–15 phút. Dùng trực tiếp làm sinh tố không cần rã đông.',
 };
 
+/** Mô tả chi tiết dạng HTML (đúng các thẻ trình soạn thảo admin tạo ra). */
+const describe = (intro: string, points: string[], tip: string) =>
+  `<p>${intro}</p><h3>Điểm nổi bật</h3><ul>${points.map((point) => `<li><p>${point}</p></li>`).join('')}</ul>` +
+  `<aside data-tone="green"><p><strong>Mẹo dùng:</strong> ${tip}</p></aside>`;
+
 const PRODUCTS: ProductSeed[] = [
   {
-    key: 'P1', slug: 'xoai-cat-cat-mieng', name: 'Xoài cát cắt miếng', category: 'C1',
-    images: ['xoai-1.png', 'xoai-2.png', 'trai-cay.png'],
+    key: 'P1', slug: 'xoai-cat-cat-mieng', name: 'Xoài cát Hòa Lộc cắt miếng', category: 'C1',
+    images: ['xoai2.jpg', 'xoai1.jpg', 'xoai3.jpg'],
     shortDescription: 'Xoài cát Hòa Lộc chín cây, gọt vỏ, cắt miếng vừa ăn.',
-    description: 'Xoài cát Hòa Lộc tuyển chọn, chín cây tự nhiên.\nGọt vỏ, cắt miếng và cấp đông nhanh ngay trong ngày.\n\nPhù hợp: sinh tố, chè, bánh, ăn trực tiếp.',
+    description: describe(
+      'Xoài cát Hòa Lộc tuyển chọn từ vườn Tiền Giang, chín cây tự nhiên, gọt vỏ và cắt miếng ngay trong ngày rồi cấp đông nhanh ở -35°C.',
+      ['Thịt vàng đậm, ngọt thanh, không xơ', 'Không chất bảo quản, không đường hoá học', 'Đóng túi hút chân không 500g / 1kg'],
+      'xay sinh tố xoài với sữa chua không cần rã đông; làm chè, bánh, kem xoài.',
+    ),
     ...STORAGE, isFeatured: true, sortOrder: 1,
     variants: [
       { packageSize: '500g', weightGrams: 500, price: 85_000, compareAtPrice: 100_000, sku: 'XCM-500' },
@@ -142,39 +165,45 @@ const PRODUCTS: ProductSeed[] = [
     ],
   },
   {
-    key: 'P2', slug: 'dau-tay-dong-lanh', name: 'Dâu tây đông lạnh', category: 'C2', images: ['dau-1.png'],
-    shortDescription: 'Dâu tây Đà Lạt nguyên trái.', ...STORAGE, sortOrder: 2,
+    key: 'P2', slug: 'dau-tay-dong-lanh', name: 'Dâu tây Đà Lạt nguyên trái', category: 'C2', images: ['dau1.jpg'],
+    shortDescription: 'Dâu tây Đà Lạt chín đỏ, cấp đông nguyên trái.', ...STORAGE, sortOrder: 2,
     variants: [{ packageSize: '500g', price: 120_000, stockStatus: 'out_of_stock', sku: 'DT-500' }],
   },
   {
-    key: 'P3', slug: 'sau-rieng-ri6', name: 'Sầu riêng Ri6', category: 'C1',
-    shortDescription: 'Múi sầu riêng Ri6 cơm vàng, hạt lép.', ...STORAGE,
-    isFeatured: true, sortOrder: 3,
+    key: 'P3', slug: 'sau-rieng-ri6', name: 'Múi sầu riêng Ri6', category: 'C6', images: ['saurieng1.jpg', 'saurieng2.jpg'],
+    shortDescription: 'Múi sầu riêng Ri6 cơm vàng, hạt lép, béo ngậy.',
+    description: describe(
+      'Sầu riêng Ri6 chín rụng tự nhiên, tách múi bằng tay và cấp đông ngay để giữ trọn mùi thơm, độ béo.',
+      ['Cơm vàng, dày, hạt lép', 'Mỗi hộp hút chân không riêng — không ám mùi tủ lạnh', 'Có thể ăn lạnh như kem'],
+      'để ngăn mát 30 phút trước khi ăn; xay sinh tố sầu riêng hoặc làm bánh crepe.',
+    ),
+    ...STORAGE, isFeatured: true, sortOrder: 3,
     variants: [
       { packageSize: '1kg', weightGrams: 1000, price: 250_000, stockStatus: 'low_stock', sku: 'SR-1K' },
       { packageSize: '2kg', weightGrams: 2000, price: 480_000, stockStatus: 'out_of_stock', sku: 'SR-2K' },
     ],
   },
   {
-    key: 'P4', slug: 'mang-cau-ngung-ban', name: 'Mãng cầu (ngừng bán)', category: 'C1', isActive: false, sortOrder: 4,
+    key: 'P4', slug: 'mang-cau-ngung-ban', name: 'Mãng cầu na (ngừng bán)', category: 'C5', images: ['mangcau3.jpg'],
+    isActive: false, sortOrder: 4,
     variants: [{ packageSize: '500g', weightGrams: 500, price: 70_000 }],
   },
   {
-    key: 'P5', slug: 'bo-sap', name: 'Bơ sáp', category: 'C3', sortOrder: 5,
+    key: 'P5', slug: 'bo-sap-mua-tet', name: 'Bơ sáp mùa Tết', category: 'C3', images: ['bo3.jpg'], sortOrder: 5,
     variants: [{ packageSize: '500g', weightGrams: 500, price: 60_000 }],
   },
   {
-    key: 'P6', slug: 'thanh-long-ruot-do', name: 'Thanh long ruột đỏ cắt hạt lựu', category: 'C5', images: ['thanh-long.png'],
-    shortDescription: 'Thanh long ruột đỏ Bình Thuận, cắt hạt lựu.', ...STORAGE, sortOrder: 6,
+    key: 'P6', slug: 'mang-cau-xiem-tach-hat', name: 'Mãng cầu xiêm tách hạt', category: 'C5', images: ['mangcau1.jpg', 'mangcau2.jpg'],
+    shortDescription: 'Mãng cầu xiêm Bến Tre, tách hạt sẵn, chua ngọt mát lạnh.', ...STORAGE, sortOrder: 6,
     variants: [
       { packageSize: '500g', weightGrams: 500, price: 45_000 },
       { packageSize: '1kg', weightGrams: 1000, price: 85_000 },
-      { packageSize: 'Thùng 5kg', weightGrams: 5000, price: 400_000, sku: 'TL-5K' },
+      { packageSize: 'Thùng 5kg', weightGrams: 5000, price: 400_000, sku: 'MC-5K' },
     ],
   },
   {
-    key: 'P7', slug: 'nho-xanh-khong-hat', name: 'Nho xanh không hạt', category: 'C5', images: ['nho-1.png', 'nho-2.png'],
-    shortDescription: 'Nho xanh Ninh Thuận, tách cuống.', ...STORAGE, sortOrder: 7,
+    key: 'P7', slug: 'bo-sap-cat-hat-luu', name: 'Bơ sáp Đắk Lắk cắt hạt lựu', category: 'C7', images: ['bo2.jpg', 'bo1.jpg'],
+    shortDescription: 'Bơ sáp Đắk Lắk dẻo béo, cắt hạt lựu sẵn.', ...STORAGE, isFeatured: true, sortOrder: 7,
     variants: [{ packageSize: '500g', weightGrams: 500, price: 95_000, compareAtPrice: 110_000 }],
   },
   {
@@ -184,11 +213,19 @@ const PRODUCTS: ProductSeed[] = [
   },
   {
     // Có một quy cách đã tắt bán: web chỉ được hiện 250g.
-    key: 'P9', slug: 'dau-tay-cat-lat', name: 'Dâu tây cắt lát', category: 'C2', images: ['dau-2.png'],
-    shortDescription: 'Dâu tây cắt lát sẵn, tiện làm topping.', ...STORAGE, sortOrder: 9,
+    key: 'P9', slug: 'dau-tay-cat-lat', name: 'Dâu tây cắt lát', category: 'C2', images: ['dau2.jpg', 'dau3.jpg'],
+    shortDescription: 'Dâu tây cắt lát sẵn, tiện làm topping trà, bánh.', ...STORAGE, sortOrder: 9,
     variants: [
       { packageSize: '250g', weightGrams: 250, price: 65_000 },
       { packageSize: '500g', weightGrams: 500, price: 120_000, isActive: false },
+    ],
+  },
+  {
+    key: 'P10', slug: 'sau-rieng-monthong', name: 'Sầu riêng Monthong nguyên múi', category: 'C6', images: ['saurieng3.jpg'],
+    shortDescription: 'Sầu riêng Monthong múi to, vị ngọt đậm, ít mùi.', ...STORAGE, sortOrder: 10,
+    variants: [
+      { packageSize: '500g', weightGrams: 500, price: 165_000 },
+      { packageSize: '1kg', weightGrams: 1000, price: 320_000, sku: 'SRM-1K' },
     ],
   },
 ];
@@ -207,6 +244,9 @@ const CUSTOMERS = [
 
 async function wipe() {
   await prisma.$transaction([
+    prisma.auditLog.deleteMany(),
+    prisma.homeBlock.deleteMany(),
+    prisma.page.deleteMany(),
     prisma.comment.deleteMany(),
     prisma.orderStatusLog.deleteMany(),
     prisma.orderItem.deleteMany(),
@@ -240,9 +280,13 @@ async function seedUsers() {
     data: { email: 'admin@test.vn', name: 'Chủ cửa hàng (test)', role: 'ADMIN', passwordHash: adminHash, lastLoginAt: daysAgo(0, 8) },
   });
   const staff1 = await prisma.user.create({
-    data: { email: 'staff1@test.vn', name: 'Nhân viên Hoa', role: 'STAFF', passwordHash: staffHash, lastLoginAt: daysAgo(1, 9) },
+    // Hoa: đủ quyền nhân viên (bán hàng + sản phẩm + nội dung).
+    data: { email: 'staff1@test.vn', name: 'Nhân viên Hoa', role: 'STAFF', permissions: [...STAFF_PERMISSIONS], passwordHash: staffHash, lastLoginAt: daysAgo(1, 9) },
   });
-  await prisma.user.create({ data: { email: 'staff2@test.vn', name: 'Nhân viên Nam', role: 'STAFF', passwordHash: staffHash } });
+  // Nam: chỉ xử lý đơn và liên hệ — để thử phân quyền.
+  await prisma.user.create({
+    data: { email: 'staff2@test.vn', name: 'Nhân viên Nam', role: 'STAFF', permissions: ['orders', 'inquiries'], passwordHash: staffHash },
+  });
   await prisma.user.create({
     data: { email: 'staff3@test.vn', name: 'Nhân viên đã nghỉ', role: 'STAFF', passwordHash: staffHash, isActive: false },
   });
@@ -392,14 +436,17 @@ async function seedOrders(variants: VariantMap, users: { admin: { id: string }; 
       items: [{ key: 'P8:Hộp 500g', quantity: 3 }] },
     { suffix: 'TSTG', createdAt: daysAgo(20), customer: tester, status: 'delivered', shippingFee: 20_000,
       items: [{ key: 'P7:500g', quantity: 1 }],
-      deletedItems: [{ productName: 'Mãng cầu xiêm (đã xoá khỏi hệ thống)', packageSize: '1kg', unitPrice: 90_000, quantity: 1 }] },
+      deletedItems: [{ productName: 'Nho xanh không hạt (đã xoá khỏi hệ thống)', packageSize: '1kg', unitPrice: 90_000, quantity: 1 }] },
     { suffix: 'TSTH', createdAt: daysAgo(0, 11), status: 'pending',
       customer: ['<img src=x onerror=alert(1)>', '0905123456', '<script>alert("địa chỉ")</script> 99 Hàm Nghi, Đà Nẵng'],
       note: '<b>Ghi chú có HTML</b>', items: [{ key: 'P6:500g', quantity: 1 }] },
   ];
 
   const created = [];
-  for (const order of fixed) created.push(await createOrder(order, variants, users));
+  for (const order of fixed) {
+    if (DEMO && order.suffix === 'TSTH') continue;
+    created.push(await createOrder(order, variants, users));
+  }
 
   // Lịch sử bán hàng ~13 tháng cho trang Tổng quan, biểu đồ và phân trang (> 20 đơn).
   const sellable = [...variants.entries()].filter(([, variant]) => variant.sellable).map(([key]) => key);
@@ -432,13 +479,13 @@ async function seedInquiries() {
     { type: 'contact', name: 'Trần Minh', email: 'minh@test.vn', message: 'Cho mình hỏi xoài 1kg còn hàng không?\nCảm ơn shop.', status: 'new', createdAt: daysAgo(1) },
     { type: 'wholesale', name: 'Lê Văn Bảo', company: 'Cafe Mộc', phone: '0236377888', quantity: 'Xoài 30kg/tháng, dâu 20kg/tháng',
       message: 'Cần báo giá giao định kỳ thứ 2 hằng tuần.', status: 'new', createdAt: daysAgo(1, 15) },
-    { type: 'wholesale', name: 'Phạm Thu', company: 'Trà sữa Mây', phone: '0914333444', quantity: 'Thanh long 50kg/tháng', status: 'in_progress', createdAt: daysAgo(4) },
+    { type: 'wholesale', name: 'Phạm Thu', company: 'Trà sữa Mây', phone: '0914333444', quantity: 'Mãng cầu 50kg/tháng', status: 'in_progress', createdAt: daysAgo(4) },
     { type: 'contact', name: 'Võ Mai', phone: '0372555666', message: 'Đơn của mình bị rã đông một phần.', status: 'in_progress', createdAt: daysAgo(6) },
     { type: 'contact', name: 'Khách cũ', email: 'khachcu@test.vn', message: 'Cảm ơn shop, dâu rất ngon!', status: 'done', createdAt: daysAgo(15) },
     { type: 'wholesale', name: 'Đặng Tuấn', company: 'Nhà hàng Biển Xanh', phone: '0868666777', quantity: 'Sầu riêng 10kg', status: 'done', createdAt: daysAgo(30) },
     { type: 'contact', name: '<script>alert(1)</script>', phone: '0905123456', message: '<img src=x onerror=alert(2)> nội dung có HTML', status: 'new', createdAt: daysAgo(0, 12) },
   ];
-  await prisma.inquiry.createMany({ data: rows });
+  await prisma.inquiry.createMany({ data: DEMO ? rows.filter((row) => !row.name.includes('<')) : rows });
 }
 
 async function seedContent() {
@@ -465,31 +512,112 @@ async function seedContent() {
     ],
   });
 
-  const content = (topic: string) =>
-    `${topic} là câu hỏi nhiều khách hàng gửi tới cửa hàng.\n\n1. Chuẩn bị\nLấy túi trái cây ra khỏi ngăn đá, giữ nguyên túi hút chân không.\n\n2. Thực hiện\nRã đông ngăn mát 6–8 tiếng, hoặc ngâm cả túi vào nước 5–15 phút.\n\n3. Lưu ý\nKhông cấp đông lại trái cây đã rã đông hoàn toàn.`;
+  // Khối trang chủ: phần chữ lớn đầu trang (trước đây viết cố định trong code) + một khối chia 2 cột ảnh / chữ.
+  await prisma.homeBlock.createMany({
+    data: [
+      {
+        title: '',
+        framed: false,
+        position: 'after_hero',
+        sortOrder: 0,
+        content:
+          '<p data-variant="badge">Trái cây đông lạnh chuẩn VietGAP</p>' +
+          '<h2 data-size="xl">Tươi tự nhiên. <span data-color="red">Đông lạnh</span> đúng cách.</h2>' +
+          '<p data-variant="lead">Cấp đông nhanh ngay sau thu hoạch, không chất bảo quản, đóng gói hút chân không giữ trọn hương vị — giao hàng lạnh tận nơi trên toàn quốc.</p>' +
+          '<p data-buttons=""><a href="/products" data-button="red">Khám phá sản phẩm</a><a href="/about" data-button="light">Tìm hiểu về chúng tôi</a></p>',
+      },
+      {
+        title: 'Vì sao chọn Trái Cây 28',
+        framed: true,
+        position: 'after_products',
+        sortOrder: 0,
+        content:
+          '<div data-columns="2"><div data-column="">' +
+          `<figure><img src="${img('saurieng2.jpg')}" alt="Sầu riêng tách múi" loading="lazy" /><figcaption>Tách múi, cấp đông ngay trong ngày</figcaption></figure>` +
+          '</div><div data-column="">' +
+          '<h3>Từ vườn tới tủ đông trong 24 giờ</h3>' +
+          '<ul><li><p><strong>Chín cây tự nhiên</strong> — thu hoạch đúng độ chín, không ép chín.</p></li>' +
+          '<li><p><strong>Cấp đông nhanh -35°C</strong> — giữ cấu trúc, vitamin và mùi thơm.</p></li>' +
+          '<li><p><strong>Giao lạnh tận nơi</strong> — thùng xốp + đá gel, đổi mới nếu hàng lỗi.</p></li></ul>' +
+          '<p data-buttons=""><a href="/products" data-button="green">Xem tất cả sản phẩm</a></p>' +
+          '</div></div>',
+      },
+    ],
+  });
+
+  const figure = (file: string, caption: string) =>
+    `<figure><img src="${img(file)}" alt="${caption}" loading="lazy" /><figcaption>${caption}</figcaption></figure>`;
+  const product = (slug: string) => `<div data-product-slug="${slug}"></div>`;
+
   await prisma.post.createMany({
     data: [
-      { slug: 'cach-ra-dong-trai-cay', title: 'Cách rã đông trái cây đúng cách', excerpt: 'Ba cách rã đông giữ trọn hương vị.',
-        content: content('Rã đông thế nào cho đúng'), coverImage: img('bai-viet-1.jpg'), publishedAt: daysAgo(1) },
-      { slug: 'sinh-to-xoai-dau', title: 'Sinh tố xoài dâu 5 phút', excerpt: 'Công thức sinh tố mát lạnh cho ngày hè.',
-        content: content('Làm sinh tố từ trái cây đông lạnh'), coverImage: img('bai-viet-2.jpg'), publishedAt: daysAgo(10) },
-      { slug: 'trai-cay-dong-lanh-co-mat-chat', title: 'Trái cây đông lạnh có mất chất?', excerpt: 'So sánh trái cây tươi và đông lạnh.',
-        content: content('Giá trị dinh dưỡng'), publishedAt: daysAgo(30) },
-      { slug: 'bai-hen-gio', title: 'Bài viết hẹn giờ (ngày mai)', excerpt: 'Chưa được hiện trên web.', content: content('Bài hẹn giờ'),
-        publishedAt: new Date(now + DAY) },
-      { slug: 'tuyen-nhan-vien-ban-hang', type: 'recruitment', title: 'Tuyển 2 nhân viên bán hàng & đóng gói',
+      {
+        slug: 'cach-ra-dong-trai-cay', title: 'Cách rã đông trái cây đúng cách', excerpt: 'Ba cách rã đông giữ trọn hương vị, không bị nhũn.',
+        coverImage: img('bai-viet-v6.jpg'), publishedAt: daysAgo(1),
+        content:
+          '<p>Rã đông sai cách là lý do khiến trái cây đông lạnh bị nhũn, chảy nước và mất vị. Dưới đây là ba cách cửa hàng khuyên dùng.</p>' +
+          '<h2>1. Rã đông trong ngăn mát (khuyên dùng)</h2>' +
+          '<p>Chuyển nguyên túi từ ngăn đá xuống ngăn mát <strong>6–8 tiếng</strong> (hoặc để qua đêm). Trái cây tan đều, giữ được độ chắc.</p>' +
+          '<h2>2. Ngâm nước lạnh</h2>' +
+          '<p>Giữ nguyên túi hút chân không, ngâm vào thau nước lạnh <strong>5–15 phút</strong> tuỳ lượng.</p>' +
+          '<aside data-tone="red"><p><strong>Không nên:</strong> ngâm nước nóng hoặc cấp đông lại trái cây đã rã đông hoàn toàn.</p></aside>' +
+          '<h2>3. Dùng trực tiếp, không cần rã đông</h2>' +
+          '<p>Làm sinh tố, smoothie bowl, kem: cho thẳng trái cây đông lạnh vào máy xay — vừa lạnh vừa sánh mịn, không cần thêm đá.</p>' +
+          figure('xoai1.jpg', 'Xoài cắt miếng dùng thẳng cho sinh tố') +
+          '<h3>Sản phẩm phù hợp</h3>' + product('xoai-cat-cat-mieng') + product('sau-rieng-ri6') + product('bo-sap-cat-hat-luu'),
+      },
+      {
+        slug: 'sinh-to-xoai-dau', title: 'Sinh tố xoài dâu 5 phút', excerpt: 'Công thức sinh tố mát lạnh cho ngày hè, không cần đá.',
+        coverImage: img('bai-viet-v7.jpg'), publishedAt: daysAgo(10),
+        content:
+          '<p>Chỉ cần 5 phút và hai loại trái cây đông lạnh là có ly sinh tố sánh mịn cho cả nhà.</p>' +
+          '<h2>Nguyên liệu (2 ly)</h2>' +
+          '<ul><li><p>150g xoài cát cắt miếng</p></li><li><p>100g dâu tây cắt lát</p></li><li><p>200ml sữa tươi hoặc sữa chua uống</p></li><li><p>1 thìa mật ong (tuỳ thích)</p></li></ul>' +
+          '<h2>Cách làm</h2>' +
+          '<ol><li><p>Cho sữa vào máy xay trước, sau đó thêm xoài và dâu.</p></li><li><p>Xay tốc độ cao 40–60 giây đến khi mịn.</p></li><li><p>Rót ra ly, trang trí vài lát dâu.</p></li></ol>' +
+          figure('dau2.jpg', 'Dâu tây Đà Lạt cấp đông nguyên trái') +
+          '<aside data-tone="green"><p><strong>Mẹo:</strong> không cần rã đông — trái cây đông lạnh giúp sinh tố lạnh và đặc hơn.</p></aside>' +
+          product('xoai-cat-cat-mieng') + product('dau-tay-cat-lat'),
+      },
+      {
+        slug: 'trai-cay-dong-lanh-co-mat-chat', title: 'Trái cây đông lạnh có mất chất?', excerpt: 'So sánh dinh dưỡng giữa trái cây tươi và trái cây cấp đông nhanh.',
+        coverImage: img('bai-viet-v8.jpg'), publishedAt: daysAgo(30),
+        content:
+          '<p>Nhiều người nghĩ trái cây đông lạnh kém dinh dưỡng hơn trái cây tươi. Thực tế không hẳn như vậy.</p>' +
+          '<h2>Cấp đông nhanh giữ lại gì?</h2>' +
+          '<p>Trái cây được cấp đông ở -35°C ngay sau thu hoạch nên gần như "dừng" quá trình chín và oxy hoá — vitamin C, chất xơ và khoáng chất được giữ lại tốt.</p>' +
+          '<h2>Trái cây "tươi" ngoài chợ thì sao?</h2>' +
+          '<p>Trái cây vận chuyển xa thường bị hái sớm và mất dần vitamin trong vài ngày bày bán.</p>' +
+          '<aside data-tone="green"><p>Kết luận: trái cây cấp đông nhanh, bảo quản đúng -18°C, có giá trị dinh dưỡng tương đương trái cây tươi mới hái.</p></aside>',
+      },
+      {
+        slug: 'bao-quan-sau-rieng-dong-lanh', title: 'Bảo quản sầu riêng đông lạnh không ám mùi tủ', excerpt: 'Mẹo giữ sầu riêng thơm ngon cả tháng mà tủ lạnh không bị ám mùi.',
+        coverImage: img('bai-viet-v5.jpg'), publishedAt: daysAgo(18),
+        content:
+          '<p>Sầu riêng đông lạnh tiện lợi nhưng nhiều nhà ngại vì sợ ám mùi tủ lạnh. Làm theo 3 bước dưới đây là yên tâm.</p>' +
+          '<div data-columns="2"><div data-column="">' + figure('saurieng3.jpg', 'Múi sầu riêng hút chân không') + '</div><div data-column="">' +
+          '<ol><li><p>Giữ nguyên hộp hút chân không, không mở ra rồi cất lại.</p></li><li><p>Bọc thêm một lớp túi zip trước khi cho vào ngăn đá.</p></li><li><p>Đặt một ly than hoạt tính hoặc bã cà phê trong ngăn đá.</p></li></ol>' +
+          '</div></div>' + product('sau-rieng-monthong'),
+      },
+      {
+        slug: 'bai-hen-gio', title: 'Mẹo chọn bơ sáp ngon (hẹn đăng ngày mai)', excerpt: 'Bài hẹn giờ — chưa hiện trên web.',
+        coverImage: img('bai-viet-v1.jpg'), publishedAt: new Date(now + DAY),
+        content: '<p>Bài viết hẹn giờ: chỉ hiện trên web khi tới ngày đăng.</p>',
+      },
+      {
+        slug: 'tuyen-nhan-vien-ban-hang', type: 'recruitment', title: 'Tuyển 2 nhân viên bán hàng & đóng gói',
         excerpt: 'Làm việc tại cửa hàng 49 Đặng Tất, ca sáng hoặc ca chiều, lương 6–8 triệu.',
-        content: `Mô tả công việc
-• Tư vấn khách tại cửa hàng và qua Zalo.
-• Đóng gói đơn hàng giữ lạnh (thùng xốp + đá gel).
-
-Yêu cầu
-• Trung thực, cẩn thận, ưu tiên ở Liên Chiểu.
-
-Quyền lợi
-• Lương 6–8 triệu + thưởng theo doanh số, nghỉ 4 ngày/tháng.`,
-        publishedAt: daysAgo(3) },
-      { slug: 'bai-nhap', title: 'Bài viết nháp', excerpt: 'Đã tắt hiển thị.', content: content('Bài nháp'), isPublished: false, publishedAt: daysAgo(2) },
+        coverImage: img('bai-viet-v3.jpg'), publishedAt: daysAgo(3),
+        content:
+          '<h2>Mô tả công việc</h2><ul><li><p>Tư vấn khách tại cửa hàng và qua Zalo.</p></li><li><p>Đóng gói đơn hàng giữ lạnh (thùng xốp + đá gel).</p></li></ul>' +
+          '<h2>Yêu cầu</h2><ul><li><p>Trung thực, cẩn thận, ưu tiên ở Liên Chiểu.</p></li></ul>' +
+          '<h2>Quyền lợi</h2><ul><li><p>Lương 6–8 triệu + thưởng theo doanh số, nghỉ 4 ngày/tháng.</p></li></ul>',
+      },
+      {
+        slug: 'bai-nhap', title: 'Combo quà Tết trái cây đông lạnh (bản nháp)', excerpt: 'Đang soạn — chưa đăng.',
+        coverImage: img('bai-viet-v2.jpg'), isPublished: false, publishedAt: daysAgo(2),
+        content: '<p>Bản nháp: tắt hiển thị nên không có trên web.</p>',
+      },
     ],
   });
 
@@ -500,7 +628,7 @@ Quyền lợi
       { postId: n1.id, name: 'Anh Minh', email: 'minh@test.vn', content: 'Rã đông bằng lò vi sóng được không shop?', status: 'approved',
         reply: 'Được bạn nhé, dùng chế độ rã đông 2–3 phút và đảo đều.', repliedAt: daysAgo(0, 11), createdAt: daysAgo(0, 10) },
       { postId: n1.id, name: 'Khách mới', email: 'moi@test.vn', content: 'Bình luận đang chờ duyệt (chưa hiện trên web).', createdAt: daysAgo(0, 12) },
-      { postId: n1.id, name: 'Spam', email: 'spam@test.vn', content: 'Bình luận đã bị ẩn.', status: 'hidden', createdAt: daysAgo(1) },
+      ...(DEMO ? [] : [{ postId: n1.id, name: 'Spam', email: 'spam@test.vn', content: 'Bình luận đã bị ẩn.', status: 'hidden' as const, createdAt: daysAgo(1) }]),
     ],
   });
 
@@ -560,17 +688,17 @@ async function main() {
 
   const counts = await Promise.all([
     prisma.category.count(), prisma.product.count(), prisma.order.count(), prisma.inquiry.count(),
-    prisma.post.count(), prisma.banner.count(), prisma.policy.count(),
+    prisma.post.count(), prisma.banner.count(), prisma.policy.count(), prisma.homeBlock.count(),
   ]);
   console.log(`
-✔ Xong. ${counts[0]} danh mục · ${counts[1]} sản phẩm · ${counts[2]} đơn · ${counts[3]} liên hệ · ${counts[4]} bài viết · ${counts[5]} banner · ${counts[6]} chính sách
+✔ Xong${DEMO ? ' (bản demo)' : ''}. ${counts[0]} danh mục · ${counts[1]} sản phẩm · ${counts[2]} đơn · ${counts[3]} liên hệ · ${counts[4]} bài viết · ${counts[5]} banner · ${counts[6]} chính sách · ${counts[7]} khối trang chủ
   Ảnh mẫu: ${SEED_UPLOAD_DIR}
   Cache web: ${cache}
 
 Tài khoản (trang quản trị http://localhost:3002):
   ADMIN   admin@test.vn    ${PASSWORDS.admin}
-  STAFF1  staff1@test.vn   ${PASSWORDS.staff}
-  STAFF2  staff2@test.vn   ${PASSWORDS.staff}
+  STAFF1  staff1@test.vn   ${PASSWORDS.staff}   (đủ quyền nhân viên)
+  STAFF2  staff2@test.vn   ${PASSWORDS.staff}   (chỉ Đơn hàng + Liên hệ)
   STAFF3  staff3@test.vn   ${PASSWORDS.staff}   (đã khoá)
 
 Đơn cố định để tra cứu (SĐT 0905123456):

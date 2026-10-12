@@ -59,7 +59,7 @@ Trạng thái: ✅ xong · 🟡 một phần · ⬜ chưa làm (đã lên kế h
 | OTP khi ADMIN đăng nhập | ⬜ | Đã thiết kế — [admin.md §5](../03-apps/admin.md#5-kế-hoạch-xác-thực-otp-cho-admin) |
 | Tự nén / resize ảnh khi tải lên | ⬜ | Hiện `next/image` resize lúc hiển thị |
 | Xuất đơn hàng ra Excel | ⬜ | |
-| Nhật ký thao tác của nhân viên (ngoài lịch sử đơn) | ⬜ | |
+| Nhật ký thao tác của nhân viên (ngoài lịch sử đơn) | ✅ | Trang **Lịch sử chỉnh sửa** (chỉ ADMIN): ai sửa gì, trường nào trước → sau |
 
 ## 3. Backend & hạ tầng
 

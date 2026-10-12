@@ -17,6 +17,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:create-admin": "tsx prisma/create-admin.ts",
     "prisma:seed-test": "tsx prisma/seed-test.ts",
+    "prisma:reset-clean": "tsx prisma/reset-clean.ts",
     "prisma:studio": "prisma studio",
     "prisma:deploy": "prisma migrate deploy"
   },

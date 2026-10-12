@@ -7,7 +7,7 @@ import { CharacterCount, Placeholder } from "@tiptap/extensions";
 import { TEXT_COLORS, TEXT_COLOR_LABELS, plainTextToHtml } from "@frozen-fruit-shop/types";
 import { ACCEPT, uploadFile } from "@/components/ui/image-upload";
 import { formatCurrency } from "@/lib/format";
-import { ButtonRow, Callout, Column, Columns, Figure, ProductEmbed, TextAlign, TextColor, type ProductOption } from "./extensions";
+import { BlockStyle, ButtonRow, Callout, Column, Columns, Figure, ProductEmbed, TextAlign, TextColor, type ProductOption } from "./extensions";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
@@ -108,6 +108,7 @@ export function RichTextEditor({
       TextColor,
       TextAlign,
       ButtonRow,
+      BlockStyle,
     ],
     editorProps: {
       attributes: { class: "rich-editor-content", "aria-label": "Nội dung" },
@@ -230,7 +231,10 @@ function Toolbar({
   const state = useEditorState({
     editor,
     selector: ({ editor: e }) => ({
-      paragraph: e.isActive("paragraph") && !e.isActive("callout"),
+      paragraph: e.isActive("paragraph") && !e.isActive("callout") && !e.getAttributes("paragraph").variant,
+      badge: e.isActive("paragraph", { variant: "badge" }),
+      lead: e.isActive("paragraph", { variant: "lead" }),
+      xl: e.isActive("heading", { size: "xl" }),
       h2: e.isActive("heading", { level: 2 }),
       h3: e.isActive("heading", { level: 3 }),
       bold: e.isActive("bold"),
@@ -264,11 +268,20 @@ function Toolbar({
         <Btn label="Văn bản thường" active={state.paragraph && !state.h2 && !state.h3} onClick={() => run((c) => c.setParagraph())}>
           Văn bản
         </Btn>
-        <Btn label="Tiêu đề lớn" active={state.h2} onClick={() => run((c) => c.toggleHeading({ level: 2 }))}>
+        <Btn label="Tiêu đề rất lớn (phần đầu trang chủ)" active={state.xl} onClick={() => run((c) => c.toggleHeadingXl())}>
+          Tiêu đề to
+        </Btn>
+        <Btn label="Tiêu đề lớn" active={state.h2 && !state.xl} onClick={() => run((c) => c.toggleHeading({ level: 2 }))}>
           Tiêu đề
         </Btn>
         <Btn label="Tiêu đề nhỏ" active={state.h3} onClick={() => run((c) => c.toggleHeading({ level: 3 }))}>
           Tiêu đề nhỏ
+        </Btn>
+        <Btn label="Nhãn nhỏ in hoa nền hồng (ví dụ: TRÁI CÂY ĐÔNG LẠNH CHUẨN VIETGAP)" active={state.badge} onClick={() => run((c) => c.toggleParagraphVariant("badge"))}>
+          Nhãn
+        </Btn>
+        <Btn label="Đoạn dẫn: chữ to hơn, màu dịu (đoạn giới thiệu ngay dưới tiêu đề)" active={state.lead} onClick={() => run((c) => c.toggleParagraphVariant("lead"))}>
+          Đoạn dẫn
         </Btn>
       </Group>
       <Group>
