@@ -6,12 +6,14 @@ import { LinkButton, SubmitButton } from "@/components/ui/button";
 import { Checkbox, Field, FormAlert, inputClass } from "@/components/ui/form";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { saveCategoryAction } from "./actions";
+import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 export function CategoryForm({ category }: { category?: Category }) {
   const [state, formAction] = useActionState(saveCategoryAction.bind(null, category?.id ?? null), undefined);
 
   return (
-    <form action={formAction} className="flex max-w-2xl flex-col gap-5 border border-divider bg-surface p-6">
+    <form action={formAction} className="flex flex-col gap-5 border border-divider bg-surface p-6">
+      <UnsavedChangesGuard state={state} />
       <Field label="Tên danh mục" htmlFor="name" required>
         <input id="name" name="name" required maxLength={120} defaultValue={category?.name} placeholder="Ví dụ: Xoài đông lạnh" className={inputClass} />
       </Field>

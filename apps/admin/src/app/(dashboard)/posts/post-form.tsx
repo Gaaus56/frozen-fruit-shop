@@ -8,6 +8,7 @@ import { ImageUpload } from "@/components/ui/image-upload";
 import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import type { ProductOption } from "@/components/editor/extensions";
 import { savePostAction } from "./actions";
+import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 /** ISO → giá trị cho <input type="datetime-local"> theo giờ Việt Nam. */
 function toLocalInput(iso: string | undefined): string {
@@ -29,6 +30,7 @@ export function PostForm({
 
   return (
     <form action={formAction} className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <UnsavedChangesGuard state={state} />
       <div className="flex flex-col gap-6 xl:col-span-2">
         <Section title="Nội dung">
           <Field label="Tiêu đề" htmlFor="title" required>

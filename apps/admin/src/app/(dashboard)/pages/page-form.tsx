@@ -7,13 +7,15 @@ import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import { SubmitButton } from "@/components/ui/button";
 import { Field, FormAlert, inputClass } from "@/components/ui/form";
 import { savePageAction } from "./actions";
+import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 /** Sửa trang nội dung cố định (trang Giới thiệu): tiêu đề, dòng giới thiệu, nội dung có định dạng. */
 export function PageForm({ page, products }: { page: Page; products: ProductOption[] }) {
   const [state, formAction] = useActionState(savePageAction.bind(null, page.slug), undefined);
 
   return (
-    <form action={formAction} className="flex max-w-4xl flex-col gap-5 border border-divider bg-surface p-6">
+    <form action={formAction} className="flex flex-col gap-5 border border-divider bg-surface p-6">
+      <UnsavedChangesGuard state={state} />
       {page.updatedAt === null ? (
         <p className="border border-leaf-100 bg-leaf-50 px-4 py-3 text-sm text-leaf-700">
           Đây là nội dung đang hiển thị trên web. Sửa trực tiếp rồi bấm <b>Lưu trang</b>.

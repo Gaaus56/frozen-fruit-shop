@@ -8,6 +8,7 @@ import { ImageUpload } from "@/components/ui/image-upload";
 import { saveBannerAction } from "./actions";
 import type { LinkOptionGroup } from "./link-options";
 import { LinkPicker } from "./link-picker";
+import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 const IMAGE_HINT: Record<BannerPlacement, string> = {
   home: "Ảnh ngang, khuyến nghị 2100×800 px (tỉ lệ 21:8). Trên điện thoại ảnh được cắt về 16:9 — đặt nội dung chính ở giữa.",
@@ -40,7 +41,8 @@ export function BannerForm({
   const isHome = placement === "home";
 
   return (
-    <form action={formAction} className="flex max-w-3xl flex-col gap-5 border border-divider bg-surface p-6">
+    <form action={formAction} className="flex flex-col gap-5 border border-divider bg-surface p-6">
+      <UnsavedChangesGuard state={state} />
       <Field
         label="Vị trí hiển thị"
         htmlFor="placement"

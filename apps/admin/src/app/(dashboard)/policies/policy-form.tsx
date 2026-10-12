@@ -7,6 +7,7 @@ import { Checkbox, Field, FormAlert, inputClass } from "@/components/ui/form";
 import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import type { ProductOption } from "@/components/editor/extensions";
 import { savePolicyAction } from "./actions";
+import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 type Draft = Pick<Policy, "title" | "slug" | "content">;
 
@@ -15,7 +16,8 @@ export function PolicyForm({ policy, template, products }: { policy?: Policy; te
   const initial = policy ?? template;
 
   return (
-    <form action={formAction} className="flex max-w-4xl flex-col gap-5 border border-divider bg-surface p-6">
+    <form action={formAction} className="flex flex-col gap-5 border border-divider bg-surface p-6">
+      <UnsavedChangesGuard state={state} />
       <Field label="Tiêu đề" htmlFor="title" required>
         <input id="title" name="title" required maxLength={150} defaultValue={initial?.title} className={inputClass} />
       </Field>

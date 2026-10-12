@@ -8,12 +8,14 @@ import { ImageListUpload } from "@/components/ui/image-upload";
 import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import { saveProductAction } from "./actions";
 import { VariantEditor } from "./variant-editor";
+import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 export function ProductForm({ product, categories }: { product?: Product; categories: Category[] }) {
   const [state, formAction] = useActionState(saveProductAction.bind(null, product?.id ?? null), undefined);
 
   return (
     <form action={formAction} className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <UnsavedChangesGuard state={state} />
       <div className="flex flex-col gap-6 xl:col-span-2">
         <Section title="Thông tin cơ bản">
           <Field label="Tên sản phẩm" htmlFor="name" required>

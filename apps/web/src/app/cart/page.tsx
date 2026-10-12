@@ -6,6 +6,7 @@ import { LinkButton } from "@/components/ui/button";
 import { useCart } from "@/lib/cart-context";
 import { formatCurrency } from "@/lib/format";
 import { ProductImage } from "@/components/product/product-image";
+import { EMPTY_ICONS, EmptyStateIcon } from "@/components/ui/line-icon";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, subtotal, isHydrated } = useCart();
@@ -17,7 +18,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <Container className="flex flex-col items-center gap-4 py-20 text-center">
-        <p className="text-5xl" aria-hidden>🛒</p>
+        <EmptyStateIcon d={EMPTY_ICONS.cart} />
         <h1 className="text-2xl uppercase text-foreground">Giỏ hàng của bạn đang trống</h1>
         <p className="text-foreground/70">Hãy khám phá các sản phẩm trái cây đông lạnh của chúng tôi.</p>
         <div className="flex flex-wrap justify-center gap-3">

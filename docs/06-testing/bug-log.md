@@ -47,6 +47,8 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 | [B-32](#b-32--seed-tạo-nhân-viên-không-có-quyền-nào) | Dữ liệu mẫu | Seed tạo nhân viên không có quyền nào | ✅ |
 | [B-33](#b-33--ảnh-mẫu-404-trên-render) | Deploy | Ảnh mẫu 404 trên Render (bị `.dockerignore` loại khỏi image) | ✅ |
 | [B-34](#b-34--số-điện-thoại-bị-bẻ-xuống-dòng) | Giao diện | Số điện thoại bị bẻ đôi xuống dòng trên điện thoại | ✅ |
+| [B-35](#b-35--hàng-nút-thành-liên-kết-khi-mở-lại) | Soạn thảo | Hàng nút điều hướng biến thành chữ liên kết khi mở lại bài | ✅ |
+| [B-36](#b-36--mở-bản-ghi-dẫn-tới-trang-404) | Admin | "Mở bản ghi này" ở Lịch sử chỉnh sửa dẫn tới trang 404 (Liên hệ, Bình luận) | ✅ |
 | [T-01](#t-01--prisma-generate-báo-eperm-trên-windows) | Công cụ | `prisma generate` báo EPERM trên Windows | ⚠️ |
 | [T-02](#t-02--sửa-packagestypes-mà-api--web-không-thấy-thay-đổi) | Công cụ | Sửa `packages/types` mà app không thấy thay đổi | ⚠️ |
 | [T-03](#t-03--lỗi-type-trong-nexttypes-sau-khi-xoá-trang) | Công cụ | Lỗi type trong `.next/types` sau khi xoá trang | ⚠️ |
@@ -104,6 +106,13 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 - **Cách sửa:** giữ `data-button` trong transform; `allowedAttributes` vẫn lọc lại chỉ nhận `red|dark|light|green`.
 - **File:** `apps/api/src/common/rich-text.ts`.
 - **Bài học:** thêm thuộc tính mới vào nội dung soạn thảo → kiểm tra **cả `transformTags` lẫn `allowedAttributes`**.
+
+### B-35 — Hàng nút thành liên kết khi mở lại
+- **Ngày:** 2026-10-12
+- **Hiện tượng:** tạo "Nút" trong trình soạn thảo, lưu, mở lại → hàng nút biến thành một dòng chữ gạch chân "Xem sản phẩmLiên hệGiới thiệu". Lưu tiếp lần nữa thì mất hẳn nút (web chỉ còn liên kết chữ).
+- **Nguyên nhân:** HTML lưu đúng (`<p data-buttons><a data-button…>`), nhưng khi nạp lại, quy tắc đọc `p[data-buttons]` của node `buttonRow` không có `priority` → ngang hàng với Paragraph (đọc mọi `<p>`, mặc định 50) và Paragraph được thử trước → thành đoạn văn chứa 3 liên kết. Lúc chèn mới thì không lỗi vì node được tạo bằng lệnh, không qua bước đọc HTML.
+- **Cách sửa:** `parseHTML() { return [{ tag: "p[data-buttons]", priority: 60 }] }` (extensions.tsx).
+- **Bài học:** node tuỳ biến dựa trên thẻ mà node có sẵn cũng đọc (`p`, `div`, `span`…) phải đặt `priority` > 50; kiểm thử phải có bước **lưu → mở lại** chứ không chỉ chèn rồi xem.
 
 ---
 
@@ -280,6 +289,13 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 - **Nguyên nhân:** `.dockerignore` (viết từ khi ảnh mẫu chỉ dùng ở máy dev) loại `apps/api/prisma/seed-assets` khỏi Docker image. Sau khi API chuyển sang phục vụ ảnh mẫu thẳng từ thư mục này (vì Render không có ổ đĩa lâu dài), thư mục không có trong image → `existsSync` sai → không đăng ký route → 404.
 - **Cách sửa:** bỏ dòng đó khỏi `.dockerignore`, deploy lại API.
 - **Bài học:** đổi chỗ đọc file lúc chạy → kiểm tra cả `.dockerignore` / Dockerfile; thử build image (hoặc gọi URL ảnh trên bản deploy) trước khi báo xong.
+
+### B-36 — "Mở bản ghi" dẫn tới trang 404
+- **Ngày:** 2026-10-12
+- **Hiện tượng:** Lịch sử chỉnh sửa → mục *Liên hệ & báo giá* (hoặc *Bình luận*) → bấm "Mở bản ghi này ›" → trang 404 đen mặc định của Next.js.
+- **Nguyên nhân:** link tạo theo mẫu chung `/<mục>/<id>`, nhưng hai mục này xử lý ngay trong danh sách, không có trang `[id]`. Admin cũng chưa có trang 404 / trang lỗi riêng nên hiện màn hình mặc định tiếng Anh.
+- **Cách sửa:** chỉ tạo link cho các mục có trang sửa riêng (`HAS_DETAIL_PAGE`: banners, categories, home-blocks, orders, policies, posts, products) + settings / users / pages; mục khác ẩn nút. Thêm trang 404 và trang lỗi tiếng Việt cho cả admin (`app/not-found.tsx`, `app/(dashboard)/not-found.tsx` giữ menu, `error.tsx`, `global-error.tsx`) và web (`error.tsx`, `global-error.tsx`, làm lại `not-found.tsx`).
+- **Bài học:** link sinh tự động theo mẫu phải đối chiếu với các route có thật; app nào cũng cần trang 404 / lỗi riêng ngay từ đầu.
 
 ---
 

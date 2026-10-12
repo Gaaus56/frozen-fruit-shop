@@ -210,14 +210,44 @@ export interface ProductAssurance {
 /** Số thẻ cam kết tối đa (một hàng 3 ô trên trang sản phẩm). */
 export const MAX_PRODUCT_ASSURANCES = 3;
 
-/** Biểu tượng admin chọn cho thẻ cam kết. */
-export const ASSURANCE_ICONS = ["❄️", "↺", "☎", "🚚", "✅", "🌿", "⏱️", "💳", "🎁", "🛡️"] as const;
+/**
+ * Biểu tượng admin chọn cho thẻ cam kết — icon nét (SVG, vẽ bằng `currentColor`) nên đổi màu theo chủ đề web,
+ * khác emoji (màu cố định, mỗi máy vẽ một kiểu). Lưu tên icon trong DB; `d` là đường vẽ trên khung 24×24.
+ */
+export const ASSURANCE_ICONS = ["snowflake", "refresh", "phone", "truck", "check", "leaf", "clock", "card", "gift", "shield"] as const;
+export type AssuranceIcon = (typeof ASSURANCE_ICONS)[number];
+
+export const ASSURANCE_ICON_INFO: Record<AssuranceIcon, { label: string; d: string }> = {
+  snowflake: { label: "Bông tuyết (giữ lạnh)", d: "M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 2.5L15 4M9 20l3-2.5 3 2.5M3.6 10.6l3.7.9-1.2 3.6M20.4 13.4l-3.7-.9 1.2-3.6M6.1 8.9 7.3 12.5M17.9 15.1l-1.2-3.6" },
+  refresh: { label: "Mũi tên vòng (đổi trả)", d: "M3 12a9 9 0 0 1 15.4-6.4L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.4 6.4L3 16M3 21v-5h5" },
+  phone: { label: "Điện thoại", d: "M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" },
+  truck: { label: "Xe giao hàng", d: "M2 5h12v11H2zM14 9h4l4 4v3h-8M6.5 19.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17.5 19.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" },
+  check: { label: "Dấu tích (đảm bảo)", d: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM7.5 12.5l3 3 6-6.5" },
+  leaf: { label: "Lá (tự nhiên)", d: "M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10zM2 21c0-3 1.9-5.4 5.1-6 2.4-.5 4.9-2 5.9-3" },
+  clock: { label: "Đồng hồ (giao nhanh)", d: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2" },
+  card: { label: "Thẻ (thanh toán)", d: "M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM2 10h20M6 15h4" },
+  gift: { label: "Hộp quà", d: "M3 8h18v4H3zM12 8v13M19 12v9H5v-9M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5" },
+  shield: { label: "Khiên (an toàn)", d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4" },
+};
+
+/** Biểu tượng emoji đã lưu trước đây → tên icon tương ứng. */
+const LEGACY_ASSURANCE_ICONS: Record<string, AssuranceIcon> = {
+  "❄️": "snowflake", "❄": "snowflake", "↺": "refresh", "☎": "phone", "📞": "phone", "🚚": "truck", "✅": "check",
+  "🌿": "leaf", "⏱️": "clock", "⏱": "clock", "💳": "card", "🎁": "gift", "🛡️": "shield", "🛡": "shield",
+};
+
+/** Tên icon hợp lệ cho một giá trị đã lưu (emoji cũ hoặc giá trị lạ → icon gần nhất / dấu tích). */
+export function normalizeAssuranceIcon(value: string): AssuranceIcon {
+  const text = value.trim();
+  if ((ASSURANCE_ICONS as readonly string[]).includes(text)) return text as AssuranceIcon;
+  return LEGACY_ASSURANCE_ICONS[text] ?? "check";
+}
 
 /** Dùng khi admin chưa chỉnh thẻ cam kết lần nào. `{phone}`, `{hotlineHours}` được thay bằng thông tin cửa hàng. */
 export const DEFAULT_PRODUCT_ASSURANCES: ProductAssurance[] = [
-  { icon: "❄️", title: "Giao hàng giữ lạnh", text: "Đóng thùng xốp + đá gel, giữ đông suốt đường đi.", linkUrl: "/policies/chinh-sach-giao-hang" },
-  { icon: "↺", title: "Đổi trả khi hàng lỗi", text: "Quay video lúc mở thùng để được đổi mới hoặc hoàn tiền.", linkUrl: "/policies/chinh-sach-doi-tra" },
-  { icon: "☎", title: "Tư vấn {hotlineHours}", text: "{phone}", linkUrl: "tel:{phone}" },
+  { icon: "snowflake", title: "Giao hàng giữ lạnh", text: "Đóng thùng xốp + đá gel, giữ đông suốt đường đi.", linkUrl: "/policies/chinh-sach-giao-hang" },
+  { icon: "refresh", title: "Đổi trả khi hàng lỗi", text: "Quay video lúc mở thùng để được đổi mới hoặc hoàn tiền.", linkUrl: "/policies/chinh-sach-doi-tra" },
+  { icon: "phone", title: "Tư vấn {hotlineHours}", text: "{phone}", linkUrl: "tel:{phone}" },
 ];
 
 /** Thay `{phone}`, `{hotlineHours}` trong chữ admin nhập bằng thông tin cửa hàng hiện tại. */

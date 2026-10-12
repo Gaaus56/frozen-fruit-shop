@@ -6,6 +6,7 @@ import { FilterChip, FilterChips } from "@/components/ui/filter-chips";
 import { PostCard } from "@/components/post/post-card";
 import { getBanners, getPosts, getSettings } from "@/lib/api";
 import { editTarget } from "@/lib/edit-target";
+import { EMPTY_ICONS, EmptyStateIcon } from "@/components/ui/line-icon";
 
 interface NewsPageProps {
   searchParams: Promise<{ type?: string }>;
@@ -77,9 +78,7 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3 rounded-xl bg-card px-6 py-14 text-center ring-1 ring-divider/70">
-              <span className="text-4xl" aria-hidden>
-                {type === "recruitment" ? "🧑‍🍳" : "📰"}
-              </span>
+              <EmptyStateIcon d={type === "recruitment" ? EMPTY_ICONS.briefcase : EMPTY_ICONS.news} />
               {type === "recruitment" ? (
                 <p className="max-w-md text-foreground/70">
                   Hiện cửa hàng chưa có vị trí tuyển dụng. Bạn vẫn có thể gửi thông tin qua Zalo{" "}
