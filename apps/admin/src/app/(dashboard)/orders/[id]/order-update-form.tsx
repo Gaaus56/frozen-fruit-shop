@@ -10,6 +10,7 @@ import {
 } from "@frozen-fruit-shop/types";
 import { SubmitButton, buttonClass } from "@/components/ui/button";
 import { Field, FormAlert, inputClass } from "@/components/ui/form";
+import { WithHelp } from "@/components/ui/help";
 import { updateOrderAction } from "../actions";
 
 /** Nút chuyển nhanh sang bước kế tiếp; "Huỷ đơn" luôn nằm riêng. */
@@ -37,7 +38,11 @@ export function OrderUpdateForm({ order }: { order: OrderDetail }) {
 
   return (
     <form action={formAction} className="flex flex-col gap-4 border border-divider bg-surface p-5 xl:sticky xl:top-6">
-      <h2 className="text-base">Xử lý đơn</h2>
+      <WithHelp
+        head={<h2 className="text-base">Xử lý đơn</h2>}
+        help={isFinished ? undefined : "Bấm nút chuyển nhanh hoặc chọn trạng thái bên dưới. Phí ship / giảm giá bên dưới sẽ được lưu cùng lúc."}
+        label="Xử lý đơn"
+      />
 
       {!isFinished ? (
         <div className="flex flex-col gap-2">
@@ -60,7 +65,6 @@ export function OrderUpdateForm({ order }: { order: OrderDetail }) {
           >
             Huỷ đơn
           </button>
-          <p className="text-xs text-foreground/55">Phí ship / giảm giá bên dưới sẽ được lưu cùng lúc.</p>
         </div>
       ) : null}
 

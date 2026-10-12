@@ -27,7 +27,7 @@ export default async function PostsPage({ searchParams }: PageProps<"/posts">) {
     <div>
       <PageHeader
         title="Bài viết"
-        description="Hiển thị ở mục Tin tức trên web, chia 2 loại: Kiến thức và Tuyển dụng."
+        help="Hiển thị ở mục Tin tức trên web, chia 2 loại: Kiến thức và Tuyển dụng."
         action={<LinkButton href={type === "recruitment" ? "/posts/new?type=recruitment" : "/posts/new"}>+ Viết bài</LinkButton>}
       />
 

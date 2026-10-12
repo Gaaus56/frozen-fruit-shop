@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent } from "react";
+import { useId, useRef, useState, type ChangeEvent } from "react";
 import { uploadImageAction } from "@/lib/upload-action";
 import { buttonClass } from "./button";
+import { HelpButton, HelpPanel } from "./help";
 
 export const ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
 
@@ -26,6 +27,8 @@ export function ImageUpload({ name, defaultValue, label = "Chọn ảnh", frame 
   const [url, setUrl] = useState(defaultValue ?? "");
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const helpId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleChange(event: ChangeEvent<HTMLInputElement>) {
@@ -65,7 +68,12 @@ export function ImageUpload({ name, defaultValue, label = "Chọn ảnh", frame 
               Bỏ ảnh
             </button>
           ) : null}
-          <p className="text-xs text-foreground/50">JPG, PNG, WEBP · tối đa 5MB</p>
+          <div className="flex items-start gap-1.5">
+            <HelpButton open={helpOpen} onToggle={() => setHelpOpen((value) => !value)} controls={helpId} label="định dạng ảnh" />
+            <HelpPanel id={helpId} open={helpOpen}>
+              <p className="text-xs text-foreground/60">JPG, PNG, WEBP · tối đa 5MB</p>
+            </HelpPanel>
+          </div>
         </div>
       </div>
       {error ? <p className="mt-2 text-xs font-semibold text-accent-700">{error}</p> : null}
@@ -141,7 +149,6 @@ export function ImageListUpload({ name, defaultValue, max = 12 }: { name: string
         ) : null}
       </div>
       <input ref={inputRef} type="file" accept={ACCEPT} multiple onChange={handleChange} className="hidden" />
-      <p className="mt-2 text-xs text-foreground/50">Ảnh đầu tiên là ảnh đại diện. JPG, PNG, WEBP · tối đa 5MB/ảnh · tối đa {max} ảnh.</p>
       {error ? <p className="mt-1 text-xs font-semibold text-accent-700">{error}</p> : null}
     </div>
   );

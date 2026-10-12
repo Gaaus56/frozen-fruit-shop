@@ -23,7 +23,7 @@ export default async function HomeBlocksPage() {
     <div>
       <PageHeader
         title="Khối trang chủ"
-        description="Nội dung tự soạn (giới thiệu, câu chuyện, khuyến mãi...) xen giữa các phần có sẵn của trang chủ. Có thể chia 2 cột ảnh / chữ, đặt trong khung hoặc không."
+        help="Nội dung tự soạn (giới thiệu, câu chuyện, khuyến mãi...) xen giữa các phần có sẵn của trang chủ. Có thể chia 2 cột ảnh / chữ, đặt trong khung hoặc không."
         action={<LinkButton href="/home-blocks/new">+ Thêm khối</LinkButton>}
       />
 

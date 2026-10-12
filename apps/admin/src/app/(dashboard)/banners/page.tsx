@@ -30,7 +30,7 @@ export default async function BannersPage({ searchParams }: PageProps<"/banners"
     <div>
       <PageHeader
         title="Banner"
-        description="Trang chủ: ảnh trình chiếu, ẩn khi không có banner nào đang bật. Trang Sản phẩm / Tin tức / Giới thiệu: ảnh nền đầu trang, dùng banner đang bật có thứ tự nhỏ nhất."
+        help="Trang chủ: ảnh trình chiếu, ẩn khi không có banner nào đang bật. Trang Sản phẩm / Tin tức / Giới thiệu: ảnh nền đầu trang, dùng banner đang bật có thứ tự nhỏ nhất."
         action={<LinkButton href={placement ? `/banners/new?placement=${placement}` : "/banners/new"}>+ Thêm banner</LinkButton>}
       />
 

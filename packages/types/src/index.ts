@@ -270,9 +270,15 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
 };
 
 /** "0396799579" → "0396 799 579" */
+/**
+ * "0396799579" → "0396 799 579". Các cụm nối bằng dấu cách không ngắt dòng (U+00A0) để số điện thoại
+ * luôn nằm trọn một dòng ở mọi nơi hiển thị (hết chỗ thì cả số xuống dòng, không bị bẻ đôi).
+ * Link `tel:` vẫn bỏ khoảng trắng bằng `.replace(/\s/g, "")` (\s khớp cả U+00A0).
+ */
 export function formatPhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
-  return digits.length === 10 ? `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}` : phone;
+  const grouped = digits.length === 10 ? `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}` : phone.trim();
+  return grouped.replace(/ /g, "\u00a0");
 }
 
 // ───────────── Đơn hàng ─────────────

@@ -27,11 +27,11 @@ export function ProductForm({ product, categories }: { product?: Product; catego
           </Field>
         </Section>
 
-        <Section title="Hình ảnh">
+        <Section title="Hình ảnh" description="Ảnh đầu tiên là ảnh đại diện. JPG, PNG, WEBP · tối đa 5MB/ảnh · tối đa 12 ảnh.">
           <ImageListUpload name="images" defaultValue={product?.images.map((image) => image.url) ?? []} />
         </Section>
 
-        <Section title="Quy cách đóng gói & giá" description="Mỗi quy cách có giá, tồn kho riêng. Khách chọn quy cách khi đặt hàng.">
+        <Section title="Quy cách đóng gói & giá" description="Mỗi quy cách có giá, tồn kho riêng. Khách chọn quy cách khi đặt hàng. Nhập khối lượng để web hiện thêm giá/kg. Quy cách đầu tiên còn hàng có giá thấp nhất sẽ hiển thị ở thẻ sản phẩm. Xoá quy cách không ảnh hưởng đơn hàng cũ.">
           <VariantEditor name="variants" initial={product?.variants ?? []} />
         </Section>
 

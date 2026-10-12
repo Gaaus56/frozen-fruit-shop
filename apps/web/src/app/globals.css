@@ -427,9 +427,18 @@ h4 {
   position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: 17px; opacity: 0;
   background: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.55) 0 14px, transparent 14px 28px);
 }
-/* Xe nằm thấp trong nút (thân xe từ -10px đến +14px quanh đường giữa) để thùng hàng rơi lên không bị cắt. */
+/* Xe nằm thấp trong nút (thân xe từ -10px đến +14px quanh đường giữa) để thùng hàng rơi từ trên xuống không bị cắt.
+   Thùng xe mở nóc, xếp lớp: lòng thùng (.order-truck-back) → thùng hàng (.order-box) → thành thùng (.order-truck-wall). */
 .order-truck { position: absolute; left: -90px; top: 50%; width: 58px; height: 24px; margin-top: -10px; opacity: 0; }
-.order-truck-back { position: absolute; left: 0; top: 0; width: 40px; height: 21px; border-radius: 3px; background: #f3f2f2; }
+.order-truck-back {
+  position: absolute; left: 0; top: 0; width: 40px; height: 21px; border-radius: 3px;
+  /* hai cột thùng trắng ở hai đầu, lòng thùng tối ở giữa */
+  background: linear-gradient(90deg, #f3f2f2 0 3px, #8f2a1a 3px calc(100% - 3px), #f3f2f2 calc(100% - 3px));
+}
+.order-truck-wall {
+  position: absolute; left: 0; top: 8px; width: 40px; height: 13px; border-radius: 0 0 3px 3px; z-index: 2;
+  background: #f3f2f2; box-shadow: inset 0 2px 0 #fff, inset 0 -2px 0 #dcd9d9;
+}
 .order-truck-front {
   position: absolute; left: 42px; top: 4px; width: 16px; height: 17px; border-radius: 2px 7px 3px 2px;
   background: #ff563c; box-shadow: inset -3px 0 0 #ffc4b8;
@@ -439,7 +448,7 @@ h4 {
 .order-wheel-1 { left: 8px; }
 .order-wheel-2 { left: 44px; }
 .order-box {
-  position: absolute; left: 12px; top: -12px; width: 16px; height: 12px; border-radius: 2px; opacity: 0;
+  position: absolute; left: 12px; top: 4px; width: 16px; height: 12px; border-radius: 2px; opacity: 0; z-index: 1;
   background: linear-gradient(#fbbf24 0 45%, #f59e0b 45% 55%, #fbbf24 55%);
 }
 
@@ -452,11 +461,13 @@ h4 {
   30%, 62% { left: calc(50% - 29px); opacity: 1; }
   100% { left: calc(100% + 30px); opacity: 1; }
 }
+/* Rơi từ trên nút xuống, lọt vào lòng thùng (thành thùng che phần dưới), nảy nhẹ rồi nằm yên. */
 @keyframes order-box {
-  0%, 32% { opacity: 0; transform: translateY(-24px); }
-  40% { opacity: 1; transform: translateY(0); }
-  46% { transform: translateY(-4px); }
-  52%, 100% { opacity: 1; transform: translateY(0); }
+  0%, 30% { opacity: 0; transform: translateY(-30px); }
+  33% { opacity: 1; transform: translateY(-24px); }
+  41% { opacity: 1; transform: translateY(0); animation-timing-function: ease-out; }
+  46% { transform: translateY(-3px); animation-timing-function: ease-in; }
+  51%, 100% { opacity: 1; transform: translateY(0); }
 }
 @keyframes order-road {
   0% { opacity: 0; background-position: 0 0; }
@@ -551,14 +562,88 @@ h4 {
   .pi-header, .pi-parties, .pi-totals, .pi-footer { break-inside: avoid; }
 }
 
-/* Dấu ✓ đặt hàng thành công nảy lên; hộp xem bill hiện dần. */
-.checkout-success-badge { animation: success-pop 550ms cubic-bezier(0.2, 1.4, 0.4, 1) both; }
-@keyframes success-pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* Hộp xem bill hiện dần. */
 .receipt-dialog { animation: dialog-fade 200ms ease-out both; }
 @keyframes dialog-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .checkout-success-badge, .receipt-dialog { animation: none; }
+  .receipt-dialog { animation: none; }
+}
+
+/* Vòng tròn xanh + dấu V (components/ui/check-icon.tsx → SuccessCheck). Mặc định đã vẽ đủ;
+   .success-check-animate mới chạy hiệu ứng vẽ, chờ var(--check-delay). */
+.success-check { color: var(--color-leaf); }
+.success-check-circle { stroke-dasharray: 176; }
+.success-check-mark { stroke-dasharray: 40; }
+.success-check-animate { animation: success-check-pop 450ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--check-delay, 0ms) both; }
+.success-check-animate .success-check-circle { animation: success-check-circle 450ms ease-out var(--check-delay, 0ms) both; }
+.success-check-animate .success-check-mark { animation: success-check-mark 320ms ease-out calc(var(--check-delay, 0ms) + 330ms) both; }
+@keyframes success-check-pop { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+@keyframes success-check-circle { from { stroke-dashoffset: 176; } to { stroke-dashoffset: 0; } }
+@keyframes success-check-mark { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .success-check-animate,
+  .success-check-animate .success-check-circle,
+  .success-check-animate .success-check-mark { animation: none; }
 }
 
 /* Chế độ sửa trong khung "Xem trước & sửa" của admin: phần sửa được hiện con trỏ bàn tay. */
 html[data-preview-edit] [data-edit] { cursor: pointer; }
+
+/* ── Form liên hệ: gửi xong máy bay giấy → dấu V → chữ cảm ơn; "Gửi tin nhắn khác" trượt phải, form vào từ trái ── */
+.contact-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem 0;
+  text-align: center;
+}
+.contact-sent-icon {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+}
+.contact-sent-icon svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.contact-plane {
+  color: var(--color-accent-600);
+  opacity: 0;
+  animation: contact-plane-fly 1000ms cubic-bezier(0.45, 0, 0.25, 1) forwards;
+}
+.contact-success-text {
+  animation: contact-fade-up 450ms ease-out 1400ms both;
+}
+.contact-success-leave {
+  animation: contact-leave-right 380ms ease-in forwards;
+}
+.contact-form-enter {
+  animation: contact-enter-left 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes contact-plane-fly {
+  0% { opacity: 0; transform: translate(-90px, 40px) rotate(-14deg) scale(0.7); }
+  15% { opacity: 1; }
+  55% { opacity: 1; transform: translate(0, -6px) rotate(4deg) scale(1); }
+  70% { opacity: 1; transform: translate(0, 0) rotate(0) scale(1); }
+  100% { opacity: 0; transform: translate(0, 0) rotate(25deg) scale(0.15); }
+}
+@keyframes contact-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes contact-leave-right {
+  to { opacity: 0; transform: translateX(48px); }
+}
+@keyframes contact-enter-left {
+  from { opacity: 0; transform: translateX(-48px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-plane { display: none; }
+  .contact-success-text,
+  .contact-success-leave,
+  .contact-form-enter { animation: none; }
+}

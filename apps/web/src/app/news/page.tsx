@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { POST_TYPES, POST_TYPE_LABELS, POST_TYPE_SLUGS, type PostType } from "@frozen-fruit-shop/types";
+import { POST_TYPES, formatPhone, POST_TYPE_LABELS, POST_TYPE_SLUGS, type PostType } from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/ui/page-hero";
 import { FilterChip, FilterChips } from "@/components/ui/filter-chips";
@@ -89,7 +89,7 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
                     rel="noopener noreferrer"
                     className="font-bold text-accent-700 hover:underline"
                   >
-                    {settings.zaloPhone || settings.phone}
+                    {formatPhone(settings.zaloPhone || settings.phone)}
                   </a>{" "}
                   để được báo khi có vị trí phù hợp.
                 </p>

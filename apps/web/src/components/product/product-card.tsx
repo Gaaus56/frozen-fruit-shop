@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart-context";
 import { formatCurrency } from "@/lib/format";
 import { ProductImage } from "./product-image";
 import { editTarget } from "@/lib/edit-target";
+import { CheckIcon } from "@/components/ui/check-icon";
 
 /** Quy cách hiển thị mặc định: rẻ nhất trong các quy cách còn hàng (hoặc quy cách đầu nếu hết hàng cả). */
 function defaultVariant(product: Product) {
@@ -93,7 +94,7 @@ export function ProductCard({ product }: { product: Product }) {
                 justAdded ? "bg-leaf" : "bg-accent-600 hover:bg-accent-700"
               }`}
             >
-              {justAdded ? "✓" : "+"}
+              {justAdded ? <CheckIcon className="h-4 w-4 sm:h-5 sm:w-5" /> : "+"}
             </button>
           </div>
         </div>

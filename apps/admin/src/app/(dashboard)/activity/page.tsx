@@ -43,7 +43,7 @@ export default async function ActivityPage({ searchParams }: PageProps<"/activit
     <div>
       <PageHeader
         title="Lịch sử chỉnh sửa"
-        description="Ai đã thêm / sửa / xoá gì trong trang quản trị, lúc nào. Bấm vào một dòng để xem từng trường đã đổi (trước → sau)."
+        help="Ai đã thêm / sửa / xoá gì trong trang quản trị, lúc nào. Bấm vào một dòng để xem từng trường đã đổi (trước → sau)."
       />
 
       <form className="mb-4 flex flex-wrap items-end gap-3" action="/activity">

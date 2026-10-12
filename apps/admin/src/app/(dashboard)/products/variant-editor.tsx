@@ -110,7 +110,7 @@ export function VariantEditor({ name, initial }: { name: string; initial: Produc
             </div>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs">
               <span className="text-foreground/55">
-                {perKg ? `≈ ${formatCurrency(perKg)}/kg` : "Nhập khối lượng để hiện giá/kg cho khách"}
+                {perKg ? `≈ ${formatCurrency(perKg)}/kg` : null}
               </span>
               <span className="flex items-center gap-2">
                 <label className="flex items-center gap-1.5 font-semibold">
@@ -142,9 +142,6 @@ export function VariantEditor({ name, initial }: { name: string; initial: Produc
       <button type="button" onClick={() => setVariants((current) => [...current, empty()])} className={buttonClass("secondary", "sm", "w-fit")}>
         + Thêm quy cách
       </button>
-      <p className="text-xs text-foreground/55">
-        Quy cách đầu tiên còn hàng có giá thấp nhất sẽ hiển thị ở thẻ sản phẩm. Xoá quy cách không ảnh hưởng đơn hàng cũ.
-      </p>
     </div>
   );
 }

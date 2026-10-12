@@ -19,7 +19,7 @@ export default async function PoliciesPage() {
     <div>
       <PageHeader
         title="Chính sách"
-        description="Các trang chính sách (đổi trả, giao hàng, bảo mật...) hiển thị ở chân trang web."
+        help="Các trang chính sách (đổi trả, giao hàng, bảo mật...) hiển thị ở chân trang web."
         action={<LinkButton href="/policies/new">+ Thêm chính sách</LinkButton>}
       />
 

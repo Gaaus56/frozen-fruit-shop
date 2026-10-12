@@ -15,7 +15,7 @@ export default async function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Thông tin cửa hàng" description="Thông tin liên hệ, địa chỉ, thanh toán hiển thị trên toàn bộ website khách hàng." />
+      <PageHeader title="Thông tin cửa hàng" help="Thông tin liên hệ, địa chỉ, thanh toán hiển thị trên toàn bộ website khách hàng." />
       <SettingsForm settings={settings} linkGroups={linkGroups} />
     </div>
   );

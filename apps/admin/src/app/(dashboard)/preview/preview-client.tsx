@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { editTargetPath, type PreviewMessage } from "@frozen-fruit-shop/types";
 import { WEB_ORIGIN, WEB_URL, setPreviewReturn } from "@/lib/preview";
+import { WithHelp } from "@/components/ui/help";
 
 type Mode = "edit" | "browse";
 type Device = "desktop" | "tablet" | "mobile";
@@ -108,12 +109,16 @@ export function PreviewClient() {
     <div className="flex flex-col gap-3 lg:h-[calc(100vh-4rem)]">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl uppercase">Xem trước &amp; sửa</h1>
-          <p className="mt-1 text-sm text-foreground/60">
-            {mode === "edit"
-              ? "Rê chuột lên website, phần nào có viền đỏ là sửa được — bấm đúp vào để mở trang sửa phần đó."
-              : "Đang ở chế độ duyệt: bấm như khách để đi tới trang cần sửa, rồi bật lại Chế độ sửa."}
-          </p>
+          <WithHelp
+            head={<h1 className="text-2xl uppercase">Xem trước &amp; sửa</h1>}
+            label="Xem trước & sửa"
+            helpClassName="max-w-2xl text-sm"
+            help={
+              mode === "edit"
+                ? "Rê chuột lên website, phần nào có viền đỏ là sửa được — bấm đúp vào để mở trang sửa phần đó."
+                : "Đang ở chế độ duyệt: bấm như khách để đi tới trang cần sửa, rồi bật lại Chế độ sửa."
+            }
+          />
         </div>
         {/* Công tắc chế độ */}
         <div className="inline-flex rounded-full bg-muted p-1 text-sm font-bold" role="radiogroup" aria-label="Chế độ xem trước">

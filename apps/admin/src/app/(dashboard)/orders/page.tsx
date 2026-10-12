@@ -40,7 +40,7 @@ export default async function OrdersPage({ searchParams }: PageProps<"/orders">)
 
   return (
     <div>
-      <PageHeader title="Đơn hàng" description="Đơn khách đặt trên website. Gọi xác nhận, chốt phí vận chuyển rồi cập nhật trạng thái." />
+      <PageHeader title="Đơn hàng" help="Đơn khách đặt trên website. Gọi xác nhận, chốt phí vận chuyển rồi cập nhật trạng thái." />
 
       <div className="mb-4 flex flex-wrap items-center gap-1 border-b border-divider">
         {[undefined, ...STATUSES].map((value) => (
