@@ -148,6 +148,8 @@ Tài khoản sau khi seed:
 
 Trước khi bấm Deploy, **mở `https://<api>.onrender.com/health` cho API thức dậy** — web lấy dữ liệu từ API lúc build.
 
+> **Nhánh deploy:** lúc import, Vercel build từ nhánh mặc định của repo (`main`). Sau khi tạo project: **Settings → Git → Production Branch** = `demo` → **Deployments → Create Deployment** → nhập `demo` → **Create**. Từ đó mỗi lần push nhánh `demo` là tự deploy lại. Làm giống hệt cho project admin.
+
 **Trang quản trị** — tạo **project thứ hai** từ cùng repo:
 
 | Mục | Giá trị |
