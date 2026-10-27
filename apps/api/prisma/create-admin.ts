@@ -2,6 +2,7 @@
 // Chạy trên máy chủ (không có API công khai nào tạo được ADMIN):
 //   ADMIN_EMAIL=... ADMIN_PASSWORD=... npm run admin:create
 // Hoặc điền ADMIN_EMAIL / ADMIN_PASSWORD trong apps/api/.env rồi chạy `npm run admin:create`.
+// Mất điện thoại + mất cả mã dự phòng OTP: thêm ADMIN_RESET_OTP=1 để tắt xác thực 2 lớp, đăng nhập rồi bật lại.
 import { existsSync } from 'node:fs';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
@@ -38,11 +39,22 @@ async function main() {
   }
 
   if (existingAdmin) {
+    const resetOtp = process.env.ADMIN_RESET_OTP === '1';
     await prisma.user.update({
       where: { id: existingAdmin.id },
-      data: { passwordHash, name, isActive: true, passwordChangedAt: new Date(), failedLoginCount: 0, lockedUntil: null },
+      data: {
+        passwordHash,
+        name,
+        isActive: true,
+        passwordChangedAt: new Date(),
+        failedLoginCount: 0,
+        lockedUntil: null,
+        ...(resetOtp
+          ? { otpSecret: null, otpPendingSecret: null, otpEnabledAt: null, otpLastTimeStep: null, otpRecoveryCodes: [] }
+          : {}),
+      },
     });
-    console.log(`Đã đặt lại mật khẩu cho ADMIN ${email}.`);
+    console.log(`Đã đặt lại mật khẩu cho ADMIN ${email}.${resetOtp ? ' Đã tắt xác thực 2 lớp (OTP).' : ''}`);
   } else {
     await prisma.user.create({ data: { email, name, passwordHash, role: 'ADMIN' } });
     console.log(`Đã tạo tài khoản ADMIN ${email}.`);

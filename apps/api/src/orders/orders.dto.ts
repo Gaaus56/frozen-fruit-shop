@@ -21,7 +21,8 @@ import { PaginationQueryDto } from '../common/pagination.js';
 import { Trim } from '../common/validators.js';
 
 export const ORDER_STATUSES = ['pending', 'confirmed', 'packing', 'shipping', 'delivered', 'cancelled'] as const;
-export const PAYMENT_METHODS = ['cod', 'bank_transfer'] as const;
+/** Chỉ nhận COD (đã bỏ chuyển khoản). */
+export const PAYMENT_METHODS = ['cod'] as const;
 export const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded'] as const;
 
 /** Số di động/cố định Việt Nam: 0xxxxxxxxx hoặc +84xxxxxxxxx, cho phép dấu cách/chấm. */
@@ -77,8 +78,10 @@ export class CreateOrderDto extends QuoteDto {
   @MaxLength(1000)
   customerNote?: string;
 
-  @IsIn(PAYMENT_METHODS, { message: 'Phương thức thanh toán không hợp lệ' })
-  paymentMethod!: (typeof PAYMENT_METHODS)[number];
+  /** Không bắt buộc (mặc định COD); trình duyệt còn bản web cũ có thể vẫn gửi lên. */
+  @IsOptional()
+  @IsIn(PAYMENT_METHODS, { message: 'Cửa hàng chỉ nhận thanh toán khi nhận hàng (COD).' })
+  paymentMethod?: (typeof PAYMENT_METHODS)[number];
 
   /** Ô ẩn chống bot: người thật không nhìn thấy nên luôn để trống. */
   @IsOptional()

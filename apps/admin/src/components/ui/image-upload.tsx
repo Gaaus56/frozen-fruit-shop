@@ -7,8 +7,50 @@ import { HelpButton, HelpPanel } from "./help";
 
 export const ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
 
+/** Ảnh chọn từ máy tối đa (trước khi thu nhỏ) — ảnh chụp điện thoại thường 3–12MB. */
+const MAX_PICK_BYTES = 30 * 1024 * 1024;
+/** Giới hạn gửi lên (Server Action + API); Vercel chặn request > ~4,5MB nên phải thu nhỏ trên máy trước. */
+const MAX_SEND_BYTES = 4 * 1024 * 1024;
+/** Cạnh dài tối đa khi thu nhỏ trên máy (API nén thêm một lần nữa, cùng giới hạn). */
+const MAX_EDGE = 2000;
+
+/**
+ * Thu nhỏ ảnh ngay trên trình duyệt trước khi gửi: xoay đúng chiều, cạnh dài ≤ 2000px, WebP chất lượng 0,86
+ * (trình duyệt không mã hoá được WebP → JPEG, PNG giữ PNG để không mất nền trong suốt).
+ * GIF (có thể là ảnh động), ảnh đã nhỏ sẵn, hoặc ảnh trình duyệt không đọc được → gửi nguyên file.
+ */
+async function shrinkImage(file: File): Promise<File> {
+  if (file.type === "image/gif" || typeof createImageBitmap !== "function") return file;
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  } catch {
+    return file;
+  }
+  const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
+  if (scale === 1 && file.size <= 1.5 * 1024 * 1024) {
+    bitmap.close();
+    return file;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+
+  const encode = (type: string, quality?: number) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, quality));
+  let blob = await encode("image/webp", 0.86);
+  if (!blob || blob.type !== "image/webp") blob = file.type === "image/png" ? await encode("image/png") : await encode("image/jpeg", 0.86);
+  if (!blob || blob.size >= file.size) return file;
+  const ext = blob.type === "image/webp" ? "webp" : blob.type === "image/png" ? "png" : "jpg";
+  return new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.${ext}`, { type: blob.type });
+}
+
 /** Tải một file ảnh lên API (qua Server Action), trả URL. Dùng chung cho ô ảnh và trình soạn thảo. */
-export async function uploadFile(file: File): Promise<string> {
+export async function uploadFile(original: File): Promise<string> {
+  if (original.size > MAX_PICK_BYTES) throw new Error("Ảnh quá lớn (trên 30MB), vui lòng chọn ảnh khác.");
+  const file = await shrinkImage(original);
+  if (file.size > MAX_SEND_BYTES) throw new Error("Ảnh vẫn quá lớn sau khi thu nhỏ (trên 4MB) — thử ảnh JPG thay vì PNG / GIF.");
   const data = new FormData();
   data.append("file", file);
   const result = await uploadImageAction(data);
@@ -71,7 +113,7 @@ export function ImageUpload({ name, defaultValue, label = "Chọn ảnh", frame 
           <div className="flex items-start gap-1.5">
             <HelpButton open={helpOpen} onToggle={() => setHelpOpen((value) => !value)} controls={helpId} label="định dạng ảnh" />
             <HelpPanel id={helpId} open={helpOpen}>
-              <p className="text-xs text-foreground/60">JPG, PNG, WEBP · tối đa 5MB</p>
+              <p className="text-xs text-foreground/60">JPG, PNG, WEBP, GIF · ảnh lớn tự thu nhỏ và nén trước khi lưu</p>
             </HelpPanel>
           </div>
         </div>

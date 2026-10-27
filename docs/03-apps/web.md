@@ -10,7 +10,7 @@ Next.js 16 App Router + Tailwind CSS 4. Chạy ở cổng 3000. Giao diện đ�
 | `/products` | Danh sách sản phẩm; ảnh nền + tiêu đề đầu trang lấy từ banner vị trí "Đầu trang Sản phẩm"; lọc theo danh mục (`?category=`, ẩn danh mục chưa có sản phẩm), tìm kiếm (`?q=`, có dấu hoặc không dấu, có chip xoá từ khoá), sắp xếp (`?sort=` newest / price_asc / price_desc); khung chờ khi đổi bộ lọc |
 | `/products/[slug]` | Chi tiết: thư viện ảnh, chọn quy cách, giá/giá gốc/% giảm, giá quy đổi/kg, tình trạng kho, bảo quản & rã đông, sản phẩm liên quan, thêm giỏ / mua ngay |
 | `/cart` | Giỏ hàng: sửa số lượng (1–99), xoá; giá được API kiểm tra lại, báo dòng hết hàng/ngừng bán |
-| `/checkout` | Thông tin nhận hàng, phương thức thanh toán (COD / chuyển khoản — hiện thông tin tài khoản từ cài đặt cửa hàng), đặt hàng |
+| `/checkout` | Thông tin nhận hàng, đặt hàng (chỉ COD — thu tiền khi giao) |
 | `/order-lookup` | Tra cứu đơn bằng mã đơn + số điện thoại; hiển thị trạng thái đơn, trạng thái thanh toán, sản phẩm và chi tiết tiền |
 | `/contact` | Thông tin liên hệ, bản đồ, form liên hệ |
 | `/about` | Giới thiệu cửa hàng — nội dung admin sửa ở "Trang Giới thiệu" (`GET /pages/about`) |

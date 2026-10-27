@@ -1,3 +1,5 @@
+// Phải đứng đầu: khởi động Sentry (theo dõi lỗi) trước khi nạp Nest.
+import './instrument.js';
 import { env } from './config/env.js';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';

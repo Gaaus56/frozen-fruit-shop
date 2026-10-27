@@ -124,6 +124,8 @@ Tài khoản sau khi seed:
    | `REVALIDATE_SECRET` | chuỗi ở bước 1.3 |
    | `CORS_ORIGINS` | tạm `http://localhost:3000` — sửa ở [mục 5](#5-điền-chéo-địa-chỉ-rồi-deploy-lại) |
    | `WEB_REVALIDATE_URL` | tạm để trống — sửa ở mục 5 |
+   | `OTP_ENCRYPTION_KEY` | `openssl rand -base64 32` — khoá mã hoá OTP; **đặt một lần, không đổi** sau khi đã có người bật OTP |
+   | `SENTRY_DSN` | (tuỳ chọn) theo dõi lỗi — [monitoring-and-backup.md §2.1](monitoring-and-backup.md#21-bật-sentry-theo-dõi-lỗi-gói-miễn-phí-5000-lỗi--tháng) |
 
    `PORT` do Render tự đặt, API đọc biến này. Dockerfile đặt sẵn `NODE_ENV=production` và tự chạy `prisma migrate deploy` khi khởi động.
 4. **Create Web Service** → chờ build (5–10 phút lần đầu). Mở `https://<api>.onrender.com/health` → thấy `{"status":"ok",...}`; mở `/uploads/seed/banner-1.jpg` → thấy ảnh.
@@ -145,6 +147,7 @@ Tài khoản sau khi seed:
 | `REVALIDATE_SECRET` | trùng với API |
 | `NEXT_PUBLIC_ADMIN_URL` | tạm để trống — sửa ở mục 5 |
 | `DESIGNER_NAME` / `DESIGNER_URL` | (tuỳ chọn) dòng "Designed by" cuối trang |
+| `NEXT_PUBLIC_SENTRY_DSN` | (tuỳ chọn) theo dõi lỗi — loại **Config**; thêm cho cả project admin |
 
 Trước khi bấm Deploy, **mở `https://<api>.onrender.com/health` cho API thức dậy** — web lấy dữ liệu từ API lúc build.
 
@@ -207,7 +210,7 @@ Render Free ngủ sau 15 phút không có request; lần đầu gọi lại ph�
 | Tải ảnh > ~4 MB lỗi | Giới hạn request của Vercel (~4,5 MB) — nén ảnh trước |
 | "Xem trước & sửa" trắng trang | `NEXT_PUBLIC_ADMIN_URL` (web) / `NEXT_PUBLIC_WEB_URL` (admin) sai → sửa và Redeploy |
 
-**Nói trước với khách:** dữ liệu là mẫu, đơn đặt thử không giao thật; thanh toán chỉ COD + chuyển khoản thủ công, chưa gửi email / Zalo xác nhận; bill lưu trên trình duyệt của chính khách; danh sách tính năng chưa làm ở [features.md](../01-product/features.md) (dòng ⬜).
+**Nói trước với khách:** dữ liệu là mẫu, đơn đặt thử không giao thật; thanh toán chỉ COD, chưa gửi email / Zalo xác nhận; bill lưu trên trình duyệt của chính khách; danh sách tính năng chưa làm ở [features.md](../01-product/features.md) (dòng ⬜).
 
 ---
 

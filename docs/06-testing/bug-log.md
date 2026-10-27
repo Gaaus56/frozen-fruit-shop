@@ -49,6 +49,7 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 | [B-34](#b-34--số-điện-thoại-bị-bẻ-xuống-dòng) | Giao diện | Số điện thoại bị bẻ đôi xuống dòng trên điện thoại | ✅ |
 | [B-35](#b-35--hàng-nút-thành-liên-kết-khi-mở-lại) | Soạn thảo | Hàng nút điều hướng biến thành chữ liên kết khi mở lại bài | ✅ |
 | [B-36](#b-36--mở-bản-ghi-dẫn-tới-trang-404) | Admin | "Mở bản ghi này" ở Lịch sử chỉnh sửa dẫn tới trang 404 (Liên hệ, Bình luận) | ✅ |
+| [B-37](#b-37--bật-otp-xong-không-thấy-mã-dự-phòng) | Admin | Bật OTP xong không thấy 8 mã dự phòng (trang tự tải lại) | ✅ |
 | [T-01](#t-01--prisma-generate-báo-eperm-trên-windows) | Công cụ | `prisma generate` báo EPERM trên Windows | ⚠️ |
 | [T-02](#t-02--sửa-packagestypes-mà-api--web-không-thấy-thay-đổi) | Công cụ | Sửa `packages/types` mà app không thấy thay đổi | ⚠️ |
 | [T-03](#t-03--lỗi-type-trong-nexttypes-sau-khi-xoá-trang) | Công cụ | Lỗi type trong `.next/types` sau khi xoá trang | ⚠️ |
@@ -58,6 +59,8 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 | [T-07](#t-07--test-playwright-hay-gặp) | Công cụ | Lỗi hay gặp khi viết test Playwright | ⚠️ |
 | [T-08](#t-08--bước-dọn-dẹp-của-test-xoá-nhầm-dữ-liệu-thật) | Công cụ | Bước dọn dẹp của test xoá nhầm tài khoản nhân viên thật | ⚠️ |
 | [T-09](#t-09--thư-mục-build-thử-bị-commit-vào-git) | Công cụ | Thư mục build thử `.buildcheck/` bị commit vào git | ✅ |
+| [T-10](#t-10--dev-server-web--admin-tắt-sau-npm-install) | Công cụ | Dev server web / admin tắt sau khi `npm install` thư viện mới | ⚠️ |
+| [T-11](#t-11--next-16-chỉ-cho-một-dev-server-mỗi-thư-mục) | Công cụ | `next dev` báo "Another next dev server is already running" | ⚠️ |
 
 ---
 
@@ -297,6 +300,13 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 - **Cách sửa:** chỉ tạo link cho các mục có trang sửa riêng (`HAS_DETAIL_PAGE`: banners, categories, home-blocks, orders, policies, posts, products) + settings / users / pages; mục khác ẩn nút. Thêm trang 404 và trang lỗi tiếng Việt cho cả admin (`app/not-found.tsx`, `app/(dashboard)/not-found.tsx` giữ menu, `error.tsx`, `global-error.tsx`) và web (`error.tsx`, `global-error.tsx`, làm lại `not-found.tsx`).
 - **Bài học:** link sinh tự động theo mẫu phải đối chiếu với các route có thật; app nào cũng cần trang 404 / lỗi riêng ngay từ đầu.
 
+### B-37 — Bật OTP xong không thấy mã dự phòng
+- **Ngày:** 2026-10-13
+- **Hiện tượng:** Tài khoản của tôi → bật xác thực 2 lớp → nhập đúng mã → khung chuyển thẳng sang "Đang bật · còn 8 mã dự phòng", **không hiện 8 mã** để lưu (người dùng mất mã dự phòng ngay từ đầu).
+- **Nguyên nhân:** Server Action `otpEnableAction` lưu token mới vào cookie → Next tự tải lại dữ liệu Server Component ngay trong cùng lượt → trang nhận `status.enabled = true` → `OtpSection` đổi từ `OtpSetupFlow` sang `OtpEnabled`; state `useActionState` chứa mã dự phòng nằm trong `OtpSetupFlow` nên bị huỷ trước khi kịp hiển thị.
+- **Cách sửa:** chuyển `useActionState(otpEnableAction)` lên component cha `OtpSection` (không bị thay khi trang tải lại); hiện mã dự phòng cho tới khi bấm "Tôi đã lưu các mã".
+- **Bài học:** Server Action có `cookies().set()` luôn kéo theo tải lại dữ liệu trang — kết quả cần giữ lại để hiển thị phải nằm ở component không phụ thuộc dữ liệu vừa đổi. Kiểm thử phải chạy qua giao diện thật (bài thử API vẫn qua vì không có bước hiển thị).
+
 ---
 
 ## Công cụ & môi trường
@@ -359,6 +369,19 @@ Trạng thái: ✅ đã sửa · 🟡 sửa một phần / theo dõi · ℹ️ k
 - **Nguyên nhân:** để build thử production mà không ghi đè `.next` của dev server đang chạy, bản sao app được đặt trong `.buildcheck/` **bên trong repo** (cần để tìm `node_modules` gốc), không có trong `.gitignore`; đúng lúc đó có lệnh commit tất cả.
 - **Cách sửa:** xoá thư mục, thêm `/.buildcheck/` vào `.gitignore`; commit việc xoá (hoặc sửa lại commit nếu chưa push).
 - **Bài học:** thư mục tạm trong repo phải được ignore **trước khi** tạo; kiểm tra `git status` ngay sau khi xong.
+
+### T-10 — Dev server web / admin tắt sau npm install
+- **Ngày:** 2026-10-13
+- **Hiện tượng:** sau khi cài `@sentry/nextjs` (và các gói cho API) bằng `npm install -w ...` trong lúc `npm run dev` đang chạy, cổng 3000 / 3002 không còn phản hồi (API 4000 vẫn chạy).
+- **Nguyên nhân (nhiều khả năng):** npm thay file trong `node_modules` (và chạy `postinstall` build lại `packages/types`) khi Next dev đang dùng chúng; kèm `next.config.ts` đổi → Next tự khởi động lại và thoát.
+- **Xử lý:** chạy lại `npm run dev:web` / `npm run dev:admin`.
+- **Bài học:** cài thư viện mới thì báo trước / dừng dev server, cài xong bật lại.
+
+### T-11 — Next 16 chỉ cho một dev server mỗi thư mục
+- **Ngày:** 2026-10-13
+- **Hiện tượng:** `next dev` báo `Another next dev server is already running` kèm PID và cổng của server khác rồi thoát.
+- **Nguyên nhân:** Next 16 khoá thư mục `.next/dev` — mỗi app chỉ chạy được **một** `next dev` (ở đây là server thử ở cổng 3100 chưa tắt hẳn: `timeout` chỉ dừng tiến trình cha, tiến trình node con vẫn chạy).
+- **Xử lý:** tắt server cũ theo PID trong thông báo rồi chạy lại. `next build` thì chạy song song với `next dev` được (Next 16 tách thư mục build khỏi dev) — không cần bản sao như T-09 nữa.
 
 ---
 

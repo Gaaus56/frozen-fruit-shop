@@ -3,8 +3,8 @@
 import { useId, useState, type FormEvent } from "react";
 import {
   ORDER_STATUS_LABELS,
-  PAYMENT_METHOD_LABELS,
   PAYMENT_STATUS_LABELS,
+  paymentMethodLabel,
   type OrderLookupResult,
   type OrderStatus,
 } from "@frozen-fruit-shop/types";
@@ -186,7 +186,7 @@ export function OrderLookup({ store }: { store: ReceiptStore }) {
                 <div className="flex justify-between pt-2">
                   <dt className="text-foreground/65">Thanh toán</dt>
                   <dd className="text-right">
-                    {PAYMENT_METHOD_LABELS[result.order.paymentMethod]} — {PAYMENT_STATUS_LABELS[result.order.paymentStatus]}
+                    {paymentMethodLabel(result.order.paymentMethod)} — {PAYMENT_STATUS_LABELS[result.order.paymentStatus]}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-6">

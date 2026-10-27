@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import type { User } from '@prisma/client';
 import type { StaffAccount } from '@frozen-fruit-shop/types';
 import { effectivePermissions } from '../auth/auth.guard.js';
-import { hashPassword } from '../auth/auth.service.js';
+import { clearOtp, hashPassword } from '../auth/auth.service.js';
 import { iso } from '../common/utils.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { CreateStaffDto, ResetPasswordDto, UpdateStaffDto } from './users.dto.js';
@@ -14,6 +14,7 @@ function toStaffAccount(user: User): StaffAccount {
     name: user.name,
     role: user.role,
     permissions: effectivePermissions(user),
+    otpEnabled: Boolean(user.otpEnabledAt),
     isActive: user.isActive,
     lastLoginAt: iso(user.lastLoginAt),
     createdAt: iso(user.createdAt),
@@ -64,6 +65,13 @@ export class UsersService {
         lockedUntil: null,
       },
     });
+    return toStaffAccount(user);
+  }
+
+  /** Tắt OTP của nhân viên (mất điện thoại) — nhân viên đăng nhập lại bằng mật khẩu rồi tự bật lại. */
+  async resetOtp(id: string): Promise<StaffAccount> {
+    await this.findStaff(id);
+    const user = await this.prisma.user.update({ where: { id }, data: clearOtp });
     return toStaffAccount(user);
   }
 

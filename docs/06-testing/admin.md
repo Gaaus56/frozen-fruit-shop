@@ -233,7 +233,7 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
 | TC-ADM-350 | Lần đầu | DB mới, mở trang | Form điền sẵn thông tin mặc định của cửa hàng | P1 | |
-| TC-ADM-351 | Lưu hợp lệ | Sửa hotline, giờ, Zalo, email, Facebook, địa chỉ, mốc, link bản đồ, chuyển khoản, MST → Lưu | Thông báo thành công; web header, footer, liên hệ, nút nổi, trang đặt hàng thành công cập nhật ngay | P0 | |
+| TC-ADM-351 | Lưu hợp lệ | Sửa hotline, giờ, Zalo, email, Facebook, địa chỉ, mốc, link bản đồ, MST → Lưu (đã bật OTP: hiện hộp nhập mã OTP rồi mới lưu) | Thông báo thành công; web header, footer, liên hệ, nút nổi, trang đặt hàng thành công cập nhật ngay | P0 | |
 | TC-ADM-352 | Bắt buộc | Xoá tên cửa hàng / tên rút gọn / hotline | Trình duyệt báo bắt buộc | P1 | |
 | TC-ADM-353 | Hotline sai | `abc`, `123` | "Số điện thoại không hợp lệ" | P1 | |
 | TC-ADM-354 | Zalo sai | `abc` | "Số Zalo không hợp lệ"; để trống → hợp lệ (dùng hotline) | P2 | |

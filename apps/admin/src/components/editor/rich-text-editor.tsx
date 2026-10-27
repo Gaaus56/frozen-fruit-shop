@@ -11,7 +11,6 @@ import { LinkSelect, useLinkOptionGroups } from "./link-select";
 import { formatCurrency } from "@/lib/format";
 import { BlockStyle, ButtonRow, Callout, Column, Columns, Figure, ProductEmbed, TextAlign, TextColor, type ProductOption } from "./extensions";
 
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 /** "…/products/xoai-cat" (link đầy đủ, "/products/…" hay "products/…") → "xoai-cat". */
 function productSlugFromUrl(text: string): string | null {
@@ -61,10 +60,6 @@ export function RichTextEditor({
     if (images.length === 0) return;
     setError(null);
     for (const file of images) {
-      if (file.size > MAX_IMAGE_BYTES) {
-        setError(`${file.name}: ảnh vượt quá 5MB.`);
-        continue;
-      }
       setUploading((count) => count + 1);
       try {
         const src = await uploadFile(file);

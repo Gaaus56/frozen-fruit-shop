@@ -74,6 +74,11 @@ const SKIP_FIELDS = new Set([
   'failedLoginCount',
   'lockedUntil',
   'lastLoginAt',
+  // OTP: khoá bí mật (dù đã mã hoá) và mã dự phòng không bao giờ ghi vào lịch sử.
+  'otpSecret',
+  'otpPendingSecret',
+  'otpLastTimeStep',
+  'otpRecoveryCodes',
 ]);
 const MAX_TEXT = 160;
 
@@ -153,8 +158,8 @@ export class AuditInterceptor implements NestInterceptor {
               const entityId = pathId ?? createdId;
               const afterId = resource === 'settings' ? 'settings' : entityId;
               const after = config && afterId && action !== 'delete' ? await config.find(this.prisma, afterId).catch(() => null) : null;
-              // Đặt lại mật khẩu: không ghi giá trị, chỉ ghi là đã đặt lại.
-              const changes = action === 'reset-password' ? [] : diffRows(before, after);
+              // Đặt lại mật khẩu / tắt OTP nhân viên: không ghi giá trị, chỉ ghi là đã làm.
+              const changes = action === 'reset-password' || action === 'reset-otp' ? [] : diffRows(before, after);
               if (action === 'update' && changes.length === 0) return result;
               const labelRow = after ?? before;
               await this.prisma.auditLog.create({

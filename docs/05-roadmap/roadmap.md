@@ -20,7 +20,7 @@ flowchart LR
 Đã hoàn thành. Hệ thống chạy đầy đủ trên máy dev:
 
 - Monorepo `apps/web`, `apps/admin`, `apps/api`, `packages/types`.
-- Website khách: xem sản phẩm, giỏ hàng, đặt hàng COD / chuyển khoản, tra cứu đơn, liên hệ, tin tức (kiến thức / tuyển dụng), chính sách.
+- Website khách: xem sản phẩm, giỏ hàng, đặt hàng COD, tra cứu đơn, liên hệ, tin tức (kiến thức / tuyển dụng), chính sách.
 - Trang quản trị: tổng quan doanh thu, đơn hàng, liên hệ, sản phẩm nhiều ảnh / nhiều quy cách, nội dung, cài đặt, tài khoản nhân viên.
 - API: phân quyền ADMIN/STAFF, rate limit, upload ảnh an toàn, realtime SSE, làm mới cache web tức thì.
 - Docker Compose production + Caddy, CI lint + build.
@@ -78,7 +78,7 @@ Chi tiết: [features.md](../01-product/features.md).
 
 | # | Việc | Ưu tiên | Ghi chú |
 |---|---|:-:|---|
-| 3.1 | **Thanh toán VietQR**: hiện mã QR có sẵn số tiền + nội dung = mã đơn ở trang đặt hàng thành công / tra cứu | P2 | Khách chuyển khoản nhanh, shop đối soát dễ. Bước sau: webhook ngân hàng (Casso / SePay) tự đánh dấu "đã thanh toán" |
+| 3.1 | **Thanh toán VietQR** (nếu mở lại thanh toán trước — hiện chỉ COD): hiện mã QR có sẵn số tiền + nội dung = mã đơn ở trang đặt hàng thành công / tra cứu | P2 | Khách chuyển khoản nhanh, shop đối soát dễ. Bước sau: webhook ngân hàng (Casso / SePay) tự đánh dấu "đã thanh toán" |
 | 3.2 | Email / Zalo ZNS xác nhận đơn cho khách | P2 | Thêm trường email tuỳ chọn đã có |
 | 3.3 | Mã giảm giá (số tiền / %, hạn dùng, số lượt) | P2 | Bảng `coupons`; áp ở báo giá phía API |
 | 3.4 | Phí ship theo khu vực (bảng phí nội thành / ngoại thành / tỉnh) để khách thấy trước | P2 | Vẫn cho shop sửa khi xác nhận |

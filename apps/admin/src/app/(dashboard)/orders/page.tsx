@@ -56,11 +56,33 @@ export default async function OrdersPage({ searchParams }: PageProps<"/orders">)
         ))}
       </div>
 
-      <form className="mb-4 flex max-w-lg gap-2" action="/orders">
-        {status ? <input type="hidden" name="status" value={status} /> : null}
-        <input name="q" defaultValue={q} placeholder="Tìm mã đơn, tên hoặc số điện thoại khách" className={`${inputClass} mt-0`} />
-        <button type="submit" className={buttonClass("secondary")}>Tìm</button>
-      </form>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <form className="flex w-full max-w-lg gap-2" action="/orders">
+          {status ? <input type="hidden" name="status" value={status} /> : null}
+          <input name="q" defaultValue={q} placeholder="Tìm mã đơn, tên hoặc số điện thoại khách" className={`${inputClass} mt-0`} />
+          <button type="submit" className={buttonClass("secondary")}>Tìm</button>
+        </form>
+
+        {/* Tải Excel theo trạng thái + từ khoá đang xem, thêm khoảng ngày nếu cần (để trống = mọi ngày). */}
+        <form action="/api/export/orders" method="get" className="flex flex-wrap items-end gap-2 text-sm">
+          {status ? <input type="hidden" name="status" value={status} /> : null}
+          {q ? <input type="hidden" name="q" value={q} /> : null}
+          <label className="flex flex-col gap-1 text-xs font-semibold text-foreground/70">
+            Từ ngày
+            <input type="date" name="from" className={`${inputClass} mt-0 w-40`} />
+          </label>
+          <label className="flex flex-col gap-1 text-xs font-semibold text-foreground/70">
+            Đến ngày
+            <input type="date" name="to" className={`${inputClass} mt-0 w-40`} />
+          </label>
+          <button type="submit" className={buttonClass("primary")}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
+              <path d="M12 3v12M7 10l5 5 5-5M4 19h16" />
+            </svg>
+            Xuất Excel
+          </button>
+        </form>
+      </div>
 
       <Table
         empty={data.items.length === 0 && (q ? "Không có đơn hàng khớp tìm kiếm." : "Chưa có đơn hàng nào.")}
@@ -90,7 +112,6 @@ export default async function OrdersPage({ searchParams }: PageProps<"/orders">)
             <Td><Badge tone={ORDER_STATUS_TONE[order.status]}>{ORDER_STATUS_LABELS[order.status]}</Badge></Td>
             <Td>
               <Badge tone={order.paymentStatus === "paid" ? "green" : "neutral"}>{PAYMENT_STATUS_LABELS[order.paymentStatus]}</Badge>
-              <p className="mt-1 text-xs text-foreground/55">{order.paymentMethod === "cod" ? "COD" : "Chuyển khoản"}</p>
             </Td>
             <Td className="text-right font-bold">{formatCurrency(order.total)}</Td>
           </tr>

@@ -1,15 +1,17 @@
-import { STAFF_PERMISSION_LABELS } from "@frozen-fruit-shop/types";
+import { STAFF_PERMISSION_LABELS, type OtpStatus } from "@frozen-fruit-shop/types";
 import { Badge } from "@/components/ui/badge";
 import { Section } from "@/components/ui/form";
 import { PageHeader } from "@/components/ui/page-header";
+import { api } from "@/lib/api";
 import { getCurrentUser } from "@/lib/auth";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { ChangePasswordForm } from "./change-password-form";
+import { OtpSection } from "./otp-section";
 
 export const metadata = { title: "Tài khoản của tôi" };
 
 export default async function AccountPage() {
-  const user = await getCurrentUser();
+  const [user, otpStatus] = await Promise.all([getCurrentUser(), api<OtpStatus>("/auth/otp")]);
 
   return (
     <div>
@@ -57,6 +59,9 @@ export default async function AccountPage() {
         </Section>
         <Section title="Đổi mật khẩu">
           <ChangePasswordForm minLength={8} />
+        </Section>
+        <Section id="otp" title="Xác thực 2 lớp (OTP)">
+          <OtpSection status={otpStatus} />
         </Section>
       </div>
     </div>

@@ -89,15 +89,15 @@ Các kịch bản test dùng đúng mã dưới đây. Sửa dữ liệu mẫu �
 | Mã | Trạng thái | Đặc điểm |
 |---|---|---|
 | `…TSTA` | Chờ xác nhận | hôm nay, có email + ghi chú, P1 500g × 2 + P3 1kg — tổng 420.000 |
-| `…TSTB` | Đã xác nhận | chuyển khoản, chưa thanh toán, phí ship 30.000 |
+| `…TSTB` | Đã xác nhận | chưa thanh toán, phí ship 30.000 |
 | `…TSTC` | Đang đóng gói | |
 | `…TSTD` | Đang giao | có ghi chú nội bộ (mã vận đơn) |
-| `…TSTE` | Đã giao | chuyển khoản đã thanh toán, phí ship 25.000, giảm 10.000 |
+| `…TSTE` | Đã giao | phí ship 25.000, giảm 10.000 |
 | `…TSTF` | Đã huỷ | |
 | `…TSTG` | Đã giao | có dòng của **sản phẩm đã xoá** (chỉ còn bản chụp) |
 | `…TSTH` | Chờ xác nhận | tên / địa chỉ / ghi chú chứa **mã HTML** (test XSS) |
 
-- **60 đơn lịch sử** rải đều 13 tháng (~88 % đã giao, ~12 % huỷ, COD và chuyển khoản) cho trang Tổng quan, biểu đồ 7/30/90/365 ngày và phân trang. Sinh theo hạt giống cố định — lần chạy nào cũng giống nhau (trừ ngày tính lùi từ hôm nay).
+- **60 đơn lịch sử** rải đều 13 tháng (~88 % đã giao, ~12 % huỷ, đều COD) cho trang Tổng quan, biểu đồ 7/30/90/365 ngày và phân trang. Sinh theo hạt giống cố định — lần chạy nào cũng giống nhau (trừ ngày tính lùi từ hôm nay).
 - **8 liên hệ**: Mới / Đang xử lý / Xong; 3 liên hệ "Báo giá sỉ" đóng vai dữ liệu cũ (tính năng sỉ đã bỏ); một liên hệ chứa mã HTML.
 
 ### Nội dung
@@ -116,7 +116,7 @@ Các kịch bản test dùng đúng mã dưới đây. Sửa dữ liệu mẫu �
 | `POL1` | Chính sách | `chinh-sach-doi-tra` — nội dung từ mẫu "Chính sách bảo hành & đổi trả" (xoá đi để test gợi ý mẫu, TC-ADM-330) |
 | — | Chính sách | Giao hàng, Bảo mật — hiển thị |
 | `POL2` | Chính sách | `chinh-sach-noi-bo` — **tắt** |
-| `SET` | Thông tin cửa hàng | Thông tin thật của cửa hàng + dải chữ chạy tự nhập + thông tin chuyển khoản (TÀI KHOẢN TEST) |
+| `SET` | Thông tin cửa hàng | Thông tin thật của cửa hàng + dải chữ chạy tự nhập |
 
 **Bản cho khách xem:** `SEED_DEMO=1 npm run db:seed:test` — giống hệt bộ trên nhưng **bỏ** đơn `…TSTH`, liên hệ chứa mã HTML và bình luận spam (dữ liệu chỉ để test bảo mật).
 **Database trống hoàn toàn** (không dữ liệu mẫu, không khối trang chủ): `npm run db:reset:clean` — xem [demo-deploy.md §8](../04-operations/demo-deploy.md#8-khởi-tạo-lại-database-sạch-không-dữ-liệu-mẫu).

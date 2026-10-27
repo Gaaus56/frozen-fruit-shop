@@ -36,7 +36,7 @@ Một website hoàn chỉnh = **Domain + DNS + Hosting + Frontend + Backend + Da
 | | | [business-info.md](01-product/business-info.md) | Thông tin cửa hàng gốc (địa chỉ, hotline, chính sách đổi trả) |
 | 2 | **[02-architecture/](02-architecture/)** | [system-overview.md](02-architecture/system-overview.md) | Hệ thống gồm những phần nào, nguyên tắc thiết kế? |
 | | | [request-flows.md](02-architecture/request-flows.md) | Một yêu cầu đi qua những đâu? (xem SP, đặt hàng, admin, realtime) |
-| | | [security.md](02-architecture/security.md) | Bảo vệ hệ thống thế nào? |
+| | | [security.md](02-architecture/security.md) | Bảo vệ hệ thống thế nào? OTP, thao tác cần OTP, danh sách kỹ thuật bảo mật backend |
 | | | [folder-structure.md](02-architecture/folder-structure.md) | Code đặt ở đâu, quy tắc thêm code? |
 | 3 | **[03-apps/](03-apps/)** | [web.md](03-apps/web.md) | Website khách hàng: trang, giỏ hàng, lấy dữ liệu |
 | | | [admin.md](03-apps/admin.md) | Trang quản trị: chức năng, phân quyền ADMIN/STAFF |
@@ -45,7 +45,8 @@ Một website hoàn chỉnh = **Domain + DNS + Hosting + Frontend + Backend + Da
 | 4 | **[04-operations/](04-operations/)** | [local-development.md](04-operations/local-development.md) | Cài và chạy trên máy dev |
 | | | [deployment.md](04-operations/deployment.md) | Đưa lên VPS: domain, DNS, HTTPS, Docker |
 | | | [demo-deploy.md](04-operations/demo-deploy.md) | Deploy bản demo miễn phí cho khách xem (Vercel + Render + Neon), khởi tạo lại database sạch |
-| | | [monitoring-and-backup.md](04-operations/monitoring-and-backup.md) | Log, giám sát, sao lưu, khôi phục sự cố |
+| | | [monitoring-and-backup.md](04-operations/monitoring-and-backup.md) | Log, giám sát (Sentry), nén ảnh, xuất Excel, sao lưu, khôi phục sự cố |
+| | | [automation.md](04-operations/automation.md) | Hướng dẫn tự động gửi email, Zalo xác nhận đơn, tính phí ship (chưa làm — phương án, chi phí) |
 | | | [ci-cd.md](04-operations/ci-cd.md) | Quy trình nhánh, PR, CI, phát hành |
 | 5 | **[05-roadmap/](05-roadmap/)** | [roadmap.md](05-roadmap/roadmap.md) | **Kế hoạch tổng thể** — làm gì tiếp, theo thứ tự nào |
 | | | [production-readiness.md](05-roadmap/production-readiness.md) | Checklist 13 lớp "full-stack production" — đã đủ chưa? |

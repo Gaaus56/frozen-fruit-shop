@@ -26,7 +26,7 @@ inquiries · posts · banners · policies · site_settings (1 dòng, id = 1)   �
 | `products` | Sản phẩm | `categoryId`, mô tả ngắn/dài, `storageTemperature`, `shelfLifeDays`, `thawInstructions`, `isFeatured`, `isActive`, `sortOrder` |
 | `product_images` | Ảnh sản phẩm | `url` (đường dẫn tương đối `/uploads/...`), `sortOrder` (0 = ảnh chính) |
 | `product_variants` | Quy cách đóng gói | `packageSize` ("500g"), `weightGrams` (tính giá/kg), `price`, `compareAtPrice` (giá gốc khi giảm), `stockStatus` in_stock/low_stock/out_of_stock, `sku` duy nhất (tuỳ chọn), `isActive` |
-| `orders` | Đơn hàng | `orderNumber` duy nhất, thông tin khách, `paymentMethod` cod/bank_transfer, `paymentStatus` unpaid/paid/refunded, `status`, `subtotal`, `shippingFee`, `discount`, `total`, `internalNote` |
+| `orders` | Đơn hàng | `orderNumber` duy nhất, thông tin khách, `paymentMethod` (chỉ `cod`), `paymentStatus` unpaid/paid/refunded, `status`, `subtotal`, `shippingFee`, `discount`, `total`, `internalNote` |
 | `order_items` | Dòng đơn | `productId`/`variantId` có thể NULL (sản phẩm đã xoá) + bản chụp `productName`, `packageSize`, `unitPrice`, `quantity`, `lineTotal` |
 | `order_status_logs` | Lịch sử đơn | `fromStatus` → `toStatus`, `note`, `changedById` |
 | `inquiries` | Liên hệ | `type` contact (`wholesale` chỉ còn ở dữ liệu cũ), `status` new/in_progress/done; `company`, `quantity` dùng cho liên hệ sỉ cũ |

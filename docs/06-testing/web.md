@@ -233,14 +233,13 @@ Cột **Ưu tiên**: P0 chặn phát hành · P1 chính · P2 phụ. Cột **KQ*
 | TC-WEB-268 | Địa chỉ dài | 301 ký tự (dán) | Ô chỉ nhận 300 ký tự | P2 | |
 | TC-WEB-269 | Ghi chú | 1000 ký tự, có xuống dòng, emoji | Đặt được; admin thấy nguyên văn | P2 | |
 | TC-WEB-270 | Mã HTML | Họ tên `<img src=x onerror=alert(1)>` | Đặt được; admin hiện nguyên văn dạng chữ, không chạy script | P0 | |
-| TC-WEB-271 | Chọn thanh toán | Bấm "Chuyển khoản ngân hàng" rồi "COD" | Ô được chọn có viền đỏ; mặc định là COD | P1 | |
-
+| TC-WEB-271 | Chọn thanh toán | Bấm "Chuyển khoản ngân hàng" rồi "COD" | Ô được chọn có viền đỏ; mặc định là COD | P1 | Đã bỏ (chỉ còn COD từ 13/10/2026) |
 ### 6.3. Gửi đơn
 | ID | Kịch bản | Các bước | Kết quả mong đợi | Ưu tiên | KQ |
 |---|---|---|---|:-:|:-:|
 | TC-WEB-280 | Đặt COD thành công | Điền hợp lệ, COD → "Đặt hàng" | Nút "Đang đặt hàng..." và khoá; sau đó màn hình ✅ "Đặt hàng thành công!", mã đơn dạng `DH{yyMMdd}{4 ký tự}`, tạm tính đúng; giỏ trống; icon giỏ hết số; cuộn lên đầu | P0 | |
-| TC-WEB-281 | Đặt chuyển khoản | Như trên, chọn chuyển khoản | Thêm khung "Hướng dẫn chuyển khoản" = nội dung "Thông tin chuyển khoản" trong cài đặt (giữ xuống dòng) | P0 | |
-| TC-WEB-282 | Chuyển khoản khi chưa cài thông tin | Xoá thông tin chuyển khoản ở admin → đặt CK | Khung hiện "Cửa hàng sẽ gửi thông tin chuyển khoản khi gọi xác nhận đơn. Nội dung chuyển khoản: {mã đơn}." | P1 | |
+| TC-WEB-281 | Đặt chuyển khoản | Như trên, chọn chuyển khoản | Thêm khung "Hướng dẫn chuyển khoản" = nội dung "Thông tin chuyển khoản" trong cài đặt (giữ xuống dòng) | P0 | Đã bỏ (chỉ còn COD từ 13/10/2026) |
+| TC-WEB-282 | Chuyển khoản khi chưa cài thông tin | Xoá thông tin chuyển khoản ở admin → đặt CK | Khung hiện "Cửa hàng sẽ gửi thông tin chuyển khoản khi gọi xác nhận đơn. Nội dung chuyển khoản: {mã đơn}." | P1 | Đã bỏ (chỉ còn COD từ 13/10/2026) |
 | TC-WEB-283 | Link sau khi đặt | Bấm "tra cứu tình trạng đơn hàng", "Tiếp tục mua sắm" | Mở `/order-lookup`, `/products`; hotline hiện đúng định dạng | P1 | |
 | TC-WEB-284 | Bấm "Đặt hàng" 2 lần nhanh | Nhấp đúp | Chỉ tạo **1** đơn | P0 | |
 | TC-WEB-285 | Hàng hết đúng lúc bấm đặt | Mở checkout, admin đặt P1 500g hết hàng (API tắt realtime nếu cần), bấm "Đặt hàng" | Khung đỏ "Một số sản phẩm trong giỏ đã hết hàng hoặc ngừng bán. Vui lòng kiểm tra lại giỏ hàng."; không tạo đơn | P0 | |

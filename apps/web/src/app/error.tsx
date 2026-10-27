@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import { Button, LinkButton } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { EMPTY_ICONS, EmptyStateIcon } from "@/components/ui/line-icon";
 export default function ErrorPage({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   useEffect(() => {
     console.error(error);
+    Sentry.captureException(error); // trang lỗi giữ lỗi lại nên phải tự gửi Sentry
   }, [error]);
 
   return (

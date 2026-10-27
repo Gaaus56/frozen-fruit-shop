@@ -7,7 +7,6 @@ import type {
   InquiryType,
   OrderLookupResult,
   OrderQuote,
-  PaymentMethod,
 } from "@frozen-fruit-shop/types";
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(/\/$/, "");
@@ -55,7 +54,6 @@ export interface PlaceOrderInput {
   customerEmail: string;
   shippingAddress: string;
   customerNote: string;
-  paymentMethod: PaymentMethod;
   items: CartLineInput[];
   website: string;
 }

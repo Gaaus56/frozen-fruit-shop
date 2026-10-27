@@ -5,7 +5,7 @@ Mỗi kịch bản đi qua nhiều app như người dùng thật. Chạy **toà
 | ID | Kịch bản | Ưu tiên | KQ |
 |---|---|:-:|:-:|
 | E2E-01 | Mua hàng COD trọn vòng | P0 | |
-| E2E-02 | Mua hàng chuyển khoản | P0 | |
+| E2E-02 | ~~Mua hàng chuyển khoản~~ — đã bỏ (chỉ còn COD từ 13/10/2026) | — | |
 | E2E-03 | Giá đổi khi khách đang thanh toán | P0 | |
 | E2E-04 | Hết hàng khi khách đang thanh toán | P0 | |
 | E2E-05 | Khách huỷ qua điện thoại | P1 | |
@@ -32,7 +32,7 @@ Mỗi kịch bản đi qua nhiều app như người dùng thật. Chạy **toà
 10. **ADMIN**: lịch sử đơn có 5 dòng (đặt, xác nhận – ADMIN, đóng gói / giao / đã giao – STAFF1, ghi chú "Giao lúc 15h"); Tổng quan 7 ngày: doanh thu +445.000, P1 và P3 trong "Sản phẩm bán chạy".
 11. Đơn đã giao: ô phí ship / giảm giá bị khoá.
 
-### E2E-02 — Mua hàng chuyển khoản
+### E2E-02 — Mua hàng chuyển khoản (ĐÃ BỎ — cửa hàng chỉ nhận COD từ 13/10/2026)
 1. Admin đã nhập "Thông tin chuyển khoản" (ngân hàng, STK, chủ TK).
 2. Khách đặt 1 đơn chọn "Chuyển khoản ngân hàng".
 3. ✅ Màn hình thành công hiện khung "Hướng dẫn chuyển khoản" đúng nội dung admin nhập, giữ xuống dòng.

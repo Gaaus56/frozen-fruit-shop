@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import { requireAdmin } from "@/lib/auth";
 import { formatDateTime } from "@/lib/format";
 import { deleteStaffAction } from "./actions";
-import { CreateStaffForm, EditPermissionsForm, ResetPasswordForm, ToggleActiveButton } from "./staff-forms";
+import { CreateStaffForm, EditPermissionsForm, ResetPasswordForm, ResetStaffOtpButton, ToggleActiveButton } from "./staff-forms";
 
 export const metadata = { title: "Tài khoản nhân viên" };
 
@@ -43,7 +43,8 @@ export default async function UsersPage() {
                 </Td>
                 <Td>
                   {user.role === "ADMIN" ? <Badge tone="red">Quản trị</Badge> : <Badge tone="blue">Nhân viên</Badge>}{" "}
-                  {!user.isActive ? <Badge>Đã khoá</Badge> : null}
+                  {!user.isActive ? <Badge>Đã khoá</Badge> : null}{" "}
+                  {user.otpEnabled ? <Badge tone="green">OTP</Badge> : null}
                 </Td>
                 <Td className="max-w-xs">
                   {user.role === "ADMIN" ? (
@@ -67,6 +68,7 @@ export default async function UsersPage() {
                       <EditPermissionsForm id={user.id} name={user.name} permissions={user.permissions} />
                       <ResetPasswordForm id={user.id} />
                       <ToggleActiveButton id={user.id} isActive={user.isActive} />
+                      {user.otpEnabled ? <ResetStaffOtpButton id={user.id} name={user.name} /> : null}
                       <DeleteButton
                         action={deleteStaffAction.bind(null, user.id)}
                         itemLabel={user.name}

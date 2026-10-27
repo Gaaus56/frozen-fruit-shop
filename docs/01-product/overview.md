@@ -36,7 +36,7 @@ Những ràng buộc này chi phối thiết kế dữ liệu và luồng đặt
 - **Thông tin chuỗi lạnh bắt buộc**: nhiệt độ bảo quản (−18 °C), hạn dùng, cách rã đông.
 - **Phí ship không tính tự động**: hàng cần thùng xốp + đá gel, phí phụ thuộc khoảng cách → shop **gọi khách xác nhận** rồi nhập phí ở trang quản trị. Đơn mới có phí ship = 0.
 - **Đổi trả có điều kiện**: bắt buộc video mở thùng; nội thành đổi trong 1–3 giờ, ngoại tỉnh cấp đông lại 24 giờ rồi gửi về.
-- **Thanh toán**: COD hoặc chuyển khoản (shop đối soát thủ công). Chưa có cổng thanh toán online.
+- **Thanh toán**: chỉ COD — thu tiền khi giao (đã bỏ chuyển khoản 13/10/2026). Chưa có cổng thanh toán online.
 
 ## 5. Phạm vi
 

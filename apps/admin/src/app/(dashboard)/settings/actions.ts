@@ -19,7 +19,6 @@ const FIELDS: Exclude<keyof SiteSettings, "marqueeEnabled" | "productAssurances"
   "taxCode",
   "taxNote",
   "marqueeText",
-  "bankTransferInfo",
 ];
 
 export async function saveSettingsAction(_prev: ActionState | undefined, formData: FormData): Promise<ActionState> {

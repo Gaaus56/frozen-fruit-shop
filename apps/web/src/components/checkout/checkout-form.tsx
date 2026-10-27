@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
-import { formatPhone, type OrderLookupResult, type OrderQuote, type PaymentMethod } from "@frozen-fruit-shop/types";
+import { formatPhone, type OrderLookupResult, type OrderQuote } from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
 import { LinkButton } from "@/components/ui/button";
 import { Field, FormMessage, HoneypotField, inputClass } from "@/components/ui/form";
@@ -16,11 +16,6 @@ import { formatCurrency } from "@/lib/format";
 import { saveReceipt, type ReceiptStore, type SavedReceipt } from "@/lib/saved-receipts";
 import { SuccessCheck } from "@/components/ui/check-icon";
 
-const PAYMENT_OPTIONS: { value: PaymentMethod; label: string; description: string }[] = [
-  { value: "cod", label: "Thanh toán khi nhận hàng (COD)", description: "Trả tiền mặt cho người giao hàng." },
-  { value: "bank_transfer", label: "Chuyển khoản ngân hàng", description: "Chuyển khoản trước theo hướng dẫn của cửa hàng." },
-];
-
 /** Khung trắng bo góc giống các khối ở trang chủ (SectionCard). */
 function Card({ title, children, className = "" }: { title: string; children: ReactNode; className?: string }) {
   return (
@@ -33,11 +28,10 @@ function Card({ title, children, className = "" }: { title: string; children: Re
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export function CheckoutForm({ bankTransferInfo, store }: { bankTransferInfo: string; store: ReceiptStore }) {
+export function CheckoutForm({ store }: { store: ReceiptStore }) {
   const { items, isHydrated, applyQuote, clearCart } = useCart();
   const [quote, setQuote] = useState<OrderQuote | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [orderState, setOrderState] = useState<"idle" | "sending" | "done">("idle");
   const [placed, setPlaced] = useState<{ receipt: SavedReceipt; savedOnDevice: boolean } | null>(null);
@@ -89,7 +83,6 @@ export function CheckoutForm({ bankTransferInfo, store }: { bankTransferInfo: st
         customerEmail: String(data.get("customerEmail") ?? ""),
         shippingAddress: String(data.get("shippingAddress") ?? ""),
         customerNote: String(data.get("customerNote") ?? ""),
-        paymentMethod,
         items: items.map(({ variantId, quantity }) => ({ variantId, quantity })),
         website: String(data.get("website") ?? ""),
       });
@@ -98,7 +91,7 @@ export function CheckoutForm({ bankTransferInfo, store }: { bankTransferInfo: st
       const order: OrderLookupResult = await lookupOrder(result.orderNumber, phone).catch(() => ({
         orderNumber: result.orderNumber,
         status: "pending",
-        paymentMethod,
+        paymentMethod: "cod",
         paymentStatus: "unpaid",
         customerName: String(data.get("customerName") ?? ""),
         shippingAddress: String(data.get("shippingAddress") ?? ""),
@@ -150,17 +143,6 @@ export function CheckoutForm({ bankTransferInfo, store }: { bankTransferInfo: st
           <ReceiptPrinter receipt={receipt} />
 
           <div className="flex flex-col gap-4">
-            {receipt.order.paymentMethod === "bank_transfer" ? (
-              <section className="rounded-2xl border border-divider bg-card p-5 text-sm shadow-sm">
-                <h2 className="mb-2 font-bold text-foreground">Hướng dẫn chuyển khoản</h2>
-                <p className="whitespace-pre-line text-foreground/80">
-                  {bankTransferInfo || `Cửa hàng sẽ gửi thông tin chuyển khoản khi gọi xác nhận đơn.`}
-                </p>
-                <p className="mt-3 rounded-lg bg-field px-3 py-2 text-foreground">
-                  Nội dung chuyển khoản: <strong>{receipt.orderNumber}</strong>
-                </p>
-              </section>
-            ) : null}
             <section className="rounded-2xl border border-divider bg-card p-5 text-sm shadow-sm">
               <h2 className="mb-2 font-bold text-foreground">Bill của bạn</h2>
               <p className="text-foreground/75">
@@ -237,38 +219,6 @@ export function CheckoutForm({ bankTransferInfo, store }: { bankTransferInfo: st
               </Field>
             </div>
           </Card>
-
-          <Card title="Phương thức thanh toán">
-            <fieldset>
-              <legend className="sr-only">Phương thức thanh toán</legend>
-              <div className="flex flex-col gap-3">
-                {PAYMENT_OPTIONS.map((option) => {
-                  const active = paymentMethod === option.value;
-                  return (
-                    <label
-                      key={option.value}
-                      className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors ${
-                        active ? "border-accent-600 bg-accent-50 ring-1 ring-accent-600" : "border-divider bg-field hover:border-accent-300"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value={option.value}
-                        checked={active}
-                        onChange={() => setPaymentMethod(option.value)}
-                        className="mt-1 accent-[#cf2a10]"
-                      />
-                      <span>
-                        <span className="block text-sm font-bold text-foreground">{option.label}</span>
-                        <span className="block text-xs text-foreground/65">{option.description}</span>
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </fieldset>
-          </Card>
         </div>
 
         <Card title="Đơn hàng của bạn" className="h-fit lg:sticky lg:top-20 lg:col-span-2">
@@ -305,6 +255,10 @@ export function CheckoutForm({ bankTransferInfo, store }: { bankTransferInfo: st
                 <div className="flex justify-between gap-4 text-foreground/70">
                   <span>Phí vận chuyển</span>
                   <span className="text-right">Cửa hàng báo khi xác nhận</span>
+                </div>
+                <div className="flex justify-between gap-4 text-foreground/70">
+                  <span>Thanh toán</span>
+                  <span className="text-right">Tiền mặt khi nhận hàng (COD)</span>
                 </div>
                 <div className="flex items-baseline justify-between border-t border-divider pt-3 text-base font-bold text-foreground">
                   <span>Tổng tạm tính</span>

@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { randomBytes } from 'node:crypto';
+import sharp from 'sharp';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Auth } from '../auth/auth.guard.js';
@@ -35,6 +36,30 @@ function detectImageType(buffer: Buffer): 'jpg' | 'png' | 'webp' | 'gif' | null 
   return null;
 }
 
+/** Cạnh dài tối đa sau khi nén: đủ nét cho banner toàn màn hình / ảnh sản phẩm phóng to. */
+const MAX_EDGE = 2000;
+const WEBP_QUALITY = 82;
+
+/**
+ * Nén ảnh trước khi lưu: xoay đúng chiều theo EXIF (ảnh chụp điện thoại), thu nhỏ nếu cạnh dài > 2000px,
+ * bỏ toàn bộ metadata (vị trí GPS, máy chụp…), lưu WebP — thường nhẹ hơn 5–10 lần ảnh gốc từ điện thoại.
+ * Nếu bản WebP không nhẹ hơn (ảnh gốc đã tối ưu sẵn) thì giữ nguyên file gốc.
+ * GIF giữ nguyên (có thể là ảnh động). Ảnh hỏng / không đọc được → báo lỗi thay vì lưu file rác.
+ */
+async function compressImage(input: Buffer, type: 'jpg' | 'png' | 'webp' | 'gif'): Promise<{ buffer: Buffer; ext: string }> {
+  if (type === 'gif') return { buffer: input, ext: 'gif' };
+  try {
+    const output = await sharp(input, { failOn: 'error' })
+      .rotate()
+      .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: WEBP_QUALITY, effort: 4 })
+      .toBuffer();
+    return output.length < input.length ? { buffer: output, ext: 'webp' } : { buffer: input, ext: type };
+  } catch {
+    throw new BadRequestException('File ảnh bị hỏng hoặc không đọc được, vui lòng chọn ảnh khác.');
+  }
+}
+
 @Injectable()
 export class UploadsService {
   /** Lưu ảnh vào UPLOAD_DIR/yyyy/mm/<ngẫu nhiên>.<ext>, trả về đường dẫn lưu DB và URL công khai. */
@@ -42,14 +67,15 @@ export class UploadsService {
     if (!file) throw new BadRequestException('Chưa chọn file ảnh.');
     if (file.size > MAX_UPLOAD_BYTES) throw new BadRequestException('Ảnh vượt quá dung lượng tối đa 5MB.');
 
-    const ext = detectImageType(file.buffer);
-    if (!ext) throw new BadRequestException('Chỉ chấp nhận ảnh JPG, PNG, WEBP hoặc GIF.');
+    const type = detectImageType(file.buffer);
+    if (!type) throw new BadRequestException('Chỉ chấp nhận ảnh JPG, PNG, WEBP hoặc GIF.');
+    const { buffer, ext } = await compressImage(file.buffer, type);
 
     const now = new Date();
     const folder = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
     const fileName = `${randomBytes(12).toString('hex')}.${ext}`;
     await mkdir(join(env.uploadDir, folder), { recursive: true });
-    await writeFile(join(env.uploadDir, folder, fileName), file.buffer);
+    await writeFile(join(env.uploadDir, folder, fileName), buffer);
 
     const path = `/uploads/${folder}/${fileName}`;
     return { path, url: toPublicUrl(path) };

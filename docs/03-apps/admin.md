@@ -6,8 +6,8 @@ Next.js 16 + Tailwind CSS 4, cổng 3002. Cùng tông màu với web khách (đ�
 
 | Vai trò | Số lượng | Tạo bằng | Đăng nhập |
 |---|---|---|---|
-| **ADMIN** (chủ cửa hàng) | Đúng **1** | Lệnh `npm run admin:create` trên máy chủ (không tạo được qua giao diện/API) | Email + mật khẩu (sau này thêm OTP — xem mục 4) |
-| **STAFF** (nhân viên) | Không giới hạn | ADMIN tạo ở trang *Tài khoản nhân viên* | Email + mật khẩu, không cần OTP |
+| **ADMIN** (chủ cửa hàng) | Đúng **1** | Lệnh `npm run admin:create` trên máy chủ (không tạo được qua giao diện/API) | Email + mật khẩu + **OTP** (tự bật, xem mục 5) |
+| **STAFF** (nhân viên) | Không giới hạn | ADMIN tạo ở trang *Tài khoản nhân viên* | Email + mật khẩu, OTP tuỳ chọn |
 
 | Chức năng | ADMIN | STAFF |
 |---|:-:|:-:|
@@ -16,7 +16,7 @@ Next.js 16 + Tailwind CSS 4, cổng 3002. Cùng tông màu với web khách (đ�
 | Liên hệ: xem, đổi trạng thái, xoá | ✅ | ✅ |
 | Sản phẩm, danh mục, ảnh | ✅ | ✅ |
 | Banner, bài viết, chính sách | ✅ | ✅ |
-| Thông tin cửa hàng (hotline, địa chỉ, chuyển khoản...) | ✅ | ❌ |
+| Thông tin cửa hàng (hotline, địa chỉ, MST...) | ✅ | ❌ |
 | Tài khoản nhân viên (tạo, khoá/mở, đặt lại mật khẩu, xoá) | ✅ | ❌ |
 | Đổi mật khẩu của chính mình | ✅ | ✅ |
 
@@ -45,7 +45,7 @@ Quy tắc phiên đăng nhập:
 | `/pages/about` | **Trang Giới thiệu**: tiêu đề, dòng giới thiệu, nội dung bằng trình soạn thảo. Chưa lưu lần nào thì mở ra là nội dung đang hiển thị |
 | `/posts` | Bài viết: lọc theo loại (Tất cả / Kiến thức / Tuyển dụng, kèm số bài); **loại bài** bắt buộc, ảnh bìa, tóm tắt, nội dung, bản nháp / hẹn giờ đăng |
 | `/policies` | Trang chính sách. Có **mẫu soạn sẵn** "Chính sách bảo hành & đổi trả" lấy từ tài liệu cửa hàng |
-| `/settings` (ADMIN) | Tên cửa hàng, hotline, giờ nghe máy, Zalo, email, Facebook, địa chỉ, link bản đồ, thông tin chuyển khoản, MST, dòng chữ chạy (có công tắc bật/tắt) |
+| `/settings` (ADMIN) | Tên cửa hàng, hotline, giờ nghe máy, Zalo, email, Facebook, địa chỉ, link bản đồ, thẻ cam kết, MST, dòng chữ chạy (có công tắc bật/tắt) |
 | `/users` (ADMIN) | Danh sách tài khoản, tạo nhân viên, đặt lại mật khẩu, khoá/mở khoá, xoá |
 | `/account` | Thông tin tài khoản, đổi mật khẩu |
 
@@ -82,14 +82,12 @@ Dùng cho **bài viết, chính sách, mô tả chi tiết sản phẩm, trang G
 
 Biến môi trường (`apps/admin/.env.local`): `API_URL` — địa chỉ API mà server admin gọi (mặc định `http://localhost:4000`).
 
-## 5. Kế hoạch xác thực OTP cho ADMIN
+## 5. Xác thực 2 lớp (OTP)
 
-Hiện ADMIN đăng nhập bằng email + mật khẩu. Thiết kế đã chừa chỗ để thêm OTP mà không đổi luồng của nhân viên:
+Đã làm (13/10/2026) — TOTP qua app Google / Microsoft Authenticator, mọi tài khoản tự bật ở **Tài khoản của tôi** (`account/otp-section.tsx`); chủ chưa bật thì dải nhắc hiện ở mọi trang (`(dashboard)/layout.tsx`).
 
-1. `POST /auth/login`: nếu tài khoản là ADMIN và mật khẩu đúng → không trả token ngay mà trả `{ otpRequired: true, challengeId }`, đồng thời gửi mã 6 số qua email (hoặc dùng ứng dụng TOTP như Google Authenticator).
-2. Thêm `POST /auth/verify-otp { challengeId, code }` → kiểm tra mã (hết hạn 5 phút, tối đa 5 lần thử) → trả token như hiện nay.
-3. Database: thêm bảng `otp_challenges` (userId, codeHash, expiresAt, attempts) hoặc cột `totpSecret` trên `users`.
-4. Admin: sau bước mật khẩu, trang `/login` hiện ô nhập mã OTP; phần còn lại (cookie, phiên) giữ nguyên.
-5. STAFF không bị ảnh hưởng: API chỉ yêu cầu OTP khi `role === 'ADMIN'`.
+- Đăng nhập 2 bước: `app/login/login-form.tsx` (một `useActionState` cho cả hai bước; ô ẩn `otpToken` → bước 2).
+- Thao tác nhạy cảm: API trả `403 OTP_REQUIRED` → `runAction` trả `{ otpRequired }` → bọc action bằng `withOtpRetry()` (`lib/otp-step-up.ts`) để hộp **Nhập mã OTP** (`components/layout/otp-step-up-dialog.tsx`, gắn một lần trong layout) hiện ra, nhập đúng thì tự gửi lại. Thêm thao tác mới cần OTP: gắn `@RequireOtp()` ở API + bọc action bằng `withOtpRetry`.
+- Chủ tắt OTP giúp nhân viên mất điện thoại: nút **Tắt OTP** ở *Tài khoản nhân viên*.
 
-Điểm chèn trong mã: `AuthService.login()` ở `apps/api/src/auth/auth.service.ts` (đã có ghi chú).
+Thiết kế bảo mật và danh sách thao tác cần OTP: [security.md §3](../02-architecture/security.md#3-xác-thực-2-lớp-otp).

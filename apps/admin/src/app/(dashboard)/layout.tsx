@@ -3,7 +3,9 @@ import { LiveUpdates } from "@/components/layout/live-updates";
 import { PreviewReturn } from "@/components/layout/preview-return";
 import { Suspense } from "react";
 import { hasPermission, type AuthUser } from "@frozen-fruit-shop/types";
+import Link from "next/link";
 import { EnterAnimation } from "@/components/layout/enter-animation";
+import { OtpStepUpDialog } from "@/components/layout/otp-step-up-dialog";
 import { ForbiddenNotice } from "@/components/layout/forbidden-notice";
 import { Sidebar } from "@/components/layout/sidebar";
 import { api } from "@/lib/api";
@@ -32,10 +34,21 @@ export default async function DashboardLayout({ children }: LayoutProps<"/">) {
         <Suspense fallback={null}>
           <ForbiddenNotice />
         </Suspense>
+        {/* Chủ cửa hàng chưa bật xác thực 2 lớp: nhắc ở mọi trang tới khi bật. */}
+        {user.role === "ADMIN" && !user.otpEnabled ? (
+          <p className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 border-l-4 border-amber-500 bg-amber-50 px-4 py-2.5 text-sm text-amber-900">
+            <strong>Tài khoản chủ cửa hàng chưa bật xác thực 2 lớp (OTP).</strong>
+            <span>Lộ mật khẩu là người khác vào được toàn bộ trang quản trị.</span>
+            <Link href="/account#otp" className="font-bold underline">
+              Bật ngay ›
+            </Link>
+          </p>
+        ) : null}
         {children}
       </main>
       <LiveUpdates />
       <EnterAnimation />
+      <OtpStepUpDialog />
       <PreviewReturn />
     </div>
   );

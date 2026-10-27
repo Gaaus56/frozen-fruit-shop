@@ -15,6 +15,9 @@ export const ACTION_LABELS: Record<string, string> = {
   update: "Sửa",
   delete: "Xoá",
   "reset-password": "Đặt lại mật khẩu",
+  "reset-otp": "Tắt OTP nhân viên",
+  "otp-enable": "Bật OTP",
+  "otp-disable": "Tắt OTP",
 };
 
 /** Tên trường trong database → tên tiếng Việt. Trường lạ hiện nguyên tên. */
@@ -72,7 +75,7 @@ const FIELD_LABELS: Record<string, string> = {
   taxNote: "Ghi chú MST",
   marqueeEnabled: "Hiện dải chữ chạy",
   marqueeText: "Dòng chữ chạy",
-  bankTransferInfo: "Thông tin chuyển khoản",
+  bankTransferInfo: "Thông tin chuyển khoản (đã bỏ)", // chỉ còn trong lịch sử cũ
   productAssurances: "Thẻ cam kết",
   permissions: "Quyền",
   role: "Vai trò",
@@ -91,7 +94,8 @@ export function valueLabel(resource: string, field: string, value: string | null
   const maps: Record<string, Record<string, string>> = {
     "orders.status": ORDER_STATUS_LABELS,
     "orders.paymentStatus": PAYMENT_STATUS_LABELS,
-    "orders.paymentMethod": PAYMENT_METHOD_LABELS,
+    // "bank_transfer": lịch sử trước khi bỏ chuyển khoản.
+    "orders.paymentMethod": { ...PAYMENT_METHOD_LABELS, bank_transfer: "Chuyển khoản (đã bỏ)" },
     "inquiries.status": INQUIRY_STATUS_LABELS,
     "comments.status": COMMENT_STATUS_LABELS,
     "banners.placement": BANNER_PLACEMENT_LABELS,

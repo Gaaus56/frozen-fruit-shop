@@ -19,7 +19,7 @@ Trạng thái: ✅ xong · 🟡 một phần · ⬜ chưa làm (đã lên kế h
 |---|:-:|---|
 | Giỏ hàng lưu trên trình duyệt, sửa số lượng 1–99, xoá | ✅ | `localStorage` |
 | Báo giá lại từ API: cập nhật giá, đánh dấu dòng hết hàng / ngừng bán | ✅ | Không tin giá phía trình duyệt |
-| Đặt hàng không cần tài khoản (COD / chuyển khoản) | ✅ | Hiện mã đơn + hướng dẫn chuyển khoản sau khi đặt |
+| Đặt hàng không cần tài khoản (chỉ COD — thu tiền khi giao) | ✅ | Đã bỏ hẳn chuyển khoản (13/10/2026); hiện mã đơn + bill sau khi đặt |
 | Tra cứu đơn bằng mã đơn + SĐT | ✅ | |
 | Email / Zalo xác nhận đơn cho khách | ⬜ | |
 | Mã giảm giá | ⬜ | Hiện shop nhập giảm giá thủ công trên đơn |
@@ -52,13 +52,13 @@ Trạng thái: ✅ xong · 🟡 một phần · ⬜ chưa làm (đã lên kế h
 | Danh mục, banner, bài viết, chính sách (có mẫu soạn sẵn) | ✅ | |
 | Trình soạn thảo: tiêu đề, đậm/nghiêng, danh sách, trích dẫn, khung ghi chú, liên kết, **ảnh có chú thích ở bất cứ đâu** (dán / kéo-thả), **ô sản phẩm** | ✅ | Bài viết, chính sách, mô tả sản phẩm, trang Giới thiệu |
 | Trang Giới thiệu sửa được | ✅ | |
-| Thông tin cửa hàng (hotline, chuyển khoản, MST, dòng chữ chạy + bật/tắt…) | ✅ | Chỉ ADMIN |
+| Thông tin cửa hàng (hotline, Zalo, MST, dòng chữ chạy + bật/tắt…) | ✅ | Chỉ ADMIN, cần nhập lại mã OTP khi lưu (nếu đã bật OTP) |
 | Tài khoản nhân viên: tạo, khoá, đặt lại mật khẩu, xoá | ✅ | Chỉ ADMIN |
 | Thông báo realtime đơn / liên hệ mới (toast + âm báo + số trên tab) | ✅ | |
-| Tải ảnh trực tiếp (kiểm tra định dạng thật, ≤ 5 MB) | ✅ | |
-| OTP khi ADMIN đăng nhập | ⬜ | Đã thiết kế — [admin.md §5](../03-apps/admin.md#5-kế-hoạch-xác-thực-otp-cho-admin) |
-| Tự nén / resize ảnh khi tải lên | ⬜ | Hiện `next/image` resize lúc hiển thị |
-| Xuất đơn hàng ra Excel | ⬜ | |
+| Tải ảnh trực tiếp (kiểm tra định dạng thật) | ✅ | |
+| Xác thực 2 lớp OTP (app Authenticator) + mã dự phòng; nhập lại mã cho thao tác nhạy cảm | ✅ | Mọi tài khoản tự bật; chủ chưa bật thì có dải nhắc — [security.md §3](../02-architecture/security.md#3-xác-thực-2-lớp-otp) |
+| Tự nén / resize ảnh khi tải lên | ✅ | Trình duyệt thu nhỏ trước khi gửi + API `sharp` nén WebP, bỏ GPS — [monitoring-and-backup.md §2.2](../04-operations/monitoring-and-backup.md#22-ảnh-tải-lên-được-nén-tự-động) |
+| Xuất đơn hàng ra Excel | ✅ | Theo trạng thái / từ khoá / khoảng ngày; 2 sheet (đơn, chi tiết món) + dòng tổng |
 | Nhật ký thao tác của nhân viên (ngoài lịch sử đơn) | ✅ | Trang **Lịch sử chỉnh sửa** (chỉ ADMIN): ai sửa gì, trường nào trước → sau |
 
 ## 3. Backend & hạ tầng
@@ -71,7 +71,7 @@ Trạng thái: ✅ xong · 🟡 một phần · ⬜ chưa làm (đã lên kế h
 | Docker Compose production + Caddy HTTPS | ✅ | |
 | CI: lint + build khi mở PR vào `main` | ✅ | Chưa có test, chưa tự triển khai |
 | Sao lưu database hằng đêm (giữ 14 bản trên VPS) | 🟡 | Chưa đẩy ra ngoài VPS, chưa diễn tập khôi phục |
-| Theo dõi lỗi (Sentry), giám sát uptime, cảnh báo | ⬜ | |
+| Theo dõi lỗi (Sentry), giám sát uptime, cảnh báo | 🟡 | Sentry gắn sẵn cho web / admin / API, bật bằng DSN — [monitoring-and-backup.md §2.1](../04-operations/monitoring-and-backup.md#21-bật-sentry-theo-dõi-lỗi-gói-miễn-phí-5000-lỗi--tháng) |
 | Test tự động (API e2e, luồng đặt hàng) | ⬜ | |
 | Tự động triển khai (CD) | ⬜ | |
 

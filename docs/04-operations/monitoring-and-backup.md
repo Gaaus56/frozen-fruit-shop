@@ -14,14 +14,46 @@ Hiện log chỉ nằm trong Docker (stdout). Nên giới hạn dung lượng đ
 { "log-driver": "json-file", "log-opts": { "max-size": "20m", "max-file": "5" } }
 ```
 
-## 2. Giám sát (chưa có — kế hoạch)
+## 2. Giám sát
 
-| Việc | Công cụ đề xuất (miễn phí) | Ưu tiên |
+| Việc | Công cụ | Trạng thái |
 |---|---|:-:|
-| Báo khi web / API sập | UptimeRobot hoặc Better Stack: kiểm tra `https://<DOMAIN>` và `https://api.<DOMAIN>/health` mỗi 5 phút, báo qua email / Telegram | P1 |
-| Bắt lỗi runtime (trình duyệt + server) | Sentry (`@sentry/nextjs`, `@sentry/nestjs`) | P2 |
-| Đĩa, RAM, CPU VPS | Biểu đồ của nhà cung cấp VPS, hoặc Netdata | P2 |
-| Hết hạn tên miền | Bật tự gia hạn + nhắc lịch | P1 |
+| Bắt lỗi runtime (trình duyệt khách, server web / admin, API) | **Sentry** — đã gắn sẵn, bật bằng biến môi trường (mục 2.1) | ✅ code · cần đặt DSN |
+| Báo khi web / API sập | UptimeRobot hoặc Better Stack: kiểm tra `https://<DOMAIN>` và `https://<API>/health` mỗi 5 phút, báo qua email / Telegram (bản demo Render đã dùng UptimeRobot để giữ API thức) | 🟡 |
+| Đĩa, RAM, CPU VPS (khi chuyển lên VPS) | Biểu đồ của nhà cung cấp VPS, hoặc Netdata | — |
+| Hết hạn tên miền | Bật tự gia hạn + nhắc lịch | — |
+
+### 2.1. Bật Sentry (theo dõi lỗi, gói miễn phí 5.000 lỗi / tháng)
+
+1. Tạo tài khoản sentry.io → **Create Project** hai lần:
+   - `traicay28-api` — nền tảng **Node.js → NestJS**.
+   - `traicay28-web` — nền tảng **Next.js** (web và admin dùng chung một project cho gọn; muốn tách thì tạo thêm `traicay28-admin`).
+2. Mỗi project có một **DSN** (dạng `https://xxx@oyyy.ingest.sentry.io/zzz`) — không phải bí mật, nhưng không có thì Sentry tắt.
+3. Đặt biến môi trường:
+
+   | Nơi | Biến |
+   |---|---|
+   | Render (API) | `SENTRY_DSN` = DSN của `traicay28-api`, `SENTRY_ENVIRONMENT=demo` |
+   | Vercel (web, admin) | `NEXT_PUBLIC_SENTRY_DSN` = DSN của `traicay28-web` (loại **Config**, không phải Secret — biến `NEXT_PUBLIC_*` được nhúng vào trình duyệt) |
+   | Vercel (tuỳ chọn) | `SENTRY_AUTH_TOKEN` (Secret), `SENTRY_ORG`, `SENTRY_PROJECT` → tải source map để Sentry chỉ đúng dòng code lỗi |
+
+4. Deploy lại. Thử: trên Sentry → **Issues** — lỗi mới sẽ hiện kèm trang, trình duyệt, dòng code. Bật **Alerts → email** khi có lỗi mới.
+
+Đã cấu hình sẵn để **không gửi dữ liệu cá nhân**: không cookie / token đăng nhập, không body request (mật khẩu, mã OTP, thông tin khách), không IP; chỉ gửi lỗi 5xx của API (lỗi 4xx như sai dữ liệu, chưa đăng nhập là bình thường, không gửi); bỏ qua lỗi do tiện ích trình duyệt / mạng chập chờn của khách. File cấu hình: `apps/api/src/instrument.ts`, `apps/{web,admin}/src/instrumentation*.ts`.
+
+### 2.2. Ảnh tải lên được nén tự động
+
+- **Trên trình duyệt** (trước khi gửi): ảnh lớn được xoay đúng chiều, thu nhỏ cạnh dài ≤ 2000px, đổi sang WebP (≈ 0,86) — ảnh điện thoại 5–12MB còn vài trăm KB, gửi nhanh và lọt giới hạn ~4,5MB / request của Vercel. Chọn được ảnh tới 30MB.
+- **Trên API** (`sharp`): nén lại lần nữa (≤ 2000px, WebP chất lượng 82), **bỏ metadata** (vị trí GPS, máy chụp), từ chối file hỏng; nếu WebP không nhẹ hơn thì giữ file gốc. GIF giữ nguyên (ảnh động).
+- Ví dụ đo được: logo PNG 4096×4096 **4,9MB → 165KB** WebP 2000×2000.
+
+### 2.3. Xuất Excel đơn hàng
+
+Trang **Đơn hàng** → khung **Xuất Excel**: lấy đúng bộ lọc đang xem (tab trạng thái, ô tìm) + khoảng ngày (giờ Việt Nam, để trống = mọi ngày), tối đa 20.000 đơn.
+
+- Sheet **Đơn hàng**: mã đơn, ngày giờ, khách, SĐT (giữ số 0 đầu), địa chỉ, trạng thái, thanh toán, số món, tạm tính, phí ship, giảm giá, tổng tiền, ghi chú; dòng **TỔNG CỘNG** dùng công thức `SUMIFS` bỏ đơn đã huỷ.
+- Sheet **Chi tiết sản phẩm**: mỗi món một dòng (sản phẩm, quy cách, số lượng, đơn giá, thành tiền) — lọc / Pivot theo sản phẩm.
+- Tiền định dạng `1.234.000 đ`, hàng tiêu đề cố định, có sẵn bộ lọc. Cần quyền **Đơn hàng**. API: `GET /admin/orders/export` (`apps/api/src/orders/orders-export.ts`).
 
 ## 3. Sao lưu
 

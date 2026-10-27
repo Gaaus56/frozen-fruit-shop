@@ -53,7 +53,7 @@ Bộ đếm nằm trong bộ nhớ tiến trình (đủ cho một máy chủ). A
 | GET | `/banners` | Banner đang bật. `?placement=home` (mặc định), `products` hoặc `news` |
 | GET | `/policies` · `/policies/:slug` | Chính sách đang bật |
 | POST | `/orders/quote` | `{ items: [{ variantId, quantity }] }` → giá hiện tại từng dòng, dòng không khả dụng, tạm tính |
-| POST | `/orders` | Tạo đơn: `items`, `customerName`, `customerPhone`, `customerEmail?`, `shippingAddress`, `customerNote?`, `paymentMethod` (cod/bank_transfer), `website` (honeypot). Trả `{ orderNumber, total }` |
+| POST | `/orders` | Tạo đơn: `items`, `customerName`, `customerPhone`, `customerEmail?`, `shippingAddress`, `customerNote?`, `paymentMethod?` (chỉ `cod`, không bắt buộc), `website` (honeypot). Trả `{ orderNumber, total }` |
 | GET | `/orders/lookup?orderNumber=&phone=` | Tra cứu đơn (phải khớp cả hai) |
 | POST | `/inquiries` | Liên hệ: `type` (chỉ `contact`), `name`, `phone`, `email`, `message`, `website` |
 | GET | `/events` | Luồng SSE: `{ type: "changed", tags }` khi dữ liệu hiển thị trên web thay đổi (xem [request-flows.md](../02-architecture/request-flows.md#5-cập-nhật-realtime)) |

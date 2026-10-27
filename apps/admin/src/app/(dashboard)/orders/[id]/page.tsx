@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import {
   ORDER_STATUS_LABELS,
-  PAYMENT_METHOD_LABELS,
   PAYMENT_STATUS_LABELS,
   type OrderDetail,
 } from "@frozen-fruit-shop/types";
@@ -84,7 +83,7 @@ export default async function OrderDetailPage({ params }: PageProps<"/orders/[id
               <div><dt className="text-foreground/55">Email</dt><dd>{order.customerEmail ?? "—"}</dd></div>
               <div>
                 <dt className="text-foreground/55">Thanh toán</dt>
-                <dd>{PAYMENT_METHOD_LABELS[order.paymentMethod]} — <strong>{PAYMENT_STATUS_LABELS[order.paymentStatus]}</strong></dd>
+                <dd><strong>{PAYMENT_STATUS_LABELS[order.paymentStatus]}</strong> · COD (thu tiền khi giao)</dd>
               </div>
               <div className="sm:col-span-2"><dt className="text-foreground/55">Địa chỉ giao hàng</dt><dd className="font-semibold">{order.shippingAddress}</dd></div>
               {order.customerNote ? (
