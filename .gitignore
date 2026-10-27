@@ -56,3 +56,6 @@ next-env.d.ts
 
 # Thư mục tạm khi build thử production cạnh dev server (không commit).
 /.buildcheck/
+
+# Cấu hình Claude Code riêng trên máy (quyền lệnh, đường dẫn local) — không commit.
+/.claude/
