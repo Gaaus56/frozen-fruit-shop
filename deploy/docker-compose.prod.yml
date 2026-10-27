@@ -31,6 +31,7 @@ services:
       CORS_ORIGINS: https://${DOMAIN},https://www.${DOMAIN},https://admin.${DOMAIN}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: 12h
+      OTP_ENCRYPTION_KEY: ${OTP_ENCRYPTION_KEY:-}
       UPLOAD_DIR: /data/uploads
       WEB_REVALIDATE_URL: http://web:3000/api/revalidate
       REVALIDATE_SECRET: ${REVALIDATE_SECRET}
