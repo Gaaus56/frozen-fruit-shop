@@ -4,9 +4,10 @@ import { useActionState, useEffect, useRef } from "react";
 import { SubmitButton } from "@/components/ui/button";
 import { Field, FormAlert, inputClass } from "@/components/ui/form";
 import { changePasswordAction } from "./actions";
+import { withOtpRetry } from "@/lib/otp-step-up";
 
 export function ChangePasswordForm({ minLength }: { minLength: number }) {
-  const [state, formAction] = useActionState(changePasswordAction, undefined);
+  const [state, formAction] = useActionState(withOtpRetry(changePasswordAction), undefined);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {

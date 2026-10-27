@@ -16,6 +16,9 @@ const ACTION_TONE: Record<string, "green" | "blue" | "red" | "amber"> = {
   update: "blue",
   delete: "red",
   "reset-password": "amber",
+  "reset-otp": "amber",
+  "otp-enable": "green",
+  "otp-disable": "amber",
 };
 
 /** Mục có trang sửa riêng theo id (app/(dashboard)/<mục>/[id]) — chỉ những mục này mới có link "Mở bản ghi này". */
@@ -117,7 +120,13 @@ export default async function ActivityPage({ searchParams }: PageProps<"/activit
                           ? "Đã xoá bản ghi này."
                           : entry.action === "reset-password"
                             ? "Đã đặt mật khẩu mới (không lưu mật khẩu trong lịch sử)."
-                            : "Không có trường nào thay đổi."}
+                            : entry.action === "reset-otp"
+                              ? "Đã tắt xác thực 2 lớp của nhân viên (mất điện thoại) — nhân viên tự bật lại sau khi đăng nhập."
+                              : entry.action === "otp-enable"
+                                ? "Đã bật xác thực 2 lớp (mã OTP từ app trên điện thoại)."
+                                : entry.action === "otp-disable"
+                                  ? "Đã tắt xác thực 2 lớp."
+                                  : "Không có trường nào thay đổi."}
                       </p>
                     ) : (
                       <table className="w-full text-sm">

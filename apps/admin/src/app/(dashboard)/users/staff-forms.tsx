@@ -5,7 +5,8 @@ import { STAFF_PERMISSIONS, STAFF_PERMISSION_LABELS, type StaffPermission } from
 import { SubmitButton, buttonClass } from "@/components/ui/button";
 import { Field, FormAlert, inputClass } from "@/components/ui/form";
 import { HelpButton, HelpPanel } from "@/components/ui/help";
-import { createStaffAction, resetStaffPasswordAction, setStaffActiveAction, updateStaffPermissionsAction } from "./actions";
+import { createStaffAction, resetStaffOtpAction, resetStaffPasswordAction, setStaffActiveAction, updateStaffPermissionsAction } from "./actions";
+import { withOtpRetry } from "@/lib/otp-step-up";
 
 export const PASSWORD_MIN_LENGTH = 8;
 
@@ -77,7 +78,7 @@ export function EditPermissionsForm({ id, name, permissions }: { id: string; nam
   const [open, setOpen] = useState(false);
   // Lưu xong thì đóng bảng quyền ngay trong action (không dùng effect).
   const [state, formAction] = useActionState(async (prev: Awaited<ReturnType<typeof updateStaffPermissionsAction>> | undefined, formData: FormData) => {
-    const result = await updateStaffPermissionsAction(id, prev, formData);
+    const result = await withOtpRetry(updateStaffPermissionsAction)(id, prev, formData);
     if (result.success) setOpen(false);
     return result;
   }, undefined);
@@ -125,7 +126,7 @@ export function EditPermissionsForm({ id, name, permissions }: { id: string; nam
 }
 
 export function CreateStaffForm() {
-  const [state, formAction] = useActionState(createStaffAction, undefined);
+  const [state, formAction] = useActionState(withOtpRetry(createStaffAction), undefined);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -162,7 +163,7 @@ export function ToggleActiveButton({ id, isActive }: { id: string; isActive: boo
         disabled={isPending}
         onClick={() =>
           startTransition(async () => {
-            const result = await setStaffActiveAction(id, !isActive);
+            const result = await withOtpRetry(setStaffActiveAction)(id, !isActive);
             setError(result.error ?? null);
           })
         }
@@ -177,7 +178,7 @@ export function ToggleActiveButton({ id, isActive }: { id: string; isActive: boo
 
 export function ResetPasswordForm({ id }: { id: string }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction] = useActionState(resetStaffPasswordAction.bind(null, id), undefined);
+  const [state, formAction] = useActionState(withOtpRetry(resetStaffPasswordAction.bind(null, id)), undefined);
 
   if (!open) {
     return (
@@ -207,5 +208,28 @@ export function ResetPasswordForm({ id }: { id: string }) {
       </div>
       <FormAlert state={state} />
     </form>
+  );
+}
+
+/** Nhân viên mất điện thoại: tắt OTP giúp (nhân viên đăng nhập bằng mật khẩu rồi tự bật lại). */
+export function ResetStaffOtpButton({ id, name }: { id: string; name: string }) {
+  const [isPending, startTransition] = useTransition();
+  const [message, setMessage] = useState<{ error?: string; success?: string } | null>(null);
+
+  return (
+    <span className="inline-flex flex-col items-end gap-1">
+      <button
+        type="button"
+        disabled={isPending}
+        onClick={() => {
+          if (!window.confirm(`Tắt xác thực 2 lớp của "${name}"? Chỉ làm khi nhân viên mất điện thoại — họ đăng nhập bằng mật khẩu rồi tự bật lại.`)) return;
+          startTransition(async () => setMessage(await withOtpRetry(resetStaffOtpAction)(id)));
+        }}
+        className={buttonClass("ghost", "sm")}
+      >
+        Tắt OTP
+      </button>
+      {message?.error ? <span className="text-xs font-semibold text-accent-700">{message.error}</span> : null}
+    </span>
   );
 }

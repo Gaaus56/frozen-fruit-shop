@@ -16,6 +16,7 @@ import { iso, normalizePhone, toPublicUrl } from '../common/utils.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RealtimeService } from '../realtime/realtime.module.js';
 import type { AdminOrderQuery, CreateOrderDto, LookupOrderQuery, UpdateOrderDto } from './orders.dto.js';
+import { buildOrdersWorkbook } from './orders-export.js';
 
 /** Trạng thái được phép chuyển tới từ mỗi trạng thái — tránh nhảy lùi hoặc sửa đơn đã kết thúc. */
 const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -145,7 +146,7 @@ export class OrdersService {
       customerEmail: dto.customerEmail || null,
       shippingAddress: dto.shippingAddress,
       customerNote: dto.customerNote ?? '',
-      paymentMethod: dto.paymentMethod,
+      paymentMethod: 'cod' as const,
       subtotal: quote.subtotal,
       total: quote.subtotal,
       items: {
@@ -214,9 +215,10 @@ export class OrdersService {
 
   // ─────────── Trang quản trị ───────────
 
-  async list(query: AdminOrderQuery): Promise<Paginated<Order>> {
+  /** Bộ lọc dùng chung cho danh sách đơn và file Excel (trạng thái, ô tìm, khoảng ngày). */
+  private adminWhere(query: AdminOrderQuery): Prisma.OrderWhereInput {
     const q = query.q?.trim();
-    const where: Prisma.OrderWhereInput = {
+    return {
       status: query.status,
       createdAt: query.from || query.to ? { gte: query.from ? new Date(query.from) : undefined, lte: query.to ? new Date(query.to) : undefined } : undefined,
       OR: q
@@ -227,12 +229,22 @@ export class OrdersService {
           ]
         : undefined,
     };
+  }
 
+  async list(query: AdminOrderQuery): Promise<Paginated<Order>> {
+    const where = this.adminWhere(query);
     const [rows, total] = await this.prisma.$transaction([
       this.prisma.order.findMany({ where, include, orderBy: { createdAt: 'desc' }, ...paginate(query) }),
       this.prisma.order.count({ where }),
     ]);
     return { items: rows.map(toOrder), total, page: query.page, pageSize: query.pageSize };
+  }
+
+  /** File Excel các đơn khớp bộ lọc đang xem (tối đa 20.000 đơn, mới nhất trước). */
+  async exportExcel(query: AdminOrderQuery): Promise<{ buffer: Buffer; fileName: string }> {
+    const rows = await this.prisma.order.findMany({ where: this.adminWhere(query), include, orderBy: { createdAt: 'desc' }, take: 20_000 });
+    const today = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10);
+    return { buffer: await buildOrdersWorkbook(rows, `Đơn hàng ${today}`), fileName: `don-hang-${today}.xlsx` };
   }
 
   async findById(id: string): Promise<OrderDetail> {

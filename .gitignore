@@ -56,3 +56,12 @@ next-env.d.ts
 
 # Thư mục tạm khi build thử production cạnh dev server (không commit).
 /.buildcheck/
+
+# ── Chỉ giữ trên máy, không đưa lên GitHub (repo chỉ chứa code + README của app) ──
+# Tài liệu dự án, bản thiết kế gốc (ảnh cần dùng đã nằm trong apps/*/public và apps/api/prisma/seed-assets).
+/docs/
+/design/
+# Claude Code: plugin "shop", marketplace, cấu hình & bộ nhớ agent.
+/.claude/
+/.claude-plugin/
+/tools/

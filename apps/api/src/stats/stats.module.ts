@@ -62,7 +62,7 @@ export class StatsService {
     ] = await Promise.all([
       this.prisma.order.findMany({
         where: periodWhere,
-        select: { createdAt: true, total: true, status: true, paymentMethod: true },
+        select: { createdAt: true, total: true, status: true },
       }),
       this.prisma.order.aggregate({
         where: { ...notCancelled, createdAt: { gte: previousFrom, lt: from } },
@@ -115,14 +115,6 @@ export class StatsService {
       }
     }
 
-    const byPayment = new Map<'cod' | 'bank_transfer', { revenue: number; orders: number }>();
-    for (const order of validOrders) {
-      const bucket = byPayment.get(order.paymentMethod) ?? { revenue: 0, orders: 0 };
-      bucket.revenue += order.total;
-      bucket.orders += 1;
-      byPayment.set(order.paymentMethod, bucket);
-    }
-
     const byProduct = new Map<string, { productId: string | null; name: string; quantity: number; revenue: number }>();
     const byCategory = new Map<string, { categoryId: string | null; name: string; quantity: number; revenue: number }>();
     for (const item of items) {
@@ -168,7 +160,6 @@ export class StatsService {
       },
       revenueByDay: [...byDay].map(([date, value]) => ({ date, ...value })),
       ordersByStatus: byStatus.map((row) => ({ status: row.status, count: row._count._all })),
-      revenueByPaymentMethod: [...byPayment].map(([method, value]) => ({ method, ...value })),
       topProducts: [...byProduct.values()].sort((a, b) => b.revenue - a.revenue).slice(0, 8),
       revenueByCategory: [...byCategory.values()].sort((a, b) => b.revenue - a.revenue),
       stockAlerts: stockAlerts.map((variant) => ({

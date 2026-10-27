@@ -58,6 +58,41 @@ export interface AuthUser {
   role: Role;
   /** Quyền của nhân viên; ADMIN trả về đủ mọi quyền. */
   permissions: StaffPermission[];
+  /** Đã bật xác thực 2 lớp (mã OTP từ app Authenticator). */
+  otpEnabled: boolean;
+}
+
+// ───────────── Xác thực 2 lớp (OTP) ─────────────
+
+/** Đăng nhập đúng mật khẩu nhưng tài khoản đã bật OTP → nhập mã 6 số với `otpToken` (hết hạn sau 5 phút). */
+export interface OtpChallenge {
+  otpRequired: true;
+  otpToken: string;
+  expiresAt: string;
+}
+
+/** Mã lỗi (403) khi thao tác nhạy cảm cần nhập lại mã OTP. */
+export const OTP_REQUIRED = "OTP_REQUIRED";
+/** Nhập mã OTP xong được làm thao tác nhạy cảm trong bấy nhiêu phút mà không phải nhập lại. */
+export const OTP_STEP_UP_MINUTES = 10;
+
+export interface OtpStatus {
+  enabled: boolean;
+  enabledAt: string | null;
+  /** Số mã dự phòng chưa dùng. */
+  recoveryCodesLeft: number;
+}
+
+/** Bật OTP bước 1: quét QR (hoặc gõ tay khoá `secret`) trong app Authenticator. */
+export interface OtpSetup {
+  secret: string;
+  uri: string;
+  qrDataUrl: string;
+}
+
+/** Mã dự phòng — chỉ hiện đúng một lần lúc tạo. */
+export interface OtpRecoveryCodes {
+  recoveryCodes: string[];
 }
 
 /** ADMIN có mọi quyền; STAFF chỉ có quyền được admin cấp. */
@@ -272,7 +307,6 @@ export interface SiteSettings {
   taxNote: string;
   marqueeEnabled: boolean;
   marqueeText: string;
-  bankTransferInfo: string;
   productAssurances: ProductAssurance[];
 }
 
@@ -295,7 +329,6 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   taxNote: "Hộ kinh doanh nhóm 1",
   marqueeEnabled: true,
   marqueeText: "",
-  bankTransferInfo: "",
   productAssurances: DEFAULT_PRODUCT_ASSURANCES,
 };
 
@@ -314,7 +347,8 @@ export function formatPhone(phone: string): string {
 // ───────────── Đơn hàng ─────────────
 
 export type OrderStatus = "pending" | "confirmed" | "packing" | "shipping" | "delivered" | "cancelled";
-export type PaymentMethod = "cod" | "bank_transfer";
+/** Cửa hàng chỉ nhận thanh toán khi giao hàng (đã bỏ chuyển khoản). */
+export type PaymentMethod = "cod";
 export type PaymentStatus = "unpaid" | "paid" | "refunded";
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
@@ -328,8 +362,12 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   cod: "Thanh toán khi nhận hàng (COD)",
-  bank_transfer: "Chuyển khoản ngân hàng",
 };
+
+/** Nhãn hình thức thanh toán; giá trị cũ không còn (bill "bank_transfer" lưu trên máy khách) → COD, khớp database đã đổi. */
+export function paymentMethodLabel(method: string): string {
+  return PAYMENT_METHOD_LABELS[method as PaymentMethod] ?? PAYMENT_METHOD_LABELS.cod;
+}
 
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
   unpaid: "Chưa thanh toán",
@@ -491,7 +529,6 @@ export interface DashboardStats {
   };
   revenueByDay: { date: string; revenue: number; orders: number }[];
   ordersByStatus: { status: OrderStatus; count: number }[];
-  revenueByPaymentMethod: { method: PaymentMethod; revenue: number; orders: number }[];
   topProducts: { productId: string | null; name: string; quantity: number; revenue: number }[];
   revenueByCategory: { categoryId: string | null; name: string; revenue: number; quantity: number }[];
   stockAlerts: { productId: string; productName: string; packageSize: string; stockStatus: StockStatus }[];
@@ -692,7 +729,7 @@ export const EDIT_KINDS = [
 export type EditKind = (typeof EDIT_KINDS)[number];
 
 /** Mục trong trang "Thông tin cửa hàng" (id của khung trên trang admin, để nhảy thẳng tới). */
-export const SETTINGS_SECTIONS = ["brand", "contact", "address", "assurances", "payment"] as const;
+export const SETTINGS_SECTIONS = ["brand", "contact", "address", "assurances", "legal"] as const;
 export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
 
 /** Thông điệp qua lại giữa trang admin và web trong khung xem trước (window.postMessage). */
@@ -747,7 +784,7 @@ export interface AuditLogEntry {
   userName: string;
   userEmail: string;
   userRole: Role;
-  /** create | update | delete | reset-password */
+  /** create | update | delete | reset-password | reset-otp | otp-enable | otp-disable */
   action: string;
   /** Mục bị sửa (đoạn đường dẫn sau /admin/): products, orders, settings… */
   resource: string;

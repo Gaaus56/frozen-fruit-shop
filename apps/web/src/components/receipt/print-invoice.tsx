@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, formatPhone } from "@frozen-fruit-shop/types";
+import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, formatPhone, paymentMethodLabel } from "@frozen-fruit-shop/types";
 import { formatCurrency } from "@/lib/format";
 import { formatDateTime } from "@/lib/receipt-content";
 import type { SavedReceipt } from "@/lib/saved-receipts";
@@ -49,7 +49,7 @@ export function PrintInvoice({ receipt }: { receipt: SavedReceipt }) {
         </div>
         <div>
           <p className="pi-label">Thanh toán</p>
-          <p className="pi-strong">{PAYMENT_METHOD_LABELS[order.paymentMethod]}</p>
+          <p className="pi-strong">{paymentMethodLabel(order.paymentMethod)}</p>
           <p>Tình trạng thanh toán: {PAYMENT_STATUS_LABELS[order.paymentStatus]}</p>
           <p>Trạng thái đơn: {ORDER_STATUS_LABELS[order.status]}</p>
         </div>

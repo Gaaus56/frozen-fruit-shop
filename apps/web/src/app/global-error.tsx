@@ -1,7 +1,14 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
+
 /** Lỗi ngay ở layout gốc (hiếm): thay cả trang nên tự có <html>/<body> và kiểu viết thẳng. */
 export default function GlobalError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <html lang="vi">
       <body style={{ margin: 0, minHeight: "100vh", display: "grid", placeItems: "center", fontFamily: "system-ui, sans-serif", background: "#eef2f6", color: "#201e1d" }}>

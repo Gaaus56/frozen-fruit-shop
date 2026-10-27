@@ -1,4 +1,4 @@
-import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, formatPhone } from "@frozen-fruit-shop/types";
+import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, formatPhone, paymentMethodLabel } from "@frozen-fruit-shop/types";
 import { formatCurrency } from "@/lib/format";
 import type { SavedReceipt } from "@/lib/saved-receipts";
 
@@ -36,7 +36,7 @@ export function receiptContent({ order, store, phone }: SavedReceipt): ReceiptCo
       { label: "Khách hàng", value: order.customerName },
       { label: "Điện thoại", value: formatPhone(phone) },
       { label: "Giao đến", value: order.shippingAddress },
-      { label: "Thanh toán", value: `${PAYMENT_METHOD_LABELS[order.paymentMethod]} · ${PAYMENT_STATUS_LABELS[order.paymentStatus]}` },
+      { label: "Thanh toán", value: `${paymentMethodLabel(order.paymentMethod)} · ${PAYMENT_STATUS_LABELS[order.paymentStatus]}` },
       { label: "Trạng thái", value: ORDER_STATUS_LABELS[order.status] },
     ],
     items: order.items.map((item) => ({

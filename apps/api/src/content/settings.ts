@@ -11,7 +11,7 @@ import {
   type ProductAssurance,
   type SiteSettings,
 } from '@frozen-fruit-shop/types';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, RequireOtp } from '../auth/auth.guard.js';
 import { Trim } from '../common/validators.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RevalidateService } from '../revalidate/revalidate.service.js';
@@ -45,7 +45,6 @@ export class UpdateSettingsDto implements SiteSettings {
   @Trim() @IsString() @MaxLength(100) taxNote!: string;
   @IsOptional() @IsBoolean() marqueeEnabled!: boolean;
   @IsOptional() @Trim() @IsString() @MaxLength(500) marqueeText!: string;
-  @IsOptional() @IsString() @MaxLength(2000) bankTransferInfo!: string;
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(MAX_PRODUCT_ASSURANCES)
@@ -76,7 +75,6 @@ export class SettingsService {
       ...dto,
       marqueeEnabled: dto.marqueeEnabled ?? true,
       marqueeText: dto.marqueeText ?? '',
-      bankTransferInfo: dto.bankTransferInfo ?? '',
       // Ô để trống tiêu đề = bỏ thẻ đó. Không gửi trường này thì giữ nguyên giá trị cũ.
       productAssurances: dto.productAssurances
         ? (dto.productAssurances.filter((item) => item.title) as unknown as Prisma.InputJsonValue)
@@ -110,6 +108,8 @@ export class AdminSettingsController {
 
   @Put()
   @Auth('ADMIN')
+  // Đổi hotline / số Zalo / Facebook là cách kẻ gian dễ lừa khách nhất → cần nhập lại mã OTP.
+  @RequireOtp()
   update(@Body() dto: UpdateSettingsDto) {
     return this.service.update(dto);
   }

@@ -57,3 +57,9 @@ export async function deleteStaffAction(id: string) {
   revalidatePath("/users");
   return result;
 }
+
+export async function resetStaffOtpAction(id: string) {
+  const result = await runAction(() => api(`/admin/users/${id}/reset-otp`, { method: "POST" }), "Đã tắt xác thực 2 lớp của nhân viên.");
+  revalidatePath("/users");
+  return result;
+}

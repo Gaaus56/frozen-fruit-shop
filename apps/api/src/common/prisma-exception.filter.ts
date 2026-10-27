@@ -1,5 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import * as Sentry from '@sentry/nestjs';
 import type { Response } from 'express';
 
 /**
@@ -22,6 +23,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
     const mapped = map[exception.code];
     if (!mapped) {
       this.logger.error(exception.message);
+      Sentry.captureException(exception); // lỗi DB lạ (không phải trùng / không tìm thấy) → báo Sentry
       response.status(500).json({ statusCode: 500, message: 'Lỗi hệ thống, vui lòng thử lại sau.' });
       return;
     }

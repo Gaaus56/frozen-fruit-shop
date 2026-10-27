@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { requestOtp } from "@/lib/otp-step-up";
 import { buttonClass } from "./button";
 
 /** Nút xoá có hộp xác nhận; hiển thị lỗi từ API (ví dụ danh mục còn sản phẩm) ngay cạnh nút. */
@@ -10,7 +11,7 @@ export function DeleteButton({
   confirmText,
   label = "Xoá",
 }: {
-  action: () => Promise<{ error?: string } | void>;
+  action: () => Promise<{ error?: string; otpRequired?: boolean } | void>;
   itemLabel: string;
   confirmText?: string;
   label?: string;
@@ -22,7 +23,9 @@ export function DeleteButton({
     if (!window.confirm(confirmText ?? `Xoá "${itemLabel}"? Thao tác này không thể hoàn tác.`)) return;
     setError(null);
     startTransition(async () => {
-      const result = await action();
+      let result = await action();
+      // Xoá cần nhập lại mã OTP (vd. xoá tài khoản nhân viên): hỏi mã rồi xoá lại.
+      if (result && result.otpRequired) result = (await requestOtp()) ? await action() : { error: "Đã huỷ — cần nhập mã OTP để xoá." };
       if (result && result.error) setError(result.error);
     });
   }

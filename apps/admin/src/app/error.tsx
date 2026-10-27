@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 import { buttonClass, LinkButton } from "@/components/ui/button";
 import { STATUS_ICONS, StatusPage } from "@/components/ui/status-page";
@@ -8,6 +9,7 @@ import { STATUS_ICONS, StatusPage } from "@/components/ui/status-page";
 export default function RootError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   useEffect(() => {
     console.error(error);
+    Sentry.captureException(error); // trang lỗi giữ lỗi lại nên phải tự gửi Sentry
   }, [error]);
 
   return (

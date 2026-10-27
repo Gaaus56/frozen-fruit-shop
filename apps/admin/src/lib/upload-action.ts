@@ -4,7 +4,7 @@ import { api } from "./api";
 
 export type UploadResult = { url: string } | { error: string };
 
-/** Nhận file ảnh từ trình duyệt rồi chuyển tiếp lên API (kèm token). Giới hạn dung lượng: 5MB. */
+/** Nhận file ảnh (trình duyệt đã thu nhỏ) rồi chuyển tiếp lên API (kèm token). Giới hạn dung lượng: 5MB. */
 export async function uploadImageAction(formData: FormData): Promise<UploadResult> {
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) return { error: "Chưa chọn file ảnh." };

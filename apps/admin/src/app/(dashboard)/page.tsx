@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import {
   ORDER_STATUS_LABELS,
-  PAYMENT_METHOD_LABELS,
   STOCK_STATUS_LABELS,
   type DashboardStats,
 } from "@frozen-fruit-shop/types";
@@ -180,16 +179,10 @@ export default async function DashboardPage({ searchParams }: PageProps<"/">) {
             format={formatCurrency}
           />
         </Panel>
-        <Panel title="Đơn hàng theo trạng thái">
+        <Panel title="Đơn hàng theo trạng thái" className="xl:col-span-2">
           <Bars
             rows={stats.ordersByStatus.map((item) => ({ label: ORDER_STATUS_LABELS[item.status], value: item.count }))}
             format={formatNumber}
-          />
-        </Panel>
-        <Panel title="Phương thức thanh toán">
-          <Bars
-            rows={stats.revenueByPaymentMethod.map((item) => ({ label: PAYMENT_METHOD_LABELS[item.method], value: item.revenue, hint: `· ${item.orders} đơn` }))}
-            format={formatCurrency}
           />
         </Panel>
       </div>

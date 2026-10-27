@@ -14,12 +14,13 @@ import { Checkbox, Field, FormAlert, Section, inputClass } from "@/components/ui
 import { LinkPicker } from "../banners/link-picker";
 import type { LinkOptionGroup } from "../banners/link-options";
 import { saveSettingsAction } from "./actions";
+import { withOtpRetry } from "@/lib/otp-step-up";
 import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 const EMPTY_ASSURANCE: ProductAssurance = { icon: ASSURANCE_ICONS[0], title: "", text: "", linkUrl: "" };
 
 export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings; linkGroups: LinkOptionGroup[] }) {
-  const [state, formAction] = useActionState(saveSettingsAction, undefined);
+  const [state, formAction] = useActionState(withOtpRetry(saveSettingsAction), undefined);
   // Luôn hiện đủ số ô; ô trống tiêu đề sẽ bị bỏ khi lưu.
   const assurances = Array.from({ length: MAX_PRODUCT_ASSURANCES }, (_, index) => settings.productAssurances[index] ?? EMPTY_ASSURANCE);
 
@@ -104,10 +105,7 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
         </div>
       </Section>
 
-      <Section id="payment" title="Thanh toán & pháp lý">
-        <Field label="Thông tin chuyển khoản" htmlFor="bankTransferInfo" hint="Hiện cho khách chọn chuyển khoản khi đặt hàng (ngân hàng, số tài khoản, chủ tài khoản, nội dung CK).">
-          <textarea id="bankTransferInfo" name="bankTransferInfo" rows={4} maxLength={2000} defaultValue={settings.bankTransferInfo} className={inputClass} />
-        </Field>
+      <Section id="legal" title="Pháp lý (hiện trên hoá đơn, chân trang)">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Mã số thuế" htmlFor="taxCode">
             <input id="taxCode" name="taxCode" maxLength={30} defaultValue={settings.taxCode} className={inputClass} />

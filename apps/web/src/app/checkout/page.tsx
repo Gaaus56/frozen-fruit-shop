@@ -11,7 +11,6 @@ export default async function CheckoutPage() {
   const settings = await getSettings();
   return (
     <CheckoutForm
-      bankTransferInfo={settings.bankTransferInfo}
       // In lên đầu bill.
       store={{ name: settings.storeName, phone: settings.phone, address: settings.address, taxCode: settings.taxCode }}
     />

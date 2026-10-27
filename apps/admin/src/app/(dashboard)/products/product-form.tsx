@@ -29,7 +29,7 @@ export function ProductForm({ product, categories }: { product?: Product; catego
           </Field>
         </Section>
 
-        <Section title="Hình ảnh" description="Ảnh đầu tiên là ảnh đại diện. JPG, PNG, WEBP · tối đa 5MB/ảnh · tối đa 12 ảnh.">
+        <Section title="Hình ảnh" description="Ảnh đầu tiên là ảnh đại diện. JPG, PNG, WEBP · ảnh lớn tự thu nhỏ và nén · tối đa 12 ảnh.">
           <ImageListUpload name="images" defaultValue={product?.images.map((image) => image.url) ?? []} />
         </Section>
 

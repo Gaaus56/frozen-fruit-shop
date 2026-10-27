@@ -1,4 +1,5 @@
-import { Body, Controller, Get, HttpCode, Module, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Module, Param, Patch, Post, Query, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { Auth, CurrentUser, Permission, type RequestUser } from '../auth/auth.guard.js';
 import { RateLimit } from '../common/rate-limit.guard.js';
 import { AdminOrderQuery, CreateOrderDto, LookupOrderQuery, QuoteDto, UpdateOrderDto } from './orders.dto.js';
@@ -37,6 +38,20 @@ export class AdminOrdersController {
   @Get()
   list(@Query() query: AdminOrderQuery) {
     return this.service.list(query);
+  }
+
+  /** Tải file Excel theo bộ lọc đang xem. Đặt trước ':id' để "export" không bị hiểu là mã đơn. */
+  @Get('export')
+  @RateLimit(10, 60)
+  async export(@Query() query: AdminOrderQuery, @Res() res: Response) {
+    const { buffer, fileName } = await this.service.exportExcel(query);
+    res
+      .set({
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+        'Cache-Control': 'no-store',
+      })
+      .send(buffer);
   }
 
   @Get(':id')

@@ -32,6 +32,16 @@ model User {
   lastLoginAt       DateTime?
   /// Mọi access token phát hành trước mốc này bị coi là hết hiệu lực (đổi/đặt lại mật khẩu).
   passwordChangedAt DateTime  @default(now())
+  /// OTP (TOTP — app Google / Microsoft Authenticator). Khoá bí mật lưu đã mã hoá AES-256-GCM (src/auth/otp.ts).
+  otpSecret         String?
+  /// Khoá đang chờ xác nhận khi bật OTP (quét QR xong, chưa nhập đúng mã).
+  otpPendingSecret  String?
+  /// null = chưa bật OTP.
+  otpEnabledAt      DateTime?
+  /// Bước thời gian (30 giây) của mã OTP dùng gần nhất — chặn dùng lại cùng một mã.
+  otpLastTimeStep   Int?
+  /// Mã dự phòng khi mất điện thoại: lưu SHA-256, mỗi mã dùng một lần.
+  otpRecoveryCodes  String[]  @default([])
 
   orderLogs OrderStatusLog[]
   auditLogs AuditLog[]
@@ -141,9 +151,9 @@ enum OrderStatus {
   cancelled // đã huỷ
 }
 
+/// Cửa hàng chỉ nhận thanh toán khi giao hàng (COD). Giữ enum để sau này thêm thanh toán online.
 enum PaymentMethod {
   cod
-  bank_transfer
 }
 
 enum PaymentStatus {
@@ -334,8 +344,6 @@ model SiteSetting {
   /// Bật/tắt dải chữ chạy đỏ ở đầu trang web.
   marqueeEnabled  Boolean  @default(true)
   marqueeText     String   @default("")
-  /// Hướng dẫn chuyển khoản hiển thị ở trang thanh toán (số tài khoản, ngân hàng, nội dung CK).
-  bankTransferInfo String  @default("")
   /// Thẻ cam kết dưới nút mua ở trang sản phẩm: [{ icon, title, text, linkUrl }]. null = chưa chỉnh → dùng mặc định.
   productAssurances Json?
   updatedAt       DateTime @updatedAt

@@ -10,7 +10,7 @@ import { copyFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { Prisma, PrismaClient, type OrderStatus, type PaymentMethod, type PaymentStatus } from '@prisma/client';
+import { Prisma, PrismaClient, type OrderStatus, type PaymentStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { DEFAULT_SITE_SETTINGS, STAFF_PERMISSIONS } from '@frozen-fruit-shop/types';
 
@@ -350,7 +350,6 @@ interface OrderSeed {
   /** Dòng hàng của sản phẩm đã bị xoá: chỉ còn bản chụp. */
   deletedItems?: { productName: string; packageSize: string; unitPrice: number; quantity: number }[];
   status: OrderStatus;
-  paymentMethod?: PaymentMethod;
   paymentStatus?: PaymentStatus;
   shippingFee?: number;
   discount?: number;
@@ -401,7 +400,6 @@ async function createOrder(seed: OrderSeed, variants: VariantMap, users: { admin
       customerEmail: seed.email ?? null,
       shippingAddress: address,
       customerNote: seed.note ?? '',
-      paymentMethod: seed.paymentMethod ?? 'cod',
       paymentStatus: seed.paymentStatus ?? (seed.status === 'delivered' ? 'paid' : 'unpaid'),
       status: seed.status,
       subtotal,
@@ -424,13 +422,13 @@ async function seedOrders(variants: VariantMap, users: { admin: { id: string }; 
   const fixed: OrderSeed[] = [
     { suffix: 'TSTA', createdAt: daysAgo(0, 9), customer: tester, status: 'pending', email: 'khach@test.vn',
       note: 'Giao giờ hành chính, gọi trước 15 phút.', items: [{ key: 'P1:500g', quantity: 2 }, { key: 'P3:1kg', quantity: 1 }] },
-    { suffix: 'TSTB', createdAt: daysAgo(1), customer: tester, status: 'confirmed', paymentMethod: 'bank_transfer',
+    { suffix: 'TSTB', createdAt: daysAgo(1), customer: tester, status: 'confirmed',
       shippingFee: 30_000, items: [{ key: 'P6:1kg', quantity: 2 }] },
     { suffix: 'TSTC', createdAt: daysAgo(2), customer: tester, status: 'packing', shippingFee: 25_000,
       items: [{ key: 'P7:500g', quantity: 1 }, { key: 'P9:250g', quantity: 2 }] },
     { suffix: 'TSTD', createdAt: daysAgo(3), customer: tester, status: 'shipping', shippingFee: 25_000,
       internalNote: 'Mã vận đơn GHN: GHN123456', items: [{ key: 'P1:1kg', quantity: 1 }] },
-    { suffix: 'TSTE', createdAt: daysAgo(5), customer: tester, status: 'delivered', paymentMethod: 'bank_transfer',
+    { suffix: 'TSTE', createdAt: daysAgo(5), customer: tester, status: 'delivered',
       shippingFee: 25_000, discount: 10_000, items: [{ key: 'P1:500g', quantity: 2 }, { key: 'P6:500g', quantity: 2 }] },
     { suffix: 'TSTF', createdAt: daysAgo(6), customer: tester, status: 'cancelled', shippingFee: 30_000,
       items: [{ key: 'P8:Hộp 500g', quantity: 3 }] },
@@ -461,7 +459,6 @@ async function seedOrders(variants: VariantMap, users: { admin: { id: string }; 
         createdAt: daysAgo(age, random.int(7, 22)),
         customer: random.pick(CUSTOMERS),
         status: roll < 0.12 ? 'cancelled' : 'delivered',
-        paymentMethod: random.next() < 0.35 ? 'bank_transfer' : 'cod',
         shippingFee: random.pick([15_000, 20_000, 25_000, 30_000, 40_000]),
         discount: random.next() < 0.15 ? 10_000 : 0,
         items: merged,
@@ -496,7 +493,6 @@ async function seedContent() {
       productAssurances: undefined, // để NULL → API dùng bộ thẻ cam kết mặc định
       marqueeEnabled: true,
       marqueeText: 'Miễn phí giao hàng nội thành Đà Nẵng cho đơn từ 300.000đ — Hotline 0396 799 579',
-      bankTransferInfo: 'Ngân hàng: Vietcombank\nSố tài khoản: 0123456789 (TÀI KHOẢN TEST)\nChủ tài khoản: NGUYEN VAN A\nNội dung: <mã đơn hàng>',
     },
   });
 
