@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { OrderStatus, Prisma } from '@prisma/client';
 import { randomInt } from 'node:crypto';
 import type {
@@ -279,19 +279,30 @@ export class OrdersService {
       throw new BadRequestException('Giảm giá không được lớn hơn tổng tiền đơn hàng.');
     }
 
-    const updated = await this.prisma.order.update({
-      where: { id },
-      data: {
-        status: dto.status,
-        paymentStatus: dto.paymentStatus,
-        shippingFee,
-        discount,
-        total: order.subtotal + shippingFee - discount,
-        internalNote: dto.internalNote,
-        logs: statusChanged
-          ? { create: { fromStatus: order.status, toStatus: dto.status!, note: dto.note ?? '', changedById: userId } }
-          : undefined,
-      },
+    // Ghi CÓ ĐIỀU KIỆN trạng thái vẫn là trạng thái vừa kiểm tra (optimistic concurrency): nếu hai người cùng
+    // sửa một đơn (vd. một người huỷ, người kia chuyển "đang giao"), người sau không được ghi đè dựa trên
+    // trạng thái cũ — tránh nhảy trạng thái sai bảng TRANSITIONS.
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.order.updateMany({
+        where: { id, status: order.status },
+        data: {
+          status: dto.status,
+          paymentStatus: dto.paymentStatus,
+          shippingFee,
+          discount,
+          total: order.subtotal + shippingFee - discount,
+          internalNote: dto.internalNote,
+        },
+      });
+      if (count === 0) {
+        throw new ConflictException('Đơn hàng vừa được người khác cập nhật, vui lòng tải lại rồi thử lại.');
+      }
+      if (statusChanged) {
+        await tx.orderStatusLog.create({
+          data: { orderId: id, fromStatus: order.status, toStatus: dto.status!, note: dto.note ?? '', changedById: userId },
+        });
+      }
+      return tx.order.findUniqueOrThrow({ where: { id } });
     });
     this.realtime.publishAdmin({ type: 'order.updated', id, orderNumber: updated.orderNumber, status: updated.status });
     return this.findById(id);
