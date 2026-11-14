@@ -1,63 +1,19 @@
-"use client";
+import type { Metadata } from "next";
+import { OrderLookup } from "@/components/order/order-lookup";
+import { getSettings } from "@/lib/api";
 
-import { useState, type FormEvent } from "react";
-import { Container } from "@/components/ui/container";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { Button } from "@/components/ui/button";
+export const metadata: Metadata = {
+  title: "Tra cứu đơn hàng",
+  description: "Tra cứu tình trạng đơn hàng và xem lại bill đã lưu trên máy.",
+  robots: { index: false },
+};
 
-export default function OrderLookupPage() {
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    // TODO: gọi API tra cứu đơn hàng thật khi tích hợp backend.
-    setIsSubmitted(true);
-  }
-
+export default async function OrderLookupPage() {
+  const settings = await getSettings();
   return (
-    <Container className="py-12">
-      <SectionHeading
-        eyebrow="Hỗ trợ"
-        title="Tra cứu đơn hàng"
-        description="Nhập mã đơn hàng và số điện thoại đã đặt để kiểm tra trạng thái đơn."
-      />
-
-      <form onSubmit={handleSubmit} className="mt-8 flex max-w-md flex-col gap-4">
-        <div>
-          <label htmlFor="orderCode" className="text-sm font-medium text-foreground/85">
-            Mã đơn hàng
-          </label>
-          <input
-            id="orderCode"
-            name="orderCode"
-            type="text"
-            required
-            className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
-          />
-        </div>
-        <div>
-          <label htmlFor="phone" className="text-sm font-medium text-foreground/85">
-            Số điện thoại
-          </label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            required
-            className="mt-1 w-full rounded-none border border-divider px-3 py-2 text-sm focus:border-accent-500 focus:outline-none"
-          />
-        </div>
-        <Button type="submit" className="w-fit">
-          Tra cứu
-        </Button>
-      </form>
-
-      {isSubmitted ? (
-        <p className="mt-6 max-w-md text-sm text-foreground/70">
-          Tính năng tra cứu đơn hàng đang được hoàn thiện cùng với hệ thống xử lý đơn hàng. Vui lòng
-          liên hệ hotline để được hỗ trợ trong lúc chờ.
-        </p>
-      ) : null}
-    </Container>
+    <OrderLookup
+      // In lên đầu bill khi khách bấm «Xuất bill».
+      store={{ name: settings.storeName, phone: settings.phone, address: settings.address, taxCode: settings.taxCode }}
+    />
   );
 }

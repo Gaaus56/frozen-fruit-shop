@@ -1,58 +1,34 @@
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-import { apiMutate } from '@/lib/api';
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { api, runAction, type ActionState } from "@/lib/api";
+import { checked, int, text } from "@/lib/format";
 
-export interface CategoryFormState {
-  error?: string;
-}
-
-function buildPayload(formData: FormData) {
+function payload(formData: FormData) {
   return {
-    slug: String(formData.get('slug') ?? '').trim(),
-    name: String(formData.get('name') ?? '').trim(),
-    image: String(formData.get('image') ?? '').trim(),
-    description: String(formData.get('description') ?? '').trim(),
+    name: text(formData, "name"),
+    slug: text(formData, "slug") || undefined,
+    description: text(formData, "description"),
+    image: text(formData, "image") || null,
+    sortOrder: int(formData, "sortOrder") ?? 0,
+    isActive: checked(formData, "isActive"),
   };
 }
 
-export async function createCategoryAction(
-  _prevState: CategoryFormState | undefined,
-  formData: FormData,
-): Promise<CategoryFormState> {
-  try {
-    await apiMutate('/categories', {
-      method: 'POST',
-      body: JSON.stringify(buildPayload(formData)),
-    });
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Có lỗi xảy ra, vui lòng thử lại.' };
-  }
-
-  revalidatePath('/categories');
-  redirect('/categories');
+export async function saveCategoryAction(id: string | null, _prev: ActionState | undefined, formData: FormData): Promise<ActionState> {
+  const result = await runAction(() =>
+    id
+      ? api(`/admin/categories/${id}`, { method: "PATCH", json: payload(formData) })
+      : api("/admin/categories", { method: "POST", json: payload(formData) }),
+  );
+  if (result.error) return result;
+  revalidatePath("/categories");
+  redirect("/categories");
 }
 
-export async function updateCategoryAction(
-  slug: string,
-  _prevState: CategoryFormState | undefined,
-  formData: FormData,
-): Promise<CategoryFormState> {
-  try {
-    await apiMutate(`/categories/${slug}`, {
-      method: 'PATCH',
-      body: JSON.stringify(buildPayload(formData)),
-    });
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Có lỗi xảy ra, vui lòng thử lại.' };
-  }
-
-  revalidatePath('/categories');
-  redirect('/categories');
-}
-
-export async function deleteCategoryAction(slug: string) {
-  await apiMutate(`/categories/${slug}`, { method: 'DELETE' });
-  revalidatePath('/categories');
+export async function deleteCategoryAction(id: string) {
+  const result = await runAction(() => api(`/admin/categories/${id}`, { method: "DELETE" }));
+  revalidatePath("/categories");
+  return result;
 }

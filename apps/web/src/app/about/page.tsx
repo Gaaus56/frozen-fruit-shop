@@ -1,62 +1,51 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { business } from "@/data/business";
+import { PageHero } from "@/components/ui/page-hero";
+import { RichContent } from "@/components/ui/rich-content";
+import { getBanners, getPage, getSettings } from "@/lib/api";
+import { editTarget } from "@/lib/edit-target";
 
-export const metadata: Metadata = {
-  title: "Giới thiệu",
-  description: `Câu chuyện thương hiệu, tiêu chuẩn chất lượng và quy trình cấp đông của ${business.name}.`,
-};
+/** Ảnh nền khi admin chưa tạo banner nào cho trang Giới thiệu. */
+const FALLBACK_BANNER = "/images/banners/banner_v3.jpg";
 
-const STANDARDS = [
-  {
-    title: "Nguồn nguyên liệu chuẩn VietGAP",
-    description: "Trái cây được thu mua từ các vùng trồng đạt chuẩn VietGAP, kiểm soát chặt chẽ từ khâu canh tác.",
-  },
-  {
-    title: "Cấp đông nhanh (IQF)",
-    description: "Trái cây được cấp đông nhanh ở nhiệt độ -35°C ngay sau sơ chế, giữ trọn cấu trúc và dinh dưỡng.",
-  },
-  {
-    title: "Đóng gói hút chân không",
-    description: "Hạn chế oxy hóa, giữ hương vị tươi ngon trong suốt thời gian bảo quản.",
-  },
-  {
-    title: "Không chất bảo quản",
-    description: "Sản phẩm hoàn toàn tự nhiên, không sử dụng chất bảo quản hay phụ gia.",
-  },
-];
+/** Nội dung trang do admin sửa ở "Trang Giới thiệu"; API trả nội dung mặc định khi chưa sửa lần nào. */
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage("about");
+  return {
+    title: "Giới thiệu",
+    description: page?.description || "Câu chuyện thương hiệu, tiêu chuẩn chất lượng và quy trình cấp đông trái cây.",
+  };
+}
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [page, settings, banners] = await Promise.all([getPage("about"), getSettings(), getBanners("about")]);
+  const banner = banners[0];
+  // Chữ đặt trên banner (nếu có) thay cho tiêu đề / mô tả của "Trang Giới thiệu".
+  const title = banner?.title || page?.title || `Về ${settings.storeName}`;
+  const description = banner?.description || page?.description || undefined;
+
   return (
-    <Container className="py-12">
-      <SectionHeading
+    <>
+      <PageHero
+        edit={
+          banner
+            ? editTarget("banner", banner.id, "Banner đầu trang Giới thiệu")
+            : editTarget("bannerNew", "about", "Banner đầu trang Giới thiệu (chưa có — tạo mới)")
+        }
+        image={banner?.image ?? FALLBACK_BANNER}
         eyebrow="Giới thiệu"
-        title={`Về ${business.name}`}
-        description="Chúng tôi mang đến trái cây đông lạnh chất lượng, tiện lợi cho mọi gia đình và đối tác F&B."
+        title={title}
+        description={description}
       />
 
-      <div className="mt-8 max-w-3xl space-y-4 text-foreground/70">
-        <p>
-          {business.name} ra đời với sứ mệnh mang đến nguồn trái cây đông lạnh chất lượng cao, được
-          cấp đông ngay sau thu hoạch để giữ trọn hương vị và dinh dưỡng tự nhiên. Chúng tôi tin rằng
-          trái cây đông lạnh không chỉ tiện lợi mà còn có thể ngon và bổ dưỡng không kém trái cây tươi.
-        </p>
-        <p>
-          Với quy trình sơ chế, cấp đông và đóng gói khép kín, sản phẩm của chúng tôi phù hợp cho cả
-          nhu cầu sử dụng hàng ngày của gia đình lẫn nhu cầu kinh doanh của các quán cà phê, nhà hàng
-          cần nguồn nguyên liệu ổn định quanh năm.
-        </p>
-      </div>
-
-      <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-        {STANDARDS.map((item) => (
-          <div key={item.title} className="rounded-none border border-divider p-6">
-            <p className="font-semibold text-foreground">{item.title}</p>
-            <p className="mt-2 text-sm text-foreground/70">{item.description}</p>
+      {page?.content ? (
+        <Container className="pb-12 pt-8">
+          {/* Khung trắng bo góc giống các khối ở trang chủ (SectionCard). */}
+          <div {...editTarget("page", "about", "Nội dung trang Giới thiệu")} className="rounded-2xl border border-divider bg-card px-4 py-6 shadow-sm sm:px-10 sm:py-10">
+            <RichContent html={page.content} className="max-w-3xl" />
           </div>
-        ))}
-      </div>
-    </Container>
+        </Container>
+      ) : null}
+    </>
   );
 }

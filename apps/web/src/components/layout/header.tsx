@@ -3,20 +3,29 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { categories } from "@frozen-fruit-shop/fixtures";
+import {
+  POST_TYPES,
+  POST_TYPE_LABELS,
+  POST_TYPE_SLUGS,
+  formatPhone,
+  type Category,
+  type SiteSettings,
+} from "@frozen-fruit-shop/types";
 import { Container } from "@/components/ui/container";
 import { useCart } from "@/lib/cart-context";
-import { business } from "@/data/business";
 import { LogoBadge } from "./logo-badge";
+import { editSettings } from "@/lib/edit-target";
 
 const NAV_LINKS = [
   { href: "/", label: "Trang chủ" },
   { href: "/products", label: "Sản phẩm" },
   { href: "/about", label: "Giới thiệu" },
-  { href: "/wholesale", label: "Đặt hàng sỉ" },
   { href: "/news", label: "Tin tức" },
   { href: "/contact", label: "Liên hệ" },
 ];
+
+/** Menu con của mục Tin tức: hai loại bài viết. */
+const NEWS_LINKS = POST_TYPES.map((type) => ({ href: `/news?type=${POST_TYPE_SLUGS[type]}`, label: POST_TYPE_LABELS[type] }));
 
 const FEATURES = [
   {
@@ -41,7 +50,12 @@ const FEATURES = [
   },
 ];
 
-export function Header() {
+interface HeaderProps {
+  settings: SiteSettings;
+  categories: Category[];
+}
+
+export function Header({ settings, categories }: HeaderProps) {
   const { totalQuantity } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownSuppressed, setIsDropdownSuppressed] = useState(false);
@@ -94,16 +108,24 @@ export function Header() {
 
   return (
     <>
-      <div className="overflow-hidden bg-accent-700 text-white">
-        <div className="marquee py-2 text-[13px] font-semibold">
-          <span className="marquee-track">
-            Chào mừng bạn đến với {business.name} — Trái cây đông lạnh cấp đông nhanh, không chất bảo quản —
-            Hotline {business.hotlineHours}: {business.phoneDisplay} — {business.addressLandmark}, {business.address}
-          </span>
-        </div>
-      </div>
+      {settings.marqueeEnabled ? (
+        <aside {...editSettings("brand", "Dải chữ chạy đầu trang")} aria-label="Thông báo của cửa hàng" className="overflow-hidden bg-accent-700 text-white">
+          <div className="marquee py-2 text-[13px] font-semibold">
+            <span className="marquee-track">
+              {settings.marqueeText ||
+                [
+                  `Chào mừng bạn đến với ${settings.storeName}`,
+                  `Hotline ${settings.hotlineHours}: ${formatPhone(settings.phone)}`,
+                  [settings.addressLandmark, settings.address].filter(Boolean).join(", "),
+                ]
+                  .filter(Boolean)
+                  .join(" — ")}
+            </span>
+          </div>
+        </aside>
+      ) : null}
 
-      <div className="relative h-0 bg-background lg:h-auto">
+      <div role="region" aria-label="Cam kết của cửa hàng" className="relative h-0 bg-card lg:h-auto">
         <Container className="hidden h-16 items-center gap-6 lg:flex lg:pl-52">
           <ul className="hidden flex-1 items-center lg:flex">
             {FEATURES.map((feature, index) => (
@@ -135,18 +157,18 @@ export function Header() {
 
         <Link
           href="/"
-          aria-label={`${business.name} — Trang chủ`}
+          aria-label={`${settings.storeName} — Trang chủ`}
           className="absolute left-3 top-0 z-50 flex h-[5.75rem] w-20 justify-center rounded-b-full bg-[#1f6b3f] pt-2 shadow-xl lg:left-8 lg:h-[9.5rem] lg:w-36 lg:pt-3"
         >
           <span className="logo-shine relative block h-16 w-16 overflow-hidden rounded-full ring-2 ring-white lg:h-28 lg:w-28 lg:ring-4">
-            <LogoBadge className="h-full w-full" />
+            <LogoBadge className="h-full w-full" label={`Logo ${settings.storeName}`} />
           </span>
         </Link>
       </div>
 
       <header
-        className={`sticky top-0 z-40 border-b border-divider backdrop-blur transition-shadow duration-300 ${
-          isScrolled ? "bg-background shadow-lg shadow-black/15" : "bg-background/95"
+        className={`sticky top-0 z-40 border-b border-divider bg-card transition-shadow duration-300 ${
+          isScrolled ? "shadow-lg shadow-black/15" : ""
         }`}
       >
         <Container
@@ -157,7 +179,7 @@ export function Header() {
           <div className={`min-w-0 leading-tight lg:hidden ${isScrolled ? "hidden" : "block"}`}>
             <Link
               href="/"
-              aria-label={business.name}
+              aria-label={settings.storeName}
               className="block text-[13px] font-extrabold uppercase leading-tight tracking-tight text-accent-700 max-[340px]:text-[11px] min-[400px]:text-sm min-[440px]:text-base"
             >
               <span className="block">Trái Cây Đông Lạnh</span>
@@ -175,7 +197,7 @@ export function Header() {
             }`}
           >
             <span className="logo-shine relative block h-10 w-10 shrink-0 overflow-hidden rounded-full">
-              <LogoBadge className="h-full w-full" />
+              <LogoBadge className="h-full w-full" label={`Logo ${settings.storeName}`} />
             </span>
             <span className="text-[13px] font-extrabold uppercase leading-tight text-accent-700 sm:whitespace-nowrap sm:text-sm">
               <span className="block sm:inline">Trái Cây Đông Lạnh</span>{" "}
@@ -186,7 +208,13 @@ export function Header() {
           <nav className="hidden items-center gap-8 lg:flex">
             {NAV_LINKS.map((link) => {
               const active = isActive(link.href);
-              const hasDropdown = link.href === "/products";
+              const dropdown =
+                link.href === "/products"
+                  ? categories.map((category) => ({ href: `/products?category=${category.slug}`, label: category.name }))
+                  : link.href === "/news"
+                    ? NEWS_LINKS
+                    : [];
+              const hasDropdown = dropdown.length > 0;
               return (
                 <div
                   key={link.href}
@@ -215,21 +243,21 @@ export function Header() {
                   </Link>
 
                   {hasDropdown ? (
-                    <div className={`invisible absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 ${
-                        isDropdownSuppressed
-                          ? ""
-                          : "group-has-[:focus-visible]/nav:visible group-has-[:focus-visible]/nav:opacity-100 group-hover/nav:visible group-hover/nav:opacity-100"
-                      }`}>
-                      <ul className="border-t-2 border-accent-700 bg-background py-2 shadow-2xl ring-1 ring-divider" role="menu">
-                        {categories.map((category) => (
-                          <li key={category.id} role="none">
+                    // Hiệu ứng cuộn xuống / cuộn lên: xem .nav-dropdown trong globals.css.
+                    <div
+                      className="nav-dropdown absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-4"
+                      data-suppressed={isDropdownSuppressed || undefined}
+                    >
+                      <ul className="nav-dropdown-panel border-t-2 border-accent-700 bg-card py-2 shadow-2xl ring-1 ring-divider" role="menu">
+                        {dropdown.map((item) => (
+                          <li key={item.href} role="none">
                             <Link
                               role="menuitem"
-                              href={`/products?category=${category.slug}`}
+                              href={item.href}
                               onClick={() => setIsDropdownSuppressed(true)}
                               className="block border-b border-divider px-5 py-3 text-sm font-semibold normal-case text-foreground/75 last:border-b-0 hover:bg-surface hover:text-accent-700"
                             >
-                              {category.name}
+                              {item.label}
                             </Link>
                           </li>
                         ))}
@@ -263,7 +291,7 @@ export function Header() {
               <form
                 id="header-search"
                 onSubmit={submitSearch}
-                className={`absolute right-[3.75rem] top-full z-50 mt-2 flex w-[min(18rem,calc(100%-10.25rem))] items-center sm:right-[4.25rem] sm:w-72 lg:right-0 lg:mt-3 border-t-2 border-accent-700 bg-background shadow-2xl ring-1 ring-divider transition-all duration-200 ${
+                className={`absolute right-[3.75rem] top-full z-50 mt-2 flex w-[min(18rem,calc(100%-10.25rem))] items-center sm:right-[4.25rem] sm:w-72 lg:right-0 lg:mt-3 border-t-2 border-accent-700 bg-card shadow-2xl ring-1 ring-divider transition-all duration-200 ${
                   isSearchOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0"
                 }`}
               >
@@ -306,14 +334,15 @@ export function Header() {
 
       <nav
         aria-label="Điều hướng chính"
-        className="fixed inset-x-3 bottom-3 z-50 flex items-center justify-between rounded-full border border-divider bg-background/95 p-1.5 shadow-xl shadow-black/15 backdrop-blur lg:hidden"
+        className="fixed inset-x-3 bottom-3 z-50 flex items-center justify-between rounded-full border border-divider bg-card/95 p-1.5 shadow-xl shadow-black/15 backdrop-blur lg:hidden"
       >
         <TabLink href="/" label="Trang chủ" active={isActive("/")} icon={<HomeIcon />} />
         <TabLink href="/products" label="Sản phẩm" active={isActive("/products")} icon={<GridIcon />} />
         {/* Chỗ trống cho nút liên hệ nổi (FloatingContact) nằm giữa thanh. */}
         <span aria-hidden className="w-14 shrink-0" />
         <TabLink href="/about" label="Giới thiệu" active={isActive("/about")} icon={<InfoIcon />} />
-        <TabLink href="/contact" label="Liên hệ" active={isActive("/contact")} icon={<ContactIcon />} />
+        {/* Liên hệ đã có nút tròn ở giữa (gọi / Zalo / SMS / Messenger); trang /contact vào từ chân trang. */}
+        <TabLink href="/news" label="Tin tức" active={isActive("/news")} icon={<NewsIcon />} />
       </nav>
     </>
   );
@@ -400,10 +429,12 @@ function InfoIcon() {
   );
 }
 
-function ContactIcon() {
+function NewsIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.6-.8L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z" />
+      <path d="M4 5a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v14a1 1 0 0 0 1 1H6a2 2 0 0 1-2-2V5z" />
+      <path d="M17 8h2a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2" />
+      <path d="M8 8h5M8 12h5M8 16h3" />
     </svg>
   );
 }

@@ -1,21 +1,38 @@
-'use client';
+"use client";
 
-export function DeleteButton({ action, itemLabel }: { action: () => Promise<void>; itemLabel: string }) {
+import { useState, useTransition } from "react";
+import { buttonClass } from "./button";
+
+/** Nút xoá có hộp xác nhận; hiển thị lỗi từ API (ví dụ danh mục còn sản phẩm) ngay cạnh nút. */
+export function DeleteButton({
+  action,
+  itemLabel,
+  confirmText,
+  label = "Xoá",
+}: {
+  action: () => Promise<{ error?: string } | void>;
+  itemLabel: string;
+  confirmText?: string;
+  label?: string;
+}) {
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  function handleClick() {
+    if (!window.confirm(confirmText ?? `Xoá "${itemLabel}"? Thao tác này không thể hoàn tác.`)) return;
+    setError(null);
+    startTransition(async () => {
+      const result = await action();
+      if (result && result.error) setError(result.error);
+    });
+  }
+
   return (
-    <form
-      action={action}
-      onSubmit={(event) => {
-        if (!window.confirm(`Xoá "${itemLabel}"? Hành động này không thể hoàn tác.`)) {
-          event.preventDefault();
-        }
-      }}
-    >
-      <button
-        type="submit"
-        className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
-      >
-        Xoá
+    <span className="inline-flex flex-col items-end gap-1">
+      <button type="button" onClick={handleClick} disabled={isPending} className={buttonClass("danger", "sm")}>
+        {isPending ? "Đang xoá..." : label}
       </button>
-    </form>
+      {error ? <span className="max-w-64 text-right text-xs font-semibold text-accent-700">{error}</span> : null}
+    </span>
   );
 }

@@ -8,9 +8,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { OrderQuote } from "@frozen-fruit-shop/types";
 import type { CartItem } from "@/types";
 
-const STORAGE_KEY = "frozen-fruit-shop:cart";
+const MAX_QUANTITY = 99;
+
+// Đổi phiên bản key khi cấu trúc dữ liệu giỏ thay đổi, tránh đọc giỏ cũ không còn hợp lệ.
+const STORAGE_KEY = "traicay28:cart:v2";
 
 interface CartContextValue {
   items: CartItem[];
@@ -18,6 +22,10 @@ interface CartContextValue {
   updateQuantity: (variantId: string, quantity: number) => void;
   removeItem: (variantId: string) => void;
   clearCart: () => void;
+  /** Cập nhật giá/tên theo báo giá mới nhất từ máy chủ; bỏ món không còn tồn tại trong hệ thống. */
+  applyQuote: (quote: OrderQuote) => void;
+  /** Đã đọc xong giỏ từ localStorage (trước đó giỏ luôn rỗng). */
+  isHydrated: boolean;
   totalQuantity: number;
   subtotal: number;
 }
@@ -57,7 +65,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existing) {
         return current.map((item) =>
           item.variantId === newItem.variantId
-            ? { ...item, quantity: item.quantity + newItem.quantity }
+            ? { ...item, quantity: Math.min(MAX_QUANTITY, item.quantity + newItem.quantity) }
             : item,
         );
       }
@@ -69,7 +77,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((current) =>
       quantity <= 0
         ? current.filter((item) => item.variantId !== variantId)
-        : current.map((item) => (item.variantId === variantId ? { ...item, quantity } : item)),
+        : current.map((item) =>
+            item.variantId === variantId ? { ...item, quantity: Math.min(MAX_QUANTITY, quantity) } : item,
+          ),
     );
   };
 
@@ -78,6 +88,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const clearCart = () => setItems([]);
+
+  const applyQuote = (quote: OrderQuote) => {
+    const lines = new Map(quote.lines.map((line) => [line.variantId, line]));
+    setItems((current) =>
+      current.flatMap((item) => {
+        const line = lines.get(item.variantId);
+        if (!line) return [];
+        return [
+          {
+            ...item,
+            productName: line.productName,
+            productSlug: line.productSlug,
+            packageSize: line.packageSize,
+            image: line.image,
+            unitPrice: line.unitPrice,
+          },
+        ];
+      }),
+    );
+  };
 
   const totalQuantity = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
@@ -91,7 +121,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, updateQuantity, removeItem, clearCart, totalQuantity, subtotal }}
+      value={{ items, addItem, updateQuantity, removeItem, clearCart, applyQuote, isHydrated, totalQuantity, subtotal }}
     >
       {children}
     </CartContext.Provider>

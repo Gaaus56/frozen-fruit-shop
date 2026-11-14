@@ -1,18 +1,297 @@
 @import "tailwindcss";
 
+/* Cùng bảng màu với web khách hàng: nền xám ấm, đỏ cho hành động, xanh lá thương hiệu, không bo góc.
+   Gọn hơn web khách: không có banner, hiệu ứng hay chế độ tối. */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f3f2f2;
+  --surface: #ffffff;
+  --muted: #eae9e9;
+  --foreground: #201e1d;
+  --divider: color-mix(in srgb, #201e1d 14%, transparent);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-divider: var(--divider);
+  --font-sans: var(--font-archivo);
+}
+
+@theme {
+  --color-accent-50: #fff6f4;
+  --color-accent-100: #fff2ef;
+  --color-accent-200: #ffe0d9;
+  --color-accent-300: #ffc4b8;
+  --color-accent-500: #ff563c;
+  --color-accent-600: #ec3013;
+  --color-accent-700: #ae1800;
+  --color-accent-800: #7c1405;
+
+  --color-leaf-50: #eef7f1;
+  --color-leaf-100: #d9eee2;
+  --color-leaf-600: #1f6b3f;
+  --color-leaf-700: #154d2d;
+
+  --color-ink: #201e1d;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
 }
+
+h1,
+h2,
+h3 {
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+/* ───────────── Trình soạn thảo (components/editor) ─────────────
+   Kiểu nội dung giữ giống .rich-content-flow ở apps/web để admin thấy đúng như khách sẽ thấy. */
+.rich-editor {
+  border: 1px solid var(--color-divider, #d6d4d3);
+  background: #fff;
+}
+.rich-editor-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 0.375rem;
+  border-bottom: 1px solid var(--color-divider, #d6d4d3);
+  background: #fbfbfb;
+}
+.rich-editor-content {
+  min-height: 22rem;
+  padding: 1.25rem 1.5rem;
+  outline: none;
+  line-height: 1.7;
+  color: #2b2827;
+}
+.rich-editor-content > * + * { margin-top: 0.85em; }
+.rich-editor-content h2 { font-size: 1.35rem; font-weight: 800; margin-top: 1.4em; color: #201e1d; }
+.rich-editor-content h3 { font-size: 1.1rem; font-weight: 800; margin-top: 1.2em; color: #201e1d; }
+.rich-editor-content ul { list-style: disc; padding-left: 1.5rem; }
+.rich-editor-content ol { list-style: decimal; padding-left: 1.5rem; }
+.rich-editor-content blockquote { border-left: 4px solid #1f6b3f; padding: 0.25rem 0 0.25rem 1rem; color: #4a4645; font-style: italic; }
+.rich-editor-content a { color: #ae1800; text-decoration: underline; }
+.rich-editor-content hr { border: 0; border-top: 1px solid #d6d4d3; margin: 1.5em 0; }
+.rich-editor-content aside { padding: 0.75rem 1rem; border-left: 4px solid; }
+.rich-editor-content aside[data-tone="green"] { background: #eef7f1; border-color: #1f6b3f; }
+.rich-editor-content aside[data-tone="red"] { background: #fff2ef; border-color: #ec3013; }
+.rich-editor-content aside > * + * { margin-top: 0.5em; }
+.rich-editor-content p.is-empty:first-child::before,
+.rich-editor-content h2.is-empty::before,
+.rich-editor-content h3.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: #a19c9a;
+}
+
+/* Màu chữ trong chủ đề web — cùng mã màu với web khách hàng (apps/web globals.css). */
+.rich-editor-content span[data-color="red"], .editor-color-swatch[data-color="red"] { color: #ae1800; }
+.rich-editor-content span[data-color="green"], .editor-color-swatch[data-color="green"] { color: #1f6b3f; }
+.rich-editor-content span[data-color="gray"], .editor-color-swatch[data-color="gray"] { color: #6b6563; }
+.editor-color-swatch { font-weight: 900; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 2px; }
+
+/* Chia 2 cột: khung nét đứt để admin thấy rõ từng cột (trên web không có khung). */
+.rich-editor-content div[data-columns] {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0.5rem;
+  border: 1px dashed #b8b3b1;
+  background: #fafafa;
+}
+.rich-editor-content div[data-column] {
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed #d6d4d3;
+  background: #fff;
+}
+.rich-editor-content div[data-column] > * + * { margin-top: 0.85em; }
+.rich-editor-content div[data-column] p.is-empty:only-child::before {
+  content: "Gõ chữ hoặc kéo ảnh vào cột này…";
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: #a19c9a;
+}
+
+/* Nhãn / tiêu đề rất lớn / đoạn dẫn — xem trước giống web khách hàng. */
+.rich-editor-content p[data-variant="badge"] {
+  width: fit-content; padding: 0.25rem 0.75rem; background: #fff2ef; color: #7c1405;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.025em; text-transform: uppercase;
+}
+.rich-editor-content p[data-variant="badge"][data-align="center"] { margin-inline: auto; }
+.rich-editor-content h2[data-size="xl"] { font-size: 2.4rem; line-height: 1.08; text-transform: uppercase; }
+.rich-editor-content p[data-variant="lead"] { max-width: 32rem; font-size: 15.5px; color: #6b6563; }
+.rich-editor-content p[data-variant="lead"][data-align="center"] { margin-inline: auto; }
+
+/* Căn lề, căn dọc cột, hàng nút — xem trước giống web khách hàng. */
+.rich-editor-content [data-align="center"] { text-align: center; }
+.rich-editor-content [data-align="right"] { text-align: right; }
+.rich-editor-content div[data-columns][data-valign="top"] { align-items: start; }
+.rich-editor-content div[data-columns][data-valign="bottom"] { align-items: end; }
+.rich-editor-content div[data-columns] { align-items: center; }
+
+.editor-buttons { margin: 1em 0; padding: 0.75rem; border: 1px dashed #b8b3b1; background: #fafafa; }
+.editor-buttons.is-selected { outline: 2px solid #1f6b3f; }
+.editor-buttons-preview { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.editor-buttons-preview[data-align="center"] { justify-content: center; }
+.editor-buttons-preview[data-align="right"] { justify-content: flex-end; }
+.editor-button { display: inline-flex; align-items: center; padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 800; }
+.editor-button[data-button="red"] { background: #cf2a10; color: #fff; }
+.editor-button[data-button="dark"] { background: #ae1800; color: #fff; }
+.editor-button[data-button="light"] { background: #fff; color: #201e1d; border: 1px solid #d6d4d3; }
+.editor-button[data-button="green"] { background: #1f6b3f; color: #fff; }
+.editor-buttons-form { display: flex; flex-direction: column; gap: 0.375rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e7e5e4; }
+.editor-buttons-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto auto; gap: 0.375rem; align-items: center; }
+.editor-buttons-row input,
+.editor-buttons-row select { min-width: 0; border: 1px solid #d6d4d3; background: #fff; padding: 0.3rem 0.5rem; font-size: 0.8125rem; }
+.editor-buttons-form > .editor-chip-btn { align-self: flex-start; }
+
+/* Ảnh có chú thích */
+.editor-figure { position: relative; margin: 1.25em 0; }
+.editor-figure img { display: block; max-width: 100%; margin: 0 auto; }
+.editor-figure.is-selected img { outline: 3px solid #1f6b3f; outline-offset: 2px; }
+.editor-figure figcaption {
+  min-height: 1.6em;
+  margin-top: 0.4rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b6664;
+}
+.editor-figure.is-empty figcaption::before {
+  content: attr(data-placeholder);
+  color: #a19c9a;
+  pointer-events: none;
+}
+.editor-figure-remove { position: absolute; top: 0.5rem; right: 0.5rem; opacity: 0; }
+.editor-figure:hover .editor-figure-remove,
+.editor-figure.is-selected .editor-figure-remove { opacity: 1; }
+
+/* Ô sản phẩm: thẻ dọc như trên web; các thẻ liền nhau xếp thành hàng (tối đa 4 thẻ / hàng). */
+.rich-editor-content .node-productEmbed {
+  display: inline-block;
+  width: calc(25% - 0.75rem);
+  min-width: 9rem;
+  margin: 0.5rem 0.75rem 0.5rem 0;
+  vertical-align: top;
+}
+.editor-product {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d6d4d3;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+  cursor: grab;
+}
+.editor-product.is-selected { outline: 3px solid #1f6b3f; outline-offset: 2px; }
+.editor-product-thumb { position: relative; display: block; aspect-ratio: 1; overflow: hidden; background: #eae9e9; }
+.editor-product-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.editor-product-body { display: block; padding: 0.5rem 0.625rem 0.625rem; text-align: center; line-height: 1.35; }
+.editor-product-name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #201e1d;
+}
+.editor-product-price { display: block; margin-top: 0.25rem; font-size: 0.875rem; font-weight: 800; color: #ae1800; }
+.editor-product-remove { position: absolute; top: 0.375rem; right: 0.375rem; opacity: 0; }
+.editor-product:hover .editor-product-remove,
+.editor-product.is-selected .editor-product-remove { opacity: 1; }
+.editor-chip-btn {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #fff;
+  color: #ae1800;
+  border: 1px solid #ffc4b8;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+}
+.editor-chip-btn:hover { background: #fff2ef; }
+
+/* ───────────── Hiệu ứng đăng nhập (app/login, components/layout/enter-animation.tsx) ─────────────
+   1. Đăng nhập hợp lệ: banner trượt mờ sang trái, form trượt mờ sang phải (.login-root[data-leaving]).
+   2. Chuyển trang với <html data-enter>: menu bên trượt vào từ bên phải, từng nút hiện lần lượt,
+      nội dung hiện dần; trang Tổng quan: số liệu nhảy (ScrambleNumber), biểu đồ mọc dần. */
+.login-banner,
+.login-panel { transition: transform 650ms cubic-bezier(0.65, 0, 0.35, 1), opacity 550ms ease; }
+.login-root[data-leaving] .login-banner { transform: translateX(-35%); opacity: 0; }
+.login-root[data-leaving] .login-panel { transform: translateX(35%); opacity: 0; }
+
+/* Điện thoại (banner nằm trên, form dưới): banner trượt lên và mờ, form mờ dần. */
+@media (max-width: 1023px) {
+  .login-root[data-leaving] .login-banner { transform: translateY(-100%); opacity: 0; }
+  .login-root[data-leaving] .login-panel { transform: none; opacity: 0; }
+}
+
+/* Vừa đăng xuất (?bye=1): ngược lại lúc đăng nhập — banner trượt vào từ trái, form từ phải (mobile: banner từ trên xuống). */
+.login-root[data-returning] .login-banner { animation: login-return-left 700ms cubic-bezier(0.22, 1, 0.36, 1) 150ms both; }
+.login-root[data-returning] .login-panel { animation: login-return-right 700ms cubic-bezier(0.22, 1, 0.36, 1) 150ms both; }
+@keyframes login-return-left { from { transform: translateX(-35%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes login-return-right { from { transform: translateX(35%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes login-return-top { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes login-return-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 1023px) {
+  .login-root[data-returning] .login-banner { animation-name: login-return-top; }
+  .login-root[data-returning] .login-panel { animation-name: login-return-fade; }
+}
+
+/* Đăng xuất (LogoutButton → <html data-leave>): nội dung mờ xuống, nút menu ẩn dần từ dưới lên, menu bên trượt ra phải. */
+html[data-leave] .enter-main { animation: leave-fade-down 380ms ease-in both; }
+html[data-leave] .enter-nav-item {
+  animation: leave-fade-right 300ms ease-in both;
+  animation-delay: max(0ms, calc(420ms - var(--i, 0) * 22ms));
+}
+html[data-leave] .enter-sidebar { animation: leave-sidebar 380ms cubic-bezier(0.65, 0, 0.35, 1) 500ms both; }
+@keyframes leave-fade-down { to { transform: translateY(16px); opacity: 0; } }
+@keyframes leave-fade-right { to { transform: translateX(18px); opacity: 0; } }
+@keyframes leave-sidebar { to { transform: translateX(48px); opacity: 0; } }
+
+html[data-enter] .enter-sidebar { animation: enter-sidebar 650ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+html[data-enter] .enter-nav-item { animation: enter-fade-left 420ms ease-out both; animation-delay: calc(250ms + var(--i, 0) * 45ms); }
+html[data-enter] .enter-main { animation: enter-fade-up 650ms ease-out 420ms both; }
+html[data-enter] .enter-grow-x { transform-origin: left; animation: enter-grow-x 900ms cubic-bezier(0.22, 1, 0.36, 1) 750ms both; }
+html[data-enter] .enter-grow-y {
+  transform-origin: bottom;
+  animation: enter-grow-y 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(700ms + var(--i, 0) * 12ms);
+}
+
+@keyframes enter-sidebar { from { transform: translateX(48px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes enter-fade-left { from { transform: translateX(18px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes enter-fade-up { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes enter-grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes enter-grow-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .login-banner, .login-panel { transition: none; }
+  html[data-enter] .enter-sidebar,
+  html[data-enter] .enter-nav-item,
+  html[data-enter] .enter-main,
+  html[data-enter] .enter-grow-x,
+  html[data-enter] .enter-grow-y,
+  .login-root[data-returning] .login-banner,
+  .login-root[data-returning] .login-panel,
+  html[data-leave] .enter-main,
+  html[data-leave] .enter-nav-item,
+  html[data-leave] .enter-sidebar { animation: none; }
+}
+
+/* Hộp hỏi "Lưu thay đổi trước khi rời trang?" (components/ui/unsaved-changes-guard.tsx) */
+.unsaved-dialog { animation: unsaved-in 180ms ease-out both; }
+@keyframes unsaved-in { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .unsaved-dialog { animation: none; } }

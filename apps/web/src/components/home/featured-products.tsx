@@ -1,26 +1,21 @@
-import { Container } from "@/components/ui/container";
-import { SectionHeading } from "@/components/ui/section-heading";
+import type { Product } from "@frozen-fruit-shop/types";
+import { SectionCard } from "@/components/ui/section-card";
 import { ProductGrid } from "@/components/product/product-grid";
 import { LinkButton } from "@/components/ui/button";
-import { getFeaturedProducts } from "@frozen-fruit-shop/fixtures";
 
-export function FeaturedProducts() {
-  const featured = getFeaturedProducts();
+export function FeaturedProducts({ products, title }: { products: Product[]; title: string }) {
+  if (products.length === 0) return null;
 
   return (
-    <section className="py-16">
-      <Container>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <SectionHeading eyebrow="Sản phẩm nổi bật" title="Được khách hàng yêu thích nhất" />
-          <LinkButton href="/products" variant="secondary">
-            Xem tất cả sản phẩm
-          </LinkButton>
-        </div>
-
-        <div className="mt-8">
-          <ProductGrid products={featured} />
-        </div>
-      </Container>
-    </section>
+    <SectionCard
+      title={title}
+      action={
+        <LinkButton href="/products" variant="dark" className="rounded-full !px-8 !py-2.5 !text-sm">
+          Xem thêm
+        </LinkButton>
+      }
+    >
+      <ProductGrid products={products} />
+    </SectionCard>
   );
 }

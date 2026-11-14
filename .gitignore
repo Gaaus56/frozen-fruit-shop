@@ -25,6 +25,10 @@ out/
 dist/
 **/dist/
 
+# ảnh admin tải lên (apps/api/uploads) — dữ liệu runtime, không commit
+# **/uploads/
+/apps/api/uploads/
+
 # prisma
 **/prisma/generated/
 
@@ -49,3 +53,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Thư mục tạm khi build thử production cạnh dev server (không commit).
+/.buildcheck/

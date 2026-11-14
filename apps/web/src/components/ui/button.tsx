@@ -1,13 +1,15 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "ghost" | "outline";
+type Variant = "primary" | "secondary" | "ghost" | "outline" | "dark";
 
 const variantClasses: Record<Variant, string> = {
   primary: "bg-accent-600 text-white hover:bg-accent-700",
-  secondary: "bg-transparent text-foreground border border-divider hover:bg-foreground/5",
+  // Nền trắng để tách khỏi nền trang (không trong suốt); rê chuột thì viền + chữ đỏ.
+  secondary: "bg-card text-foreground border border-divider shadow-sm hover:border-accent-600 hover:text-accent-700",
   ghost: "bg-transparent text-accent-600 hover:bg-accent-100",
   outline: "bg-transparent text-current border border-current/30 hover:border-current/60",
+  dark: "bg-accent-700 text-white hover:bg-accent-800",
 };
 
 const baseClasses =
@@ -34,6 +36,14 @@ interface LinkButtonProps {
 }
 
 export function LinkButton({ href, variant = "primary", className = "", children }: LinkButtonProps) {
+  // Link ra ngoài web (banner gắn link Shopee, Facebook...) → mở tab mới, giữ nguyên tab web.
+  if (/^https?:\/\//i.test(href)) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
+        {children}
+      </a>
+    );
+  }
   return (
     <Link href={href} className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
       {children}

@@ -1,0 +1,12 @@
+**/node_modules
+**/.next
+**/dist
+.git
+.github
+design
+docs
+**/.env
+**/.env.local
+**/*.tsbuildinfo
+# KHÔNG loại apps/api/prisma/seed-assets: API phục vụ ảnh dữ liệu mẫu (/uploads/seed/*) thẳng từ thư mục này
+# (Render miễn phí không có ổ đĩa lâu dài) và lệnh seed chép ảnh từ đây.
