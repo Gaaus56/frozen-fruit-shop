@@ -35,6 +35,7 @@ services:
       UPLOAD_DIR: /data/uploads
       WEB_REVALIDATE_URL: http://web:3000/api/revalidate
       REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+      INTERNAL_PROXY_SECRET: ${INTERNAL_PROXY_SECRET:-}
     volumes:
       # Ảnh admin tải lên — phải nằm trong volume để không mất khi build lại image.
       - uploads_data:/data/uploads
@@ -46,6 +47,7 @@ services:
       args:
         # Biến NEXT_PUBLIC_* được "đóng gói" vào mã trình duyệt lúc build.
         NEXT_PUBLIC_API_URL: https://api.${DOMAIN}
+        NEXT_PUBLIC_SITE_URL: https://${DOMAIN}
     restart: unless-stopped
     depends_on:
       - api
@@ -62,6 +64,7 @@ services:
       - api
     environment:
       API_URL: http://api:4000
+      INTERNAL_PROXY_SECRET: ${INTERNAL_PROXY_SECRET:-}
 
   caddy:
     image: caddy:2-alpine

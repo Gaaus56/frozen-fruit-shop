@@ -2,7 +2,7 @@
 
 import type { LoginResponse, OtpChallenge } from "@frozen-fruit-shop/types";
 import { API_URL } from "@/lib/api";
-import { setToken } from "@/lib/session";
+import { clientIpHeaders, setToken } from "@/lib/session";
 import { homePathFor } from "@/lib/nav";
 
 /** `otpToken`: đúng mật khẩu, tài khoản đã bật OTP → form chuyển sang bước nhập mã. */
@@ -20,7 +20,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
   try {
     res = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...(await clientIpHeaders()) },
       body: JSON.stringify({ email, password }),
       cache: "no-store",
     });
@@ -40,7 +40,7 @@ export async function loginOtpAction(_prev: LoginState, formData: FormData): Pro
   try {
     res = await fetch(`${API_URL}/auth/login/otp`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...(await clientIpHeaders()) },
       body: JSON.stringify({ otpToken, code }),
       cache: "no-store",
     });

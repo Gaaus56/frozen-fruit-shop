@@ -10,6 +10,28 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
+import { timingSafeEqual } from 'node:crypto';
+import { env } from '../config/env.js';
+
+function sameSecret(received: string, expected: string): boolean {
+  const a = Buffer.from(received);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/**
+ * IP của người dùng thật. Request từ server admin (đăng nhập, server action) mang `x-client-ip` kèm
+ * `x-internal-secret` khớp INTERNAL_PROXY_SECRET → dùng IP đó; còn lại dùng IP kết nối (sau reverse proxy).
+ * Không có khoá thì bỏ qua header — người ngoài không giả IP được.
+ */
+export function clientIp(request: Request): string {
+  const forwarded = request.headers['x-client-ip'];
+  const secret = request.headers['x-internal-secret'];
+  if (env.internalProxySecret && typeof forwarded === 'string' && typeof secret === 'string' && forwarded.length <= 64) {
+    if (sameSecret(secret, env.internalProxySecret)) return forwarded;
+  }
+  return request.ip ?? 'unknown';
+}
 
 interface RateLimitOptions {
   /** Số request tối đa trong một cửa sổ thời gian. */
@@ -45,7 +67,7 @@ export class RateLimitGuard implements CanActivate {
     if (!options) return true;
 
     const request = context.switchToHttp().getRequest<Request>();
-    const key = `${context.getClass().name}.${context.getHandler().name}:${request.ip ?? 'unknown'}`;
+    const key = `${context.getClass().name}.${context.getHandler().name}:${clientIp(request)}`;
     const now = Date.now();
 
     if (this.hits.size > 10_000) this.sweep(now);

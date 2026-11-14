@@ -1,8 +1,11 @@
 name: CI
 
 on:
+  # demo là nhánh đang deploy (Render / Vercel) — PR vào demo phải qua CI như main.
   pull_request:
-    branches: [main]
+    branches: [main, demo]
+  push:
+    branches: [admin]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -23,6 +26,11 @@ jobs:
       - name: Install dependencies (also builds shared packages)
         run: npm ci
 
+      # Chặn merge khi thư viện có lỗ hổng mức critical đã công bố. (Chưa dùng mức high: CLI Prisma 6 còn
+      # deepmerge-ts < 8 — chỉ đọc file cấu hình của chính dự án; hết khi nâng Prisma 7, xem docs audit 2026-10-30.)
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=critical
+
       - name: Lint web
         run: npm run lint:web
 
@@ -37,6 +45,10 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
+        working-directory: apps/api
+
+      - name: Type-check api
+        run: npx tsc --noEmit -p tsconfig.json
         working-directory: apps/api
 
       - name: Build api

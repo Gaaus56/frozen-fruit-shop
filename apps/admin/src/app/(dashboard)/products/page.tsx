@@ -49,11 +49,11 @@ export default async function ProductsPage({ searchParams }: PageProps<"/product
 
       <form action="/products" className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto_auto]">
         <input name="q" defaultValue={q} placeholder="Tìm theo tên sản phẩm" className={`${inputClass} mt-0`} />
-        <select name="categoryId" defaultValue={categoryId} className={`${inputClass} mt-0`}>
+        <select name="categoryId" aria-label="Lọc theo danh mục" defaultValue={categoryId} className={`${inputClass} mt-0`}>
           <option value="">Mọi danh mục</option>
           {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
         </select>
-        <select name="status" defaultValue={status} className={`${inputClass} mt-0`}>
+        <select name="status" aria-label="Lọc theo trạng thái" defaultValue={status} className={`${inputClass} mt-0`}>
           <option value="all">Mọi trạng thái</option>
           <option value="active">Đang bán</option>
           <option value="inactive">Đang ẩn</option>

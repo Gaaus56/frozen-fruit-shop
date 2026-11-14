@@ -5,7 +5,8 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: frozen_fruit_shop
+      # Trùng tên DB trong DATABASE_URL của apps/api/.env.example (chỉ có tác dụng khi tạo volume lần đầu).
+      POSTGRES_DB: traicay28
     ports:
       - "5434:5432"
     volumes:

@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import type { User } from '@prisma/client';
+import type { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import type { AuthUser, LoginResponse, OtpChallenge, OtpRecoveryCodes, OtpSetup, OtpStatus } from '@frozen-fruit-shop/types';
 import { iso } from '../common/utils.js';
@@ -94,14 +94,11 @@ export class AuthService {
     this.assertNotLocked(user);
 
     const verified = await this.checkCode(user, code);
-    if (!verified) {
+    const updated = verified && (await this.consumeCode(user, { ...verified, failedLoginCount: 0, lockedUntil: null, lastLoginAt: new Date() }));
+    if (!updated) {
       await this.recordFailure(user);
       throw new UnauthorizedException('Mã OTP không đúng hoặc đã dùng. Mở app xác thực và nhập mã mới nhất.');
     }
-    const updated = await this.prisma.user.update({
-      where: { id: user.id },
-      data: { ...verified, failedLoginCount: 0, lockedUntil: null, lastLoginAt: new Date() },
-    });
     return this.issueToken(updated, Date.now());
   }
 
@@ -138,6 +135,7 @@ export class AuthService {
   async otpSetup(userId: string, { password }: PasswordConfirmDto): Promise<OtpSetup> {
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
     if (user.otpEnabledAt) throw new BadRequestException('Xác thực 2 lớp đang bật. Tắt đi trước nếu muốn đổi điện thoại.');
+    this.assertNotLocked(user);
     await this.assertPassword(user, password);
     const setup = await createOtpSetup(user.email);
     await this.prisma.user.update({ where: { id: userId }, data: { otpPendingSecret: encryptSecret(setup.secret) } });
@@ -149,20 +147,28 @@ export class AuthService {
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
     if (user.otpEnabledAt) throw new BadRequestException('Xác thực 2 lớp đã bật.');
     if (!user.otpPendingSecret) throw new BadRequestException('Chưa tạo mã QR. Bấm "Bật xác thực 2 lớp" để bắt đầu lại.');
+    this.assertNotLocked(user);
     const timeStep = await verifyTotp(user.otpPendingSecret, code, null);
-    if (timeStep === null) throw new BadRequestException('Mã không đúng. Kiểm tra giờ trên điện thoại và nhập mã mới nhất trong app.');
+    if (timeStep === null) {
+      await this.recordFailure(user);
+      throw new BadRequestException('Mã không đúng. Kiểm tra giờ trên điện thoại và nhập mã mới nhất trong app.');
+    }
 
     const { codes, hashes } = generateRecoveryCodes();
-    const updated = await this.prisma.user.update({
-      where: { id: userId },
+    // Chỉ bật nếu khoá đang chờ vẫn là khoá vừa kiểm tra (không bị lần "Bật" khác thay giữa chừng).
+    const { count } = await this.prisma.user.updateMany({
+      where: { id: userId, otpEnabledAt: null, otpPendingSecret: user.otpPendingSecret },
       data: {
         otpSecret: user.otpPendingSecret,
         otpPendingSecret: null,
         otpEnabledAt: new Date(),
         otpLastTimeStep: timeStep,
         otpRecoveryCodes: hashes,
+        failedLoginCount: 0,
       },
     });
+    if (count === 0) throw new BadRequestException('Mã QR đã thay đổi. Bấm "Bật xác thực 2 lớp" để bắt đầu lại.');
+    const updated = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
     await this.logOtpChange(updated, 'otp-enable');
     return { ...(await this.issueToken(updated, Date.now())), recoveryCodes: codes };
   }
@@ -171,9 +177,13 @@ export class AuthService {
   async otpDisable(userId: string, { password, code }: OtpDisableDto): Promise<void> {
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
     if (!user.otpEnabledAt) throw new BadRequestException('Xác thực 2 lớp đang tắt.');
+    this.assertNotLocked(user);
     await this.assertPassword(user, password);
-    if (!(await this.checkCode(user, code))) throw new BadRequestException('Mã OTP không đúng hoặc đã dùng.');
-    await this.prisma.user.update({ where: { id: userId }, data: clearOtp });
+    const verified = await this.checkCode(user, code);
+    if (!verified || !(await this.consumeCode(user, { ...clearOtp, failedLoginCount: 0 }))) {
+      await this.recordFailure(user);
+      throw new BadRequestException('Mã OTP không đúng hoặc đã dùng.');
+    }
     await this.logOtpChange(user, 'otp-disable');
   }
 
@@ -181,10 +191,13 @@ export class AuthService {
   async otpRegenerateRecoveryCodes(userId: string, { code }: OtpCodeDto): Promise<OtpRecoveryCodes> {
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
     if (!user.otpEnabledAt || !user.otpSecret) throw new BadRequestException('Xác thực 2 lớp đang tắt.');
+    this.assertNotLocked(user);
     const timeStep = await verifyTotp(user.otpSecret, code, user.otpLastTimeStep);
-    if (timeStep === null) throw new BadRequestException('Mã OTP không đúng hoặc đã dùng.');
     const { codes, hashes } = generateRecoveryCodes();
-    await this.prisma.user.update({ where: { id: userId }, data: { otpRecoveryCodes: hashes, otpLastTimeStep: timeStep } });
+    if (timeStep === null || !(await this.consumeCode(user, { otpRecoveryCodes: hashes, otpLastTimeStep: timeStep, failedLoginCount: 0 }))) {
+      await this.recordFailure(user);
+      throw new BadRequestException('Mã OTP không đúng hoặc đã dùng.');
+    }
     return { recoveryCodes: codes };
   }
 
@@ -194,11 +207,11 @@ export class AuthService {
     if (!user.otpEnabledAt || !user.otpSecret) throw new BadRequestException('Xác thực 2 lớp đang tắt.');
     this.assertNotLocked(user);
     const verified = await this.checkCode(user, code);
-    if (!verified) {
+    const updated = verified && (await this.consumeCode(user, { ...verified, failedLoginCount: 0 }));
+    if (!updated) {
       await this.recordFailure(user);
       throw new BadRequestException('Mã OTP không đúng hoặc đã dùng.');
     }
-    const updated = await this.prisma.user.update({ where: { id: userId }, data: { ...verified, failedLoginCount: 0 } });
     return this.issueToken(updated, Date.now());
   }
 
@@ -214,6 +227,18 @@ export class AuthService {
     if (timeStep !== null) return { otpLastTimeStep: timeStep };
     const remaining = useRecoveryCode(user.otpRecoveryCodes, code);
     return remaining ? { otpRecoveryCodes: remaining } : null;
+  }
+
+  /**
+   * Ghi nhận mã vừa dùng một cách nguyên tử: chỉ cập nhật nếu trạng thái OTP chưa đổi kể từ lúc đọc. Hai request
+   * song song cùng một mã (hoặc cùng một mã dự phòng) → chỉ request đầu thành công, request sau nhận null (coi như sai).
+   */
+  private async consumeCode(user: User, data: Prisma.UserUpdateManyMutationInput): Promise<User | null> {
+    const { count } = await this.prisma.user.updateMany({
+      where: { id: user.id, otpLastTimeStep: user.otpLastTimeStep, otpRecoveryCodes: { equals: user.otpRecoveryCodes } },
+      data,
+    });
+    return count === 1 ? this.prisma.user.findUniqueOrThrow({ where: { id: user.id } }) : null;
   }
 
   /** Bật / tắt OTP của chính mình (đường /auth/* nên không qua bộ ghi lịch sử tự động) → ghi tay vào Lịch sử chỉnh sửa. */
@@ -242,20 +267,28 @@ export class AuthService {
     }
   }
 
+  /** Xác nhận lại mật khẩu (bật / tắt OTP). Sai cũng tính vào giới hạn khoá tài khoản như khi đăng nhập. */
   private async assertPassword(user: User, password: string) {
-    if (!(await bcrypt.compare(password, user.passwordHash))) throw new BadRequestException('Mật khẩu không đúng.');
+    if (!(await bcrypt.compare(password, user.passwordHash))) {
+      await this.recordFailure(user);
+      throw new BadRequestException('Mật khẩu không đúng.');
+    }
   }
 
   /** Sai mật khẩu / mã OTP: cộng dồn, đủ 5 lần thì khoá 15 phút. */
   private async recordFailure(user: User) {
-    const failed = user.failedLoginCount + 1;
-    await this.prisma.user.update({
+    // Tăng ngay trong DB (không đọc-cộng-ghi) — gửi song song nhiều lần sai cũng không lách được giới hạn.
+    const { failedLoginCount } = await this.prisma.user.update({
       where: { id: user.id },
-      data: {
-        failedLoginCount: failed >= MAX_FAILED_ATTEMPTS ? 0 : failed,
-        lockedUntil: failed >= MAX_FAILED_ATTEMPTS ? new Date(Date.now() + LOCK_MINUTES * 60_000) : null,
-      },
+      data: { failedLoginCount: { increment: 1 } },
+      select: { failedLoginCount: true },
     });
+    if (failedLoginCount >= MAX_FAILED_ATTEMPTS) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { failedLoginCount: 0, lockedUntil: new Date(Date.now() + LOCK_MINUTES * 60_000) },
+      });
+    }
   }
 
   /** `otpVerifiedAt` (ms): mốc phiên này nhập đúng OTP — giữ qua token mới để không phải nhập lại ngay. */

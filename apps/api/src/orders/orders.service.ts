@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import type { OrderStatus, Prisma } from '@prisma/client';
 import { randomInt } from 'node:crypto';
 import type {
@@ -16,7 +16,8 @@ import { iso, normalizePhone, toPublicUrl } from '../common/utils.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RealtimeService } from '../realtime/realtime.module.js';
 import type { AdminOrderQuery, CreateOrderDto, LookupOrderQuery, UpdateOrderDto } from './orders.dto.js';
-import { buildOrdersWorkbook } from './orders-export.js';
+import type { Writable } from 'node:stream';
+import { streamOrdersWorkbook } from './orders-export.js';
 
 /** Trạng thái được phép chuyển tới từ mỗi trạng thái — tránh nhảy lùi hoặc sửa đơn đã kết thúc. */
 const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -27,6 +28,16 @@ const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   delivered: [],
   cancelled: [],
 };
+
+/**
+ * Tiền lưu kiểu integer trong Postgres (tối đa ~2,1 tỷ). Giới hạn tổng đơn đặt qua web ở 1 tỷ để còn chỗ cho phí ship,
+ * tránh lỗi tràn số (API trả 500) khi giỏ hàng cực lớn hoặc ai đó cố gửi số lượng tối đa cho mọi món.
+ */
+const MAX_ORDER_SUBTOTAL = 1_000_000_000;
+
+/** Xuất Excel: tối đa 20.000 đơn, đọc DB từng lô 500 đơn. */
+const EXPORT_MAX_ORDERS = 20_000;
+const EXPORT_BATCH = 500;
 
 const include = { items: true } satisfies Prisma.OrderInclude;
 type OrderRow = Prisma.OrderGetPayload<{ include: typeof include }>;
@@ -138,6 +149,9 @@ export class OrdersService {
         'Một số sản phẩm trong giỏ đã hết hàng hoặc ngừng bán. Vui lòng kiểm tra lại giỏ hàng.',
       );
     }
+    if (quote.subtotal > MAX_ORDER_SUBTOTAL) {
+      throw new BadRequestException('Đơn hàng có giá trị quá lớn để đặt online. Vui lòng gọi hotline để cửa hàng báo giá sỉ.');
+    }
 
     // Phí vận chuyển do cửa hàng báo khi gọi xác nhận đơn (nội thành / ngoại tỉnh khác nhau).
     const data = {
@@ -240,11 +254,36 @@ export class OrdersService {
     return { items: rows.map(toOrder), total, page: query.page, pageSize: query.pageSize };
   }
 
-  /** File Excel các đơn khớp bộ lọc đang xem (tối đa 20.000 đơn, mới nhất trước). */
-  async exportExcel(query: AdminOrderQuery): Promise<{ buffer: Buffer; fileName: string }> {
-    const rows = await this.prisma.order.findMany({ where: this.adminWhere(query), include, orderBy: { createdAt: 'desc' }, take: 20_000 });
-    const today = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10);
-    return { buffer: await buildOrdersWorkbook(rows, `Đơn hàng ${today}`), fileName: `don-hang-${today}.xlsx` };
+  /**
+   * File Excel các đơn khớp bộ lọc đang xem (tối đa 20.000 đơn, mới nhất trước), ghi thẳng ra `out` theo lô 500 đơn.
+   * Chốt mốc thời gian lúc bắt đầu để hai lượt đọc (sheet đơn và sheet chi tiết) thấy cùng một tập đơn.
+   */
+  async exportExcel(query: AdminOrderQuery, out: Writable): Promise<void> {
+    const where: Prisma.OrderWhereInput = { AND: [this.adminWhere(query), { createdAt: { lte: new Date() } }] };
+    const prisma = this.prisma;
+    async function* batches() {
+      let cursor: string | undefined;
+      for (let fetched = 0; fetched < EXPORT_MAX_ORDERS; ) {
+        const rows = await prisma.order.findMany({
+          where,
+          include,
+          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+          take: Math.min(EXPORT_BATCH, EXPORT_MAX_ORDERS - fetched),
+          ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+        });
+        if (rows.length === 0) return;
+        yield rows;
+        fetched += rows.length;
+        cursor = rows[rows.length - 1].id;
+        if (rows.length < EXPORT_BATCH) return;
+      }
+    }
+    await streamOrdersWorkbook(out, batches, 'Đơn hàng');
+  }
+
+  /** Tên file tải về theo ngày giờ Việt Nam. */
+  exportFileName(): string {
+    return `don-hang-${new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)}.xlsx`;
   }
 
   async findById(id: string): Promise<OrderDetail> {
@@ -291,21 +330,31 @@ export class OrdersService {
       throw new BadRequestException('Giảm giá không được lớn hơn tổng tiền đơn hàng.');
     }
 
-    const updated = await this.prisma.order.update({
-      where: { id },
-      data: {
-        status: dto.status,
-        paymentStatus: dto.paymentStatus,
-        shippingFee,
-        discount,
-        total: order.subtotal + shippingFee - discount,
-        internalNote: dto.internalNote,
-        logs: statusChanged
-          ? { create: { fromStatus: order.status, toStatus: dto.status!, note: dto.note ?? '', changedById: userId } }
-          : undefined,
-      },
+    // Khoá lạc quan: chỉ ghi nếu đơn chưa bị ai sửa kể từ lúc đọc (updatedAt không đổi). Hai nhân viên bấm gần như
+    // cùng lúc ("Đã giao" và "Huỷ") → người sau nhận lỗi thay vì vượt qua bảng chuyển trạng thái dựa trên dữ liệu cũ.
+    await this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.order.updateMany({
+        where: { id, updatedAt: order.updatedAt },
+        data: {
+          status: dto.status,
+          paymentStatus: dto.paymentStatus,
+          shippingFee,
+          discount,
+          total: order.subtotal + shippingFee - discount,
+          internalNote: dto.internalNote,
+        },
+      });
+      if (count === 0) {
+        throw new ConflictException('Đơn hàng vừa được người khác cập nhật. Tải lại trang để xem trạng thái mới rồi thử lại.');
+      }
+      if (statusChanged) {
+        await tx.orderStatusLog.create({
+          data: { orderId: id, fromStatus: order.status, toStatus: dto.status!, note: dto.note ?? '', changedById: userId },
+        });
+      }
     });
+    const updated = await this.findById(id);
     this.realtime.publishAdmin({ type: 'order.updated', id, orderNumber: updated.orderNumber, status: updated.status });
-    return this.findById(id);
+    return updated;
   }
 }

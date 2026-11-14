@@ -27,6 +27,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
   return {
     title: post.title,
     description: post.excerpt || undefined,
+    alternates: { canonical: `/news/${post.slug}` },
     openGraph: post.coverImage ? { images: [post.coverImage] } : undefined,
   };
 }

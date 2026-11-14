@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer';
 import { ArrayUnique, IsArray, IsBoolean, IsEmail, IsIn, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { STAFF_PERMISSIONS, type StaffPermission } from '@frozen-fruit-shop/types';
 import { PASSWORD_MIN_LENGTH } from '../auth/auth.dto.js';
-import { Trim } from '../common/validators.js';
+import { IsBcryptSafe, Trim } from '../common/validators.js';
 
 export class CreateStaffDto {
   @Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
@@ -17,7 +17,7 @@ export class CreateStaffDto {
 
   @IsString()
   @MinLength(PASSWORD_MIN_LENGTH, { message: `Mật khẩu phải có ít nhất ${PASSWORD_MIN_LENGTH} ký tự` })
-  @MaxLength(200)
+  @IsBcryptSafe()
   password!: string;
 
   /** Mục nhân viên được dùng; bỏ trống = chưa cấp quyền nào (chỉ vào được Tài khoản của tôi). */
@@ -50,6 +50,6 @@ export class UpdateStaffDto {
 export class ResetPasswordDto {
   @IsString()
   @MinLength(PASSWORD_MIN_LENGTH, { message: `Mật khẩu phải có ít nhất ${PASSWORD_MIN_LENGTH} ký tự` })
-  @MaxLength(200)
+  @IsBcryptSafe()
   password!: string;
 }

@@ -6,6 +6,8 @@ export class PaginationQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  // Trang quá lớn làm OFFSET vượt giới hạn số nguyên → lỗi 500.
+  @Max(10_000)
   page = 1;
 
   @IsOptional()

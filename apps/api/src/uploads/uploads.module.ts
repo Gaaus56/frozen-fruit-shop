@@ -12,7 +12,7 @@ import { randomBytes } from 'node:crypto';
 import sharp from 'sharp';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { Auth } from '../auth/auth.guard.js';
+import { Auth, Permission } from '../auth/auth.guard.js';
 import { env } from '../config/env.js';
 import { toPublicUrl } from '../common/utils.js';
 import { RateLimit } from '../common/rate-limit.guard.js';
@@ -36,6 +36,12 @@ function detectImageType(buffer: Buffer): 'jpg' | 'png' | 'webp' | 'gif' | null 
   return null;
 }
 
+/**
+ * Số điểm ảnh tối đa được giải nén (40 MP ≈ 7.700×5.200). Chặn "bom giải nén": file PNG vài MB khai báo
+ * kích thước khổng lồ làm sharp cấp phát hàng GB RAM. Ảnh điện thoại 48 MP thường đã bị thu nhỏ khi tải qua trình duyệt.
+ */
+const MAX_INPUT_PIXELS = 50_000_000;
+
 /** Cạnh dài tối đa sau khi nén: đủ nét cho banner toàn màn hình / ảnh sản phẩm phóng to. */
 const MAX_EDGE = 2000;
 const WEBP_QUALITY = 82;
@@ -49,13 +55,16 @@ const WEBP_QUALITY = 82;
 async function compressImage(input: Buffer, type: 'jpg' | 'png' | 'webp' | 'gif'): Promise<{ buffer: Buffer; ext: string }> {
   if (type === 'gif') return { buffer: input, ext: 'gif' };
   try {
-    const output = await sharp(input, { failOn: 'error' })
+    const output = await sharp(input, { failOn: 'error', limitInputPixels: MAX_INPUT_PIXELS })
       .rotate()
       .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
       .webp({ quality: WEBP_QUALITY, effort: 4 })
       .toBuffer();
     return output.length < input.length ? { buffer: output, ext: 'webp' } : { buffer: input, ext: type };
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && /pixel limit/i.test(error.message)) {
+      throw new BadRequestException('Ảnh có kích thước quá lớn (tối đa khoảng 50 megapixel), vui lòng thu nhỏ ảnh rồi tải lại.');
+    }
     throw new BadRequestException('File ảnh bị hỏng hoặc không đọc được, vui lòng chọn ảnh khác.');
   }
 }
@@ -84,6 +93,8 @@ export class UploadsService {
 
 @Controller('admin/uploads')
 @Auth()
+// Chỉ người được sửa nội dung có ảnh (ADMIN luôn qua) — nhân viên chưa được cấp quyền nào không tải ảnh lên được.
+@Permission('products', 'categories', 'banners', 'homeBlocks', 'posts', 'pages', 'policies')
 export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
 

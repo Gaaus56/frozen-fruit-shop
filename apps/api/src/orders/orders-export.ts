@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs';
+import type { Writable } from 'node:stream';
 import type { Prisma } from '@prisma/client';
 import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from '@frozen-fruit-shop/types';
 
@@ -9,6 +10,9 @@ const DATE_TIME = 'dd/mm/yyyy hh:mm';
 const HEADER_FILL: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCF2A10' } };
 
 /** Excel không có múi giờ: dời giờ UTC sang giờ Việt Nam để ô ngày hiện đúng giờ khách đặt. */
+/** Cố định dòng tiêu đề khi cuộn — sheet ghi dạng stream chỉ nhận views lúc tạo sheet. */
+const SHEET_OPTIONS: Partial<ExcelJS.AddWorksheetOptions> = { views: [{ state: 'frozen', ySplit: 1 }] };
+
 const vnTime = (date: Date) => new Date(date.getTime() + 7 * 3600_000);
 
 function styleHeader(sheet: ExcelJS.Worksheet) {
@@ -17,21 +21,23 @@ function styleHeader(sheet: ExcelJS.Worksheet) {
   header.fill = HEADER_FILL;
   header.alignment = { vertical: 'middle' };
   header.height = 22;
-  sheet.views = [{ state: 'frozen', ySplit: 1 }];
-  sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: sheet.columnCount } };
+  sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: sheet.columns.length } };
 }
 
 /**
  * File Excel đơn hàng cho chủ cửa hàng: sheet "Đơn hàng" (một dòng mỗi đơn + dòng tổng không tính đơn huỷ)
  * và sheet "Chi tiết sản phẩm" (một dòng mỗi món) để lọc / cộng theo sản phẩm.
+ *
+ * Ghi thẳng ra `out` (response HTTP) theo từng lô đơn — không dựng cả file trong RAM, nên xuất hàng chục nghìn đơn
+ * vẫn chạy được trên máy chủ ít bộ nhớ. `batches()` được gọi hai lần (mỗi sheet một lượt), phải trả cùng dữ liệu.
  */
-export async function buildOrdersWorkbook(rows: ExportRow[], title: string): Promise<Buffer> {
-  const book = new ExcelJS.Workbook();
+export async function streamOrdersWorkbook(out: Writable, batches: () => AsyncIterable<ExportRow[]>, title: string): Promise<void> {
+  const book = new ExcelJS.stream.xlsx.WorkbookWriter({ stream: out, useStyles: true, useSharedStrings: false });
   book.creator = 'Trái Cây Đông Lạnh Đà Nẵng 28';
   book.created = new Date();
   book.title = title;
 
-  const orders = book.addWorksheet('Đơn hàng');
+  const orders = book.addWorksheet('Đơn hàng', SHEET_OPTIONS);
   orders.columns = [
     { header: 'Mã đơn', key: 'orderNumber', width: 16 },
     { header: 'Ngày đặt', key: 'createdAt', width: 17, style: { numFmt: DATE_TIME } },
@@ -49,40 +55,51 @@ export async function buildOrdersWorkbook(rows: ExportRow[], title: string): Pro
     { header: 'Ghi chú của khách', key: 'customerNote', width: 30 },
     { header: 'Ghi chú nội bộ', key: 'internalNote', width: 30 },
   ];
-  for (const row of rows) {
-    orders.addRow({
-      orderNumber: row.orderNumber,
-      createdAt: vnTime(row.createdAt),
-      customerName: row.customerName,
-      // Giữ dạng chữ: nếu là số Excel sẽ bỏ số 0 ở đầu.
-      customerPhone: row.customerPhone,
-      customerEmail: row.customerEmail ?? '',
-      shippingAddress: row.shippingAddress,
-      status: ORDER_STATUS_LABELS[row.status],
-      paymentStatus: PAYMENT_STATUS_LABELS[row.paymentStatus],
-      itemCount: row.items.reduce((sum, item) => sum + item.quantity, 0),
-      subtotal: row.subtotal,
-      shippingFee: row.shippingFee,
-      discount: row.discount,
-      total: row.total,
-      customerNote: row.customerNote,
-      internalNote: row.internalNote,
-    });
-  }
   styleHeader(orders);
+  orders.getRow(1).commit();
+
+  let count = 0;
+  let cancelledCount = 0;
+  const sums = { subtotal: 0, shippingFee: 0, discount: 0, total: 0 };
+  for await (const rows of batches()) {
+    for (const row of rows) {
+      count += 1;
+      if (row.status === 'cancelled') cancelledCount += 1;
+      else for (const key of Object.keys(sums) as (keyof typeof sums)[]) sums[key] += row[key];
+      orders
+        .addRow({
+          orderNumber: row.orderNumber,
+          createdAt: vnTime(row.createdAt),
+          customerName: row.customerName,
+          // Giữ dạng chữ: nếu là số Excel sẽ bỏ số 0 ở đầu.
+          customerPhone: row.customerPhone,
+          customerEmail: row.customerEmail ?? '',
+          shippingAddress: row.shippingAddress,
+          status: ORDER_STATUS_LABELS[row.status],
+          paymentStatus: PAYMENT_STATUS_LABELS[row.paymentStatus],
+          itemCount: row.items.reduce((sum, item) => sum + item.quantity, 0),
+          subtotal: row.subtotal,
+          shippingFee: row.shippingFee,
+          discount: row.discount,
+          total: row.total,
+          customerNote: row.customerNote,
+          internalNote: row.internalNote,
+        })
+        .commit();
+    }
+  }
 
   // Dòng tổng: công thức SUMIFS bỏ đơn "Đã huỷ" (vẫn đúng khi chủ cửa hàng sửa trong Excel), kèm kết quả tính sẵn.
-  if (rows.length > 0) {
-    const last = rows.length + 1;
-    const valid = rows.filter((row) => row.status !== 'cancelled');
+  if (count > 0) {
+    const last = count + 1;
     const cancelled = ORDER_STATUS_LABELS.cancelled;
-    const sumOf = (column: string, key: 'subtotal' | 'shippingFee' | 'discount' | 'total') => ({
+    const sumOf = (column: string, key: keyof typeof sums) => ({
       formula: `SUMIFS(${column}2:${column}${last},G2:G${last},"<>${cancelled}")`,
-      result: valid.reduce((sum, row) => sum + row[key], 0),
+      result: sums[key],
     });
     const totalRow = orders.addRow({
       orderNumber: 'TỔNG CỘNG',
-      customerName: `${valid.length} đơn (không tính ${rows.length - valid.length} đơn huỷ)`,
+      customerName: `${count - cancelledCount} đơn (không tính ${cancelledCount} đơn huỷ)`,
       subtotal: sumOf('J', 'subtotal'),
       shippingFee: sumOf('K', 'shippingFee'),
       discount: sumOf('L', 'discount'),
@@ -90,9 +107,11 @@ export async function buildOrdersWorkbook(rows: ExportRow[], title: string): Pro
     });
     totalRow.font = { bold: true };
     totalRow.border = { top: { style: 'thin' } };
+    totalRow.commit();
   }
+  orders.commit();
 
-  const items = book.addWorksheet('Chi tiết sản phẩm');
+  const items = book.addWorksheet('Chi tiết sản phẩm', SHEET_OPTIONS);
   items.columns = [
     { header: 'Mã đơn', key: 'orderNumber', width: 16 },
     { header: 'Ngày đặt', key: 'createdAt', width: 17, style: { numFmt: DATE_TIME } },
@@ -103,21 +122,27 @@ export async function buildOrdersWorkbook(rows: ExportRow[], title: string): Pro
     { header: 'Đơn giá', key: 'unitPrice', width: 13, style: { numFmt: MONEY } },
     { header: 'Thành tiền', key: 'lineTotal', width: 14, style: { numFmt: MONEY } },
   ];
-  for (const row of rows) {
-    for (const item of row.items) {
-      items.addRow({
-        orderNumber: row.orderNumber,
-        createdAt: vnTime(row.createdAt),
-        status: ORDER_STATUS_LABELS[row.status],
-        productName: item.productName,
-        packageSize: item.packageSize,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        lineTotal: item.lineTotal,
-      });
+  styleHeader(items);
+  items.getRow(1).commit();
+  for await (const rows of batches()) {
+    for (const row of rows) {
+      for (const item of row.items) {
+        items
+          .addRow({
+            orderNumber: row.orderNumber,
+            createdAt: vnTime(row.createdAt),
+            status: ORDER_STATUS_LABELS[row.status],
+            productName: item.productName,
+            packageSize: item.packageSize,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            lineTotal: item.lineTotal,
+          })
+          .commit();
+      }
     }
   }
-  styleHeader(items);
+  items.commit();
 
-  return Buffer.from(await book.xlsx.writeBuffer());
+  await book.commit();
 }

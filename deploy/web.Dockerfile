@@ -6,6 +6,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+# Địa chỉ web (sitemap.xml, robots.txt, link chia sẻ).
+ARG NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
 
 COPY package.json package-lock.json ./
 COPY packages ./packages

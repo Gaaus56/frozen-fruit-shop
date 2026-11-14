@@ -161,6 +161,15 @@ export function Footer({ settings, policies }: { settings: SiteSettings; policie
                 allow="encrypted-media"
               />
             </div>
+            {/* Facebook có thể không hiện khung cho khách chưa đăng nhập Facebook / trình duyệt chặn cookie bên thứ ba — luôn có link mở thẳng. */}
+            <a
+              href={settings.facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-block text-sm font-semibold text-white/80 underline-offset-4 hover:text-white hover:underline"
+            >
+              Mở Fanpage trên Facebook ↗
+            </a>
           </div>
         ) : null}
       </Container>

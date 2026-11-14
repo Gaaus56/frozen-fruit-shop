@@ -1,7 +1,23 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs/config";
 
+/**
+ * Header bảo mật cho mọi trang quản trị: không cho trang khác nhúng admin vào iframe (chống lừa bấm nút
+ * "Huỷ đơn", "Xoá nhân viên" — clickjacking), không đoán kiểu file, không gửi đường dẫn admin sang trang ngoài.
+ */
+const SECURITY_HEADERS = [
+  { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "same-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+];
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+  },
   experimental: {
     serverActions: {
       // Ảnh tải lên tối đa 5MB (API cũng giới hạn 5MB) + phần đệm của multipart.

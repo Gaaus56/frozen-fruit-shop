@@ -2,6 +2,9 @@ import { API_URL } from "@/lib/api";
 import { getToken } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
+// Trên Vercel kết nối bị cắt sau thời lượng tối đa của function; trình duyệt tự nối lại (shared-event-source) và tải
+// lại dữ liệu nếu có thể đã lỡ sự kiện. Giới hạn rõ 5 phút để không bị tính phí chạy liên tục. Máy chủ riêng bỏ qua.
+export const maxDuration = 300;
 
 /**
  * Chuyển tiếp luồng sự kiện realtime của API (GET /admin/events) tới trình duyệt. Token nằm trong cookie

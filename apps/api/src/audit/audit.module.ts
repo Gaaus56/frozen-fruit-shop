@@ -7,6 +7,8 @@ import {
   Logger,
   Module,
   NestInterceptor,
+  OnModuleDestroy,
+  OnModuleInit,
   Query,
 } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -187,7 +189,7 @@ export class AuditInterceptor implements NestInterceptor {
 }
 
 class AuditQuery {
-  @IsOptional() @Type(() => Number) @IsInt() @Min(1) page?: number;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(10_000) page?: number;
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(100) pageSize?: number;
   @IsOptional() @IsString() userId?: string;
   @IsOptional() @IsString() resource?: string;
@@ -231,8 +233,40 @@ export class AuditController {
   }
 }
 
+/** Lịch sử chỉnh sửa giữ 12 tháng; cũ hơn tự xoá (chạy lúc khởi động rồi mỗi ngày) để bảng không phình mãi. */
+const AUDIT_RETENTION_DAYS = 365;
+
+@Injectable()
+class AuditRetention implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(AuditRetention.name);
+  private timer?: NodeJS.Timeout;
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  onModuleInit() {
+    void this.purge();
+    this.timer = setInterval(() => void this.purge(), 24 * 3600_000);
+    this.timer.unref();
+  }
+
+  onModuleDestroy() {
+    clearInterval(this.timer);
+  }
+
+  private async purge() {
+    try {
+      const { count } = await this.prisma.auditLog.deleteMany({
+        where: { createdAt: { lt: new Date(Date.now() - AUDIT_RETENTION_DAYS * 24 * 3600_000) } },
+      });
+      if (count > 0) this.logger.log(`Đã xoá ${count} dòng lịch sử chỉnh sửa cũ hơn ${AUDIT_RETENTION_DAYS} ngày`);
+    } catch (error) {
+      this.logger.warn(`Không dọn được lịch sử chỉnh sửa: ${String(error)}`);
+    }
+  }
+}
+
 @Module({
   controllers: [AuditController],
-  providers: [{ provide: APP_INTERCEPTOR, useClass: AuditInterceptor }],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: AuditInterceptor }, AuditRetention],
 })
 export class AuditModule {}

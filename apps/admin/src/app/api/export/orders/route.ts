@@ -1,5 +1,5 @@
 import { API_URL } from "@/lib/api";
-import { getToken } from "@/lib/session";
+import { clientIpHeaders, getToken } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   let upstream: Response;
   try {
     upstream = await fetch(`${API_URL}/admin/orders/export?${params.toString()}`, {
-      headers: { authorization: `Bearer ${token}` },
+      headers: { authorization: `Bearer ${token}`, ...(await clientIpHeaders()) },
       cache: "no-store",
     });
   } catch {

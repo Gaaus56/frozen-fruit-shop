@@ -10,6 +10,7 @@ import { ProductGallery } from "@/components/product/product-gallery";
 import { AddToCartForm } from "@/components/product/add-to-cart-form";
 import { fillSettingsPlaceholders } from "@frozen-fruit-shop/types";
 import { getPolicies, getProduct, getSettings } from "@/lib/api";
+import { SITE_URL } from "@/lib/site-url";
 import { editSettings, editTarget } from "@/lib/edit-target";
 import { AssuranceIconView } from "@/components/ui/line-icon";
 
@@ -25,6 +26,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   return {
     title: product.name,
     description: product.shortDescription || undefined,
+    alternates: { canonical: `/products/${product.slug}` },
     openGraph: product.images[0] ? { images: [product.images[0].url] } : undefined,
   };
 }
@@ -53,8 +55,40 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     { label: "Rã đông", value: storageInfo.thawInstructions },
   ].filter((spec) => spec.value);
 
+  // Dữ liệu cấu trúc cho Google (giá, còn hàng) — có thể hiện giá ngay trên kết quả tìm kiếm.
+  const prices = product.variants.map((variant) => variant.price);
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.shortDescription || undefined,
+    image: product.images.map((image) => image.url),
+    category: product.category.name,
+    brand: { "@type": "Brand", name: settings.storeName },
+    ...(prices.length > 0
+      ? {
+          offers: {
+            "@type": "AggregateOffer",
+            priceCurrency: "VND",
+            lowPrice: Math.min(...prices),
+            highPrice: Math.max(...prices),
+            offerCount: prices.length,
+            availability: product.variants.some((variant) => variant.stockStatus !== "out_of_stock")
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+            url: `${SITE_URL}/products/${product.slug}`,
+          },
+        }
+      : {}),
+  };
+
   return (
     <Container className="flex flex-col gap-6 py-6 sm:py-8 lg:py-12">
+      <script
+        type="application/ld+json"
+        // JSON do server tạo; thay "<" để chuỗi trong dữ liệu không đóng được thẻ script.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd).replace(/</g, "\\u003c") }}
+      />
       {/* Khung trắng bo góc giống các khối ở trang chủ (SectionCard): ảnh + thông tin mua hàng. */}
       <section
         {...editTarget("product", product.id, `Sản phẩm: ${product.name}`)}

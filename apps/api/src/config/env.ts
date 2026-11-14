@@ -58,4 +58,9 @@ export const env = {
   uploadDir: isAbsolute(uploadDir) ? uploadDir : resolve(process.cwd(), uploadDir),
   webRevalidateUrl: process.env.WEB_REVALIDATE_URL ?? '',
   revalidateSecret: process.env.REVALIDATE_SECRET ?? '',
+  /**
+   * Khoá dùng chung với server admin: admin gọi API thay trình duyệt (đăng nhập, server action) nên API chỉ thấy IP
+   * của server admin. Có khoá này, admin gửi kèm IP thật của người dùng (x-client-ip) để giới hạn tần suất đúng người.
+   */
+  internalProxySecret: process.env.INTERNAL_PROXY_SECRET ?? '',
 } as const;

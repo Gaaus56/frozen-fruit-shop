@@ -10,6 +10,7 @@ import { NavigationTracker } from "@/components/ui/back-button";
 import { PreviewEditOverlay } from "@/components/layout/preview-edit-overlay";
 import { CartProvider } from "@/lib/cart-context";
 import { getCategories, getPolicies, getSettings } from "@/lib/api";
+import { SITE_URL } from "@/lib/site-url";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -20,6 +21,9 @@ const archivo = Archivo({
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return {
+    // Link ảnh / trang tương đối trong metadata (Open Graph, canonical) được ghép với địa chỉ này.
+    metadataBase: new URL(SITE_URL),
+    openGraph: { siteName: settings.storeName, locale: "vi_VN", type: "website" },
     title: {
       default: `${settings.storeName} — Trái cây đông lạnh chất lượng`,
       template: `%s | ${settings.storeName}`,

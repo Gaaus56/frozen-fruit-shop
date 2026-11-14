@@ -1,5 +1,6 @@
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { IsBcryptSafe } from '../common/validators.js';
 
 export const PASSWORD_MIN_LENGTH = 8;
 
@@ -21,7 +22,7 @@ export class ChangePasswordDto {
 
   @IsString()
   @MinLength(PASSWORD_MIN_LENGTH, { message: `Mật khẩu mới phải có ít nhất ${PASSWORD_MIN_LENGTH} ký tự` })
-  @MaxLength(200)
+  @IsBcryptSafe()
   newPassword!: string;
 }
 

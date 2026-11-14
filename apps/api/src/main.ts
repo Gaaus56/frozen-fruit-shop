@@ -9,6 +9,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AppModule } from './app.module.js';
 import { PrismaExceptionFilter } from './common/prisma-exception.filter.js';
+import { vietnameseValidationErrors } from './common/validation.js';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: true });
@@ -51,6 +52,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transform: true,
       stopAtFirstError: true,
+      // Lỗi validate luôn bằng tiếng Việt (kể cả decorator chưa khai báo message) — xem common/validation.ts.
+      exceptionFactory: vietnameseValidationErrors,
     }),
   );
   app.enableShutdownHooks();

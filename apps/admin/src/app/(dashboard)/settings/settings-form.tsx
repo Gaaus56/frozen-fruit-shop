@@ -67,7 +67,7 @@ export function SettingsForm({ settings, linkGroups }: { settings: SiteSettings;
         </div>
       </Section>
 
-      <Section id="address" title="Địa chỉ">
+      <Section id="address-section" title="Địa chỉ">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Địa chỉ cửa hàng" htmlFor="address">
             <input id="address" name="address" maxLength={200} defaultValue={settings.address} className={inputClass} />

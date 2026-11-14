@@ -1,7 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { OTP_REQUIRED } from "@frozen-fruit-shop/types";
-import { getToken } from "./session";
+import { clientIpHeaders, getToken } from "./session";
 
 export const API_URL = (process.env.API_URL || "http://localhost:4000").replace(/\/$/, "");
 
@@ -33,6 +33,7 @@ export async function api<T>(path: string, init: RequestInit & { json?: unknown 
   const { json, ...rest } = init;
   const headers = new Headers(rest.headers);
   if (token) headers.set("authorization", `Bearer ${token}`);
+  for (const [name, value] of Object.entries(await clientIpHeaders())) headers.set(name, value);
   if (json !== undefined) headers.set("content-type", "application/json");
 
   let res: Response;

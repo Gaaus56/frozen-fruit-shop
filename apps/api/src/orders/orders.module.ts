@@ -44,14 +44,22 @@ export class AdminOrdersController {
   @Get('export')
   @RateLimit(10, 60)
   async export(@Query() query: AdminOrderQuery, @Res() res: Response) {
-    const { buffer, fileName } = await this.service.exportExcel(query);
-    res
-      .set({
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="${fileName}"`,
-        'Cache-Control': 'no-store',
-      })
-      .send(buffer);
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename="${this.service.exportFileName()}"`,
+      'Cache-Control': 'no-store',
+    });
+    try {
+      await this.service.exportExcel(query, res);
+    } catch (error) {
+      // Lỗi trước khi gửi byte nào → trả lỗi JSON như thường; lỗi giữa chừng → cắt kết nối (file tải về sẽ báo hỏng).
+      if (!res.headersSent) {
+        res.removeHeader('Content-Disposition');
+        res.set('Content-Type', 'application/json; charset=utf-8');
+        throw error;
+      }
+      res.destroy(error instanceof Error ? error : undefined);
+    }
   }
 
   @Get(':id')
