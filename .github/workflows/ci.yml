@@ -39,5 +39,8 @@ jobs:
         run: npx prisma generate
         working-directory: apps/api
 
+      - name: Unit tests api (orders, auth) + coverage
+        run: npm run test:coverage -w apps/api
+
       - name: Build api
         run: npm run build:api

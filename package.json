@@ -15,6 +15,7 @@
     "build:web": "npm run build -w apps/web",
     "build:api": "npm run build -w apps/api",
     "build:admin": "npm run build -w apps/admin",
+    "test:api": "npm run test -w apps/api",
     "lint:web": "npm run lint -w apps/web",
     "lint:admin": "npm run lint -w apps/admin",
     "db:up": "docker compose up -d",

@@ -13,6 +13,8 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main.js",
+    "test": "node --import tsx --import ./test/setup.ts --test \"test/*.test.ts\"",
+    "test:coverage": "node --import tsx --import ./test/setup.ts --test --experimental-test-coverage --test-coverage-include=\"src/**/*.ts\" \"test/*.test.ts\"",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:create-admin": "tsx prisma/create-admin.ts",
